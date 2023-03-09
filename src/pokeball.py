@@ -28,7 +28,7 @@ class BasePokeball(ABC):
         return self._catching_pkmn.catch_rate
 
 
-class Pokeball(BasePokeball):
+class PokeBall(BasePokeball):
     def __init__(self, catching_pkmn: Pokemon):
         super().__init__(catching_pkmn)
         self._name = "Pokeball"

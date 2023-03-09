@@ -1,11 +1,11 @@
 from .pokemon import Pokemon
-from .pokeball import BasePokeball, Pokeball, UltraBall, FastBall, HeavyBall
+from .pokeball import BasePokeball, PokeBall, UltraBall, FastBall, HeavyBall
 from typing import Tuple
 import random
 import numpy as np
 
 _POKEBALL = {
-    "pokeball": lambda x: Pokeball(x),
+    "pokeball": lambda x: PokeBall(x),
     "ultraball": lambda x: UltraBall(x),
     "fastball": lambda x: FastBall(x),
     "heavyball": lambda x: HeavyBall(x),
