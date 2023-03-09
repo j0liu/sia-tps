@@ -9,6 +9,7 @@ matplotlib = "*"
 seaborn = "*"
 jupyter = "*"
 notebook = "*"
+pandas = "*"
 
 [dev-packages]
 
