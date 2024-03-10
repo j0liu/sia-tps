@@ -53,19 +53,30 @@ pokemon_pokeball_matrix = createMatrix(TRIES)
 
 
 df = pd.DataFrame(pokemon_pokeball_matrix)
+original_df = df.copy()
 df = df.applymap(lambda x: x / TRIES)
 jolteon_stats_df = df["jolteon"].copy().map(lambda x: x/df["jolteon"]["pokeball"]).to_frame()
 snorlax_stats_df = df["snorlax"].copy().map(lambda x: x/df["snorlax"]["pokeball"]).to_frame()
-# df
-# snorlax_stats_df
-# jolteon_stats_df
 
-df.plot.hist(
-    bins=30,
-    alpha=0.5,
-    title="Efficiency of pokeballs when catching Snorlax"
-)
+jolteon_stats_df
+jolteon_stats_df.reset_index(inplace=True)
+jolteon_stats_df.columns = ["Pokeball", "Efficiency"]
+jolteon_stats_df.plot.bar(x="Pokeball", y="Efficiency", 
+                          ylim=(0, 5),
+                          title="Efficiency of pokeballs when catching Jolteon",
+                          ylabel="Relative efficiency",
+                          color=['blue', 'red', 'green', 'orange'],
+                          legend=False)
 
+snorlax_stats_df
+snorlax_stats_df.reset_index(inplace=True)
+snorlax_stats_df.columns = ["Pokeball", "Efficiency"]
+snorlax_stats_df.plot.bar(x="Pokeball", y="Efficiency", 
+                          ylim=(0, 5),
+                          title="Efficiency of pokeballs when catching Snorlax",
+                          ylabel="Relative efficiency",
+                          color=['blue', 'red', 'green', 'orange'],
+                          legend=False)
 plt.show()
 
 # %%
