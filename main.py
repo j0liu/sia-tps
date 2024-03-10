@@ -29,10 +29,10 @@ def create_pokemon_pokeball_matrix(tries, level = 100, status_effect = StatusEff
                 pokemon_pokeball_matrix[name][ball] += attempt_catch(pokemon, ball)[0]
     return pokemon_pokeball_matrix
 
-def create_pokemon_status_matrix(tries, level = 100, ball = 'pokeball', health_points = 1):
+def create_pokemon_status_matrix(tries, level = 100, ball = 'pokeball', health_points = 1, names = pokemon_names):
     pokemon_status_matrix = {} 
 
-    for name in pokemon_names:
+    for name in names: 
         pokemon_status_matrix[name] = {}
         for status_effect in StatusEffect:
             pokemon = factory.create(name, level, status_effect, health_points)
@@ -53,6 +53,18 @@ def create_pokemon_health_matrix(tries, level = 100, ball = 'pokeball', status_e
                 pokemon_status_matrix[name][health] += attempt_catch(pokemon, ball)[0]
     return pokemon_status_matrix
 
+def create_pokemon_level_matrix(tries, ball = 'pokeball', status_effect = StatusEffect.NONE, names = pokemon_names, health_points = 1):
+    pokemon_status_matrix = {} 
+
+    for name in names:
+        pokemon_status_matrix[name] = {}
+        for level in range(1, 100):
+            pokemon = factory.create(name, level, status_effect, health_points)
+            pokemon_status_matrix[name][level] = 0
+            for _ in range(tries):
+                pokemon_status_matrix[name][level] += attempt_catch(pokemon, ball)[0]
+    return pokemon_status_matrix
+
 
 # In[1]: Exercise 1a
 
@@ -67,8 +79,21 @@ df = pd.DataFrame(pokemon_pokeball_matrix).transpose()
 for ball in pokeballs:
     pokeball_stats[ball] = f"{df[ball].sum() / len(pokemon_names):.2f}%"
 
-catchRateDf = pd.DataFrame(pokeball_stats, index=["Catch Rate"])
-catchRateDf
+catch_rate_df = pd.DataFrame(pokeball_stats, index=["Catch Rate"])
+catch_rate_df
+
+cdft = catch_rate_df.applymap(lambda x: float(x[:-1])).transpose()
+cdft.reset_index(inplace=True)
+cdft.columns = ["Pokeball", "Catch Rate"]
+
+cdft.plot.bar(
+    x="Pokeball",
+    y="Catch Rate",
+    ylim=(0, 50),
+    title="Catch rate of pokeballs",
+    legend=False,
+    color=['blue', 'red', 'green', 'orange'],
+)
 
 
 #In[2] Exercise 1b
@@ -139,12 +164,7 @@ pokemon_health_matrix = create_pokemon_health_matrix(tries=TRIES, names=["jolteo
 df = pd.DataFrame(pokemon_health_matrix)
 df = df.apply(lambda x: 100 * x / TRIES)
 
-# df.reset_index(inplace=True)
-# df.columns = ["hp", "jolteon", "snorlax"]
-
 df.plot(title="Health of pokemon when catching",
-                # x="hp", 
-                # y=["jolteon", "snorlax"],
         yticks=[i for i in range(0, 30, 3)],  # Set y-axis ticks from 0 to 100 by 10
         ylabel="Catch rate %",
         xlabel="Health",
@@ -155,4 +175,73 @@ df.plot(title="Health of pokemon when catching",
 plt.show()
 
 
-# %%
+# In[5] Exercise 2c 
+
+TRIES = 1000
+
+pokemon_status_matrix = create_pokemon_status_matrix(tries=TRIES)
+
+df = pd.DataFrame(pokemon_status_matrix)
+df = df.apply(lambda x: 100 * x / TRIES)
+
+mf = df.mean(axis=1).to_frame()
+mf.columns = ["Average"]
+
+mf.plot.bar(y="Average", 
+            ylim=(0, 50),
+            title="Average and standard deviation of status effects",
+            color=['blue', 'red', 'green', 'orange', 'purple'],
+            legend=False)
+
+pokemon_level_matrix = create_pokemon_level_matrix(tries=TRIES)
+
+df = pd.DataFrame(pokemon_level_matrix)
+df = df.apply(lambda x: 100 * x / TRIES)
+
+mf = df.mean(axis=1).to_frame()
+mf.columns = ["Average"]
+
+mf.plot(y="Average", 
+            ylim=(0, 50),
+            title="Average and standard deviation of levels",
+            color=['blue', 'red', 'green', 'orange', 'purple'],
+            style=['o'],
+            legend=False)
+
+
+plt.show()
+
+
+
+# In[6] Exercise 2d - Jolteon
+TRIES = 10_000
+
+jolteon_matrix = create_pokemon_status_matrix(tries=TRIES, names=['jolteon'], health_points=0.5, ball='fastball')
+df_jolteon = pd.DataFrame([jolteon_matrix['jolteon']]).apply(lambda x: 100 * x / TRIES).transpose()
+df_jolteon.columns = ["Catch rate"]
+df_jolteon
+
+# In[7] Exercise 2d - Snorlax
+TRIES = 10_000
+
+snorlax_matrix = create_pokemon_status_matrix(tries=TRIES, names=['snorlax'], health_points=0.5, ball='heavyball')
+df_snorlax = pd.DataFrame([snorlax_matrix['snorlax']]).apply(lambda x: 100 * x / TRIES).transpose()
+df_snorlax.columns = ["Catch rate"]
+df_snorlax
+
+
+# In[8] Exercise 2e - Jolteon 
+TRIES = 100_000
+
+jolteon_matrix = create_pokemon_level_matrix(tries=TRIES, names=['jolteon'], health_points=0.5, ball='fastball', status_effect=StatusEffect.SLEEP)
+df_jolteon = pd.DataFrame([jolteon_matrix['jolteon']]).apply(lambda x: 100 * x / TRIES).transpose()
+df_jolteon.columns = ["Catch rate"]
+df_jolteon.std()
+
+# In[8] Exercise 2e - Jolteon 
+TRIES = 100_000
+
+snorlax_matrix = create_pokemon_level_matrix(tries=TRIES, names=['snorlax'], health_points=0.5, ball='heavyball', status_effect=StatusEffect.SLEEP)
+df_snorlax = pd.DataFrame([snorlax_matrix['snorlax']]).apply(lambda x: 100 * x / TRIES).transpose()
+df_snorlax.columns = ["Catch rate"]
+df_snorlax.std()
