@@ -5,6 +5,8 @@ import json
 from functools import reduce
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 factory = PokemonFactory("pokemon.json")
 
@@ -37,6 +39,18 @@ def create_pokemon_status_matrix(tries, level = 100, ball = 'pokeball', health_p
             pokemon_status_matrix[name][status_effect] = 0
             for _ in range(tries):
                 pokemon_status_matrix[name][status_effect] += attempt_catch(pokemon, ball)[0]
+    return pokemon_status_matrix
+    
+def create_pokemon_health_matrix(tries, level = 100, ball = 'pokeball', status_effect = StatusEffect.NONE, names = pokemon_names):
+    pokemon_status_matrix = {} 
+
+    for name in names:
+        pokemon_status_matrix[name] = {}
+        for health in [x / 100.0 for x in range(1, 100)]:
+            pokemon = factory.create(name, level, status_effect, health)
+            pokemon_status_matrix[name][health] = 0
+            for _ in range(tries):
+                pokemon_status_matrix[name][health] += attempt_catch(pokemon, ball)[0]
     return pokemon_status_matrix
 
 
@@ -118,3 +132,27 @@ status_effect_stats.plot.bar(y="Average",
 
 # In[4] Exercise 2b 
 
+TRIES = 10_000
+
+pokemon_health_matrix = create_pokemon_health_matrix(tries=TRIES, names=["jolteon", "snorlax"])
+
+df = pd.DataFrame(pokemon_health_matrix)
+df = df.apply(lambda x: 100 * x / TRIES)
+
+# df.reset_index(inplace=True)
+# df.columns = ["hp", "jolteon", "snorlax"]
+
+df.plot(title="Health of pokemon when catching",
+                # x="hp", 
+                # y=["jolteon", "snorlax"],
+        yticks=[i for i in range(0, 30, 3)],  # Set y-axis ticks from 0 to 100 by 10
+        ylabel="Catch rate %",
+        xlabel="Health",
+        style=['o', 'o'],
+        legend=False)
+
+
+plt.show()
+
+
+# %%
