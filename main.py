@@ -7,7 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 factory = PokemonFactory("pokemon.json")
 
 with open("pokemon.json", "r") as c:
@@ -75,12 +74,16 @@ TRIES = 100
 pokeball_stats = {}
 pokemon_pokeball_matrix = create_pokemon_pokeball_matrix(tries=TRIES)
 df = pd.DataFrame(pokemon_pokeball_matrix).transpose()
+df
 
 for ball in pokeballs:
     pokeball_stats[ball] = f"{df[ball].sum() / len(pokemon_names):.2f}%"
 
 catch_rate_df = pd.DataFrame(pokeball_stats, index=["Catch Rate"])
 catch_rate_df
+
+# In[1] Exercise 1a - Plot
+
 
 cdft = catch_rate_df.applymap(lambda x: float(x[:-1])).transpose()
 cdft.reset_index(inplace=True)
