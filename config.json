@@ -1,0 +1,25 @@
+{
+    "ejercicio1a":{
+      "tries": 100
+    },
+    "ejercicio1b":{
+      "tries": 1000
+    },
+    "ejercicio2a":{
+      "tries": 10000
+    },
+    "ejercicio2b":{
+      "tries": 10000
+    },
+    "ejercicio2c":{
+      "tries": 1000
+    },
+    "ejercicio2d":{
+      "tries": 10000
+    },
+    "ejercicio2e":{
+      "tries": 10000
+    }
+   
+
+}
