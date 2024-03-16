@@ -16,7 +16,7 @@ objetivo de evaluar la función de captura de un Pokemon.
 
 
 ### Alumnos
-- Dithurbide, Manuel - 62057
+- Dithurbide, Manuel Esteban - 62057
 - Liu, Jonathan Daniel - 62533
 - Vilamowski, Abril - 62495
 - Wischñevsky, David - 62494
