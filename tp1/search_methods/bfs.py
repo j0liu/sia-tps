@@ -1,5 +1,3 @@
-#from node import Node
-
 def search(initial_node):
     border = [initial_node]
     visited = []

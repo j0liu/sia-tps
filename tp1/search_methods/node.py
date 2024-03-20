@@ -11,6 +11,6 @@ class Node(ABC):
     @abstractmethod    
     def expand(self):
         pass
-    
+
     def __eq__(self, other):
         return self.state == other.state

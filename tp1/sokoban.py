@@ -10,10 +10,10 @@ class Direction(object):
 class Entity(object):
     SPACE = ' '
     WALL = '#'
-    BOX = 'b'
-    PLAYER = 'p'
-    GOAL = 'g'
-    BOX_ON_GOAL = '!'
+    BOX = '▧'
+    PLAYER = '☺'
+    GOAL = '!'
+    BOX_ON_GOAL = '★'
     PLAYER_ON_GOAL = 'x'
 
 def sum_tuples(t1, t2):
@@ -28,6 +28,7 @@ def has_box(matrix, pos):
 def can_move(matrix, pos):
     return pos[0] >= 0 and pos[0] < matrix.shape[0] and pos[1] >= 0 and pos[1] < matrix.shape[1] and matrix[pos] != Entity.WALL and not has_box(matrix, pos) 
 
+
 def move_box(matrix, old, new):
     matrix[old] = Entity.SPACE if matrix[old] == Entity.BOX else Entity.GOAL
     matrix[new] = Entity.BOX if matrix[new] == Entity.SPACE else Entity.BOX_ON_GOAL
@@ -36,46 +37,53 @@ def move_player(matrix, old, new):
     matrix[old] = Entity.SPACE if matrix[old] == Entity.PLAYER else Entity.GOAL
     matrix[new] = Entity.PLAYER if matrix[new] == Entity.SPACE else Entity.PLAYER_ON_GOAL
 
+def m_distance(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+
+def manhattan_heuristic(node):
+    state = node.state
+    distance = 0
+    for box in state.boxes:
+        distance += min([m_distance(box, goal) for goal in state.goals])
+    return distance
+
+def euclidean_heuristic(node):
+    state = node.state
+    distance = 0
+    for box in state.boxes:
+        distance += min([np.linalg.norm(np.array(box) - np.array(goal)) for goal in state.goals])
+    return distance
+
 class SokobanState(object):
     def __init__(self, matrix) -> None:
         self.matrix = matrix
-        self.player = self.find_player()
-        # self.goals = self.find_goals()
-        #self.boxes = self.find_boxes()
-    
+        self.goals = []
+        self.boxes = []
+        self.boxes_on_goal = []
+        for t, cell in np.ndenumerate(self.matrix):
+            if cell == Entity.PLAYER or cell == Entity.PLAYER_ON_GOAL:
+                self.player = t
+            if cell == Entity.GOAL or cell == Entity.PLAYER_ON_GOAL:
+                self.goals.append(t)
+            elif cell == Entity.BOX:
+                self.boxes.append(t)
+            elif cell == Entity.BOX_ON_GOAL:
+                self.boxes_on_goal.append(t)
+        
     def __eq__(self, other):
         return np.array_equal(self.matrix, other.matrix)
 
     def __print__(self):
         print(self.matrix)
 
-    def find_player(self):
-        for t, cell in np.ndenumerate(self.matrix):
-            if cell == Entity.PLAYER or cell == Entity.PLAYER_ON_GOAL:
-                return t
-
-    
-    def find_goals(self):
-        goals = []
-        for t, cell in np.ndenumerate(self.matrix):
-                if cell == Entity.GOAL or cell == Entity.BOX_ON_GOAL:
-                    goals.append(t)
-        return goals
-    
-    def find_boxes(self):
-        boxes = []
-        for t, cell in np.ndenumerate(self.matrix):
-            if cell == Entity.BOX or cell == Entity.BOX_ON_GOAL:
-                boxes.append(t)
-        return boxes
 
     def is_solution(self):
         for _, cell in np.ndenumerate(self.matrix):
                 if cell == Entity.GOAL or cell == Entity.PLAYER_ON_GOAL or cell == Entity.BOX:
                     return False
         return True
-
-
+        
     def move(self, action):
         new_matrix = self.matrix.copy()
         directions = {

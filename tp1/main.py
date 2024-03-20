@@ -1,7 +1,7 @@
 import numpy as np
-from sokoban import SokobanState, Entity, SokobanNode
+from sokoban import SokobanState, Entity, SokobanNode, manhattan_heuristic, euclidean_heuristic
 
-from search_methods.dfs import search
+from search_methods.greedy import search
 
 
 def parse_sokoban_level(level_file):
@@ -39,8 +39,7 @@ def parse_sokoban_level(level_file):
 
 def main():
     # Your Sokoban level
-    sokoban_level = "tp1/levels/lvl3.txt"
-
+    sokoban_level = "tp1/levels/lvl4.txt"
     # Parse the level
     parsed_level = parse_sokoban_level(sokoban_level)
     initial_matrix = np.matrix(parsed_level)
@@ -50,11 +49,11 @@ def main():
     print(initial_state.player)
 
     initial_node = SokobanNode(initial_state, None, None, 0)
-    solution = search(initial_node)
+
+    solution = search(initial_node, h=euclidean_heuristic)
     print(solution.state.matrix)
     print(solution.cost)
     print(solution.get_sequence())
-
 
 if __name__ == "__main__":
     main()
