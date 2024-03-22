@@ -98,6 +98,7 @@ class SokobanState(object):
 
         if has_box(new_matrix, pos) and can_move(new_matrix, next_pos):
             move_box(new_matrix, pos, next_pos)
+            
         if can_move(new_matrix, pos):
             move_player(new_matrix, self.player, pos)
             return SokobanState(new_matrix)

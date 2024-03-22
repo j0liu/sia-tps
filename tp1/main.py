@@ -1,7 +1,7 @@
 import numpy as np
 from sokoban import SokobanState, Entity, SokobanNode, manhattan_heuristic, euclidean_heuristic
 
-from search_methods.greedy import search
+from search_methods.astar import search
 
 
 def parse_sokoban_level(level_file):
@@ -50,7 +50,7 @@ def main():
 
     initial_node = SokobanNode(initial_state, None, None, 0)
 
-    solution = search(initial_node, h=euclidean_heuristic)
+    solution = search(initial_node, h=manhattan_heuristic)
     print(solution.state.matrix)
     print(solution.cost)
     print(solution.get_sequence())

@@ -12,5 +12,8 @@ class Node(ABC):
     def expand(self):
         pass
 
+    def f(self):
+        return self.cost + self.h
+
     def __eq__(self, other):
         return self.state == other.state
