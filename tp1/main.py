@@ -9,6 +9,7 @@ from sokoban import (
 from search_methods import bfs, dfs, greedy, astar
 from map_parser import parse_sokoban_level
 from functools import partial
+from datetime import datetime
 
 methods = {
     "dfs": dfs.search,
@@ -34,23 +35,25 @@ def main():
     SOKOBAN_LEVEL = config["level"] 
     search = methods[config["method"]]
     heuristic = heuristics.get(config.get("heuristic", None), None)
+    print(config)
 
     parsed_level = parse_sokoban_level(SOKOBAN_LEVEL)
 
     initial_matrix = np.matrix(parsed_level)
-    print(initial_matrix)
-
-    initial_state = SokobanState(initial_matrix)
-    print(initial_state.player)
+    initial_state = SokobanState.from_matrix(initial_matrix)
+    print(initial_state)
 
     initial_node = SokobanNode(initial_state, None, None, 0)
 
+    begin_time = datetime.now(); print(begin_time)
     (solution, visited) = search(initial_node, h=heuristic)
-    # (solution, visited) = search(initial_node)
-    print(solution.state.matrix)
+    finish_time = datetime.now(); print(finish_time)
+
     print(solution.cost)
     print(solution.get_sequence())
     print(len(visited))
+    print("Time: ", finish_time - begin_time)
+    print(config)
     print("fin!!!")
 
 if __name__ == "__main__":

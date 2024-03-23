@@ -134,26 +134,45 @@ def verify_dead_state(matrix, box):
 
     
 class SokobanState(object):
-    def __init__(self, matrix) -> None:
+    def __init__(self, matrix, goals, boxes, boxes_on_goal, player) -> None:
         self.matrix = matrix
-        self.goals = []
-        self.boxes = []
-        self.boxes_on_goal = []
-        for t, cell in np.ndenumerate(self.matrix):
+        self.goals = goals
+        self.boxes = boxes
+        self.boxes_on_goal = boxes_on_goal
+        self.player = player
+    
+    @classmethod
+    def from_matrix(cls, matrix):
+        goals = []
+        boxes = []
+        boxes_on_goal = []
+        player = None
+        for t, cell in np.ndenumerate(matrix):
             if cell == Entity.PLAYER or cell == Entity.PLAYER_ON_GOAL:
-                self.player = t
+                player = t
             if cell == Entity.GOAL or cell == Entity.PLAYER_ON_GOAL:
-                self.goals.append(t)
+                goals.append(t)
             elif cell == Entity.BOX:
-                self.boxes.append(t)
+                boxes.append(t)
             elif cell == Entity.BOX_ON_GOAL:
-                self.boxes_on_goal.append(t)
-        
+                boxes_on_goal.append(t)
+        if player is None:
+            raise ValueError("Player not found in matrix")
+        return cls(matrix, goals, boxes, boxes_on_goal, player)
+
+
     def __eq__(self, other):
         return np.array_equal(self.matrix, other.matrix)
 
-    def __print__(self):
-        print(self.matrix)
+    def __str__(self):
+        if self is not None:
+            representation = ""
+            for row in self.matrix:
+                for _, cell in np.ndenumerate(row):
+                    representation += cell
+                representation += "\n"
+            return representation
+        return None
 
 
     def is_solution(self):
@@ -162,7 +181,7 @@ class SokobanState(object):
                     return False
         return True
 
-    def move(self, action):
+    def move(self, action, ignore_dead_states=False):
         new_matrix = self.matrix.copy()
         dir = directions[action] 
         pos = sum_tuples(self.player, dir) 
@@ -170,12 +189,13 @@ class SokobanState(object):
 
         if has_box(new_matrix, pos) and can_move(new_matrix, next_pos):
             move_box(new_matrix, pos, next_pos)
-            if verify_dead_state(new_matrix, next_pos):
+
+            if not ignore_dead_states and verify_dead_state(new_matrix, next_pos):
                 return None
             
         if can_move(new_matrix, pos):
             move_player(new_matrix, self.player, pos)
-            return SokobanState(new_matrix)
+            return SokobanState.from_matrix(new_matrix)
         return None
 
 
