@@ -37,7 +37,14 @@ with open("tp1/sokoban_config.json") as f:
     config = json.load(f)
 OPT_CORNER =config["optimizations"]["corners"]
 OPT_AXIS = config["optimizations"]["axis"]
+DUAL = config["optimizations"]["dual"]
 
+
+def perp(v):
+    return (-v[1], v[0])
+
+def opose(v):
+    return (-v[0], -v[1])
 
 def sum_tuples(t1, t2):
     return (t1[0] + t2[0], t1[1] + t2[1])
@@ -78,10 +85,8 @@ def verify_dead_state(matrix, box):
         # If there is a wall in the x-axis (left or right), the box can only move in the y-axis, and vice versa
         (dir, wall_dir1, wall_dir2) = (Versor.UP, Versor.LEFT, Versor.RIGHT) if has_wall(matrix, sum_tuples(box,Versor.LEFT)) or has_wall(matrix, sum_tuples(box,Versor.RIGHT)) else (Versor.LEFT, Versor.UP, Versor.DOWN)
 
-        # return False
-
         dead_ends = 0
-        for d in [dir, (-dir[0], -dir[1])]: 
+        for d in [dir, opose(dir)]: 
             pos = box 
             while has_wall(matrix, sum_tuples(pos, wall_dir1)) or has_wall(matrix, sum_tuples(pos, wall_dir2)):
                 pos = sum_tuples(pos, d)
@@ -92,10 +97,19 @@ def verify_dead_state(matrix, box):
                     dead_ends += 1
                     break
 
-        return dead_ends == 2
-    # return False
-
+        if dead_ends == 2:
+            return True
     
+    if (DUAL):
+        p_neighbor = [(sum_tuples(box, dir), dir) for dir in [Versor.UP, Versor.DOWN, Versor.LEFT, Versor.RIGHT] if has_box(matrix, sum_tuples(box, dir))]
+        for (ne, dir) in p_neighbor:
+            if (has_wall(matrix, sum_tuples(box, perp(dir))) or has_wall(matrix, sum_tuples(box, opose(perp(dir))))) or (
+                has_wall(matrix, sum_tuples(ne, perp(dir))) and has_wall(matrix, sum_tuples(ne, opose(perp(dir))))):
+                return True
+
+    return False
+
+
 class SokobanState(object):
     def __init__(self, matrix, goals, boxes, boxes_on_goal, player) -> None:
         self.matrix = matrix

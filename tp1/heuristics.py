@@ -15,7 +15,7 @@ def distance_heuristic(node, distance_function):
     distance = 0
     for box in state.boxes:
         distance += min([distance_function(box, goal) for goal in state.goals])
-    if state.boxes:
+    if len(state.boxes) > 0 :
         distance += min([distance_function(player, box) for box in node.state.boxes])
     return distance
 
@@ -27,7 +27,7 @@ def modified_distance_heuristic(node, distance_function):
     for box in state.boxes:
         distance += min([distance_function(box, goal) + sum_neighbors(state.matrix, goal) for goal in state.goals])
         distance += sum_neighbors(state.matrix, box)
-    if state.boxes:
+    if len(state.boxes) > 0:
         distance += min([distance_function(player, box) for box in node.state.boxes])
     return distance
 
