@@ -1,10 +1,10 @@
 {
     "method": "A*",
     "heuristic": "super_manhattan",
-    "level": "tp1/levels/lvl5.txt",
+    "level": "tp1/levels/lvl1.txt",
     "optimizations": {
         "corners": true,
-        "axis": true,
+        "axis": false,
         "dual": false
     }
 }

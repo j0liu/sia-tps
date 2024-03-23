@@ -162,16 +162,33 @@ class SokobanState(object):
         dir = directions[action] 
         pos = sum_tuples(self.player, dir) 
         next_pos = sum_tuples(pos, dir)
+        new_boxes = self.boxes.copy()
+        new_goals = self.goals.copy()
+        new_boxes_on_goal = self.boxes_on_goal.copy()
+        new_player = pos
 
         if has_box(new_matrix, pos) and can_move(new_matrix, next_pos):
+            if new_matrix[pos] == Entity.BOX:
+                new_boxes.remove(pos)
+            if new_matrix[pos] == Entity.BOX_ON_GOAL:
+                new_boxes_on_goal.remove(pos)
+                new_goals.append(pos)
+            
             move_box(new_matrix, pos, next_pos)
+
+            if new_matrix[next_pos] == Entity.BOX:
+                new_boxes.append(next_pos)
+            if new_matrix[next_pos] == Entity.BOX_ON_GOAL:
+                new_goals.remove(next_pos)
+                new_boxes_on_goal.append(next_pos)
 
             if not ignore_dead_states and verify_dead_state(new_matrix, next_pos):
                 return None
             
         if can_move(new_matrix, pos):
             move_player(new_matrix, self.player, pos)
-            return SokobanState.from_matrix(new_matrix)
+            return SokobanState(new_matrix, new_goals, new_boxes, new_boxes_on_goal, new_player)
+            #return SokobanState.from_matrix(new_matrix)
         return None
 
 

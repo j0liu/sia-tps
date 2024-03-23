@@ -48,12 +48,13 @@ def main():
     initial_node = SokobanNode(initial_state, None, None, 0)
 
     begin_time = datetime.now(); print(begin_time)
-    (solution, visited) = search(initial_node, h=heuristic)
+    (solution, visited, border) = search(initial_node, h=heuristic)
     finish_time = datetime.now(); print(finish_time)
 
     print(solution.cost)
     print(solution.get_sequence())
     print(len(visited))
+    print(len(border))
     print("Time: ", finish_time - begin_time)
     print(config)
     print("fin!!!")

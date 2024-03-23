@@ -6,7 +6,7 @@ def search(initial_node, h=None):
         current = border.pop(0)
 
         if current.state.is_solution():
-            return (current, visited)
+            return (current, visited, border)
 
         visited.append(current)
 
@@ -17,4 +17,4 @@ def search(initial_node, h=None):
         border.extend(new_nodes)
         border.sort(key=lambda x: (x.f(), x.h))
 
-    return (None, visited)
+    return (None, visited, border)
