@@ -2,8 +2,10 @@ import numpy as np
 import json
 from sokoban import (
     SokobanState, Entity, SokobanNode, 
-    modified_distance_heuristic,
-    manhattan_heuristic, euclidean_heuristic, max_heuristic, distance_heuristic,
+)
+from heuristics import (
+    modified_distance_heuristic,distance_heuristic, p_distance_heuristic,
+    manhattan_heuristic, euclidean_heuristic, max_heuristic, 
     manhattan_distance
 )
 from search_methods import bfs, dfs, greedy, astar
@@ -24,6 +26,7 @@ heuristics = {
     "max_eucliman": max_heuristic(manhattan_heuristic, euclidean_heuristic),
     "mod_manhattan": partial(modified_distance_heuristic, distance_function=manhattan_distance),
     "super_manhattan": max_heuristic(manhattan_heuristic, partial(modified_distance_heuristic, distance_function=manhattan_distance)),
+    "p_manhattan": partial(p_distance_heuristic, distance_function=manhattan_distance)
 }
 
 

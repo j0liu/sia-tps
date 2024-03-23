@@ -63,43 +63,6 @@ def move_player(matrix, old, new):
     matrix[old] = Entity.SPACE if matrix[old] == Entity.PLAYER else Entity.GOAL
     matrix[new] = Entity.PLAYER if matrix[new] == Entity.SPACE else Entity.PLAYER_ON_GOAL
 
-
-def manhattan_distance(p1, p2):
-    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-
-
-def distance_heuristic(node, distance_function):
-    state = node.state
-    distance = 0
-    for box in state.boxes:
-        distance += min([distance_function(box, goal) for goal in state.goals])
-    
-    return distance
-
-def modified_distance_heuristic(node, distance_function):
-    state = node.state
-    distance = 0
-    sum_neighbors = lambda matrix, point: sum([ 1 if not can_move(matrix, sum_tuples(point, d)) else 0 for d in [Versor.UP, Versor.LEFT, Versor.RIGHT, Versor.DOWN]])
-    for box in state.boxes:
-        distance += min([distance_function(box, goal) + sum_neighbors(state.matrix, goal) for goal in state.goals])
-        distance += sum_neighbors(state.matrix, box)
-    return distance
-
-def manhattan_heuristic(node):
-    distance = distance_heuristic(node, manhattan_distance)
-    return distance
-
-
-def euclidean_heuristic(node):
-    euclidian_distance = lambda a, b : np.linalg.norm(np.array(b) - np.array(a))
-    distance = distance_heuristic(node, euclidian_distance)
-    return distance
-
-
-def max_heuristic(h1, h2):
-    return lambda node: max(h1(node), h2(node))
-
-
 def verify_dead_state(matrix, box):
     # After this if, it is guaranteed that the box is not in a goal, and that there is at least one wall around it 
     if matrix[box] == Entity.BOX_ON_GOAL or all(matrix[pos] != Entity.WALL for pos in [sum_tuples(box, dir) for dir in [Versor.UP, Versor.DOWN, Versor.LEFT, Versor.RIGHT]]):

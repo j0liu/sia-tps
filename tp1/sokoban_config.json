@@ -1,6 +1,6 @@
 {
-    "method": "greedy",
-    "heuristic": "super_manhattan",
+    "method": "A*",
+    "heuristic": "p_manhattan",
     "level": "tp1/levels/lvl5.txt",
     "optimizations": {
         "corners": true,
