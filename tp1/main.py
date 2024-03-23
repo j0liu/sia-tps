@@ -44,19 +44,19 @@ def main():
     initial_state = SokobanState.from_matrix(initial_matrix)
     print(initial_state)
 
-    initial_node = SokobanNode(initial_state, None, None, 0)
+    #Run it 10 times to get the time, visited, border and cost
+    for _ in range(10):
+        initial_node = SokobanNode(initial_state, None, None, 0)
 
-    begin_time = datetime.now(); print(begin_time)
-    (solution, visited, border) = search(initial_node, h=heuristic)
-    finish_time = datetime.now(); print(finish_time)
+        begin_time = datetime.now()
+        (solution, visited, border) = search(initial_node, h=heuristic)
+        finish_time = datetime.now()
 
-    print(solution.cost)
-    print(solution.get_sequence())
-    print(len(visited))
-    print(len(border))
-    print("Time: ", finish_time - begin_time)
-    print(config)
-    print("fin!!!")
+        print(f"cost = {solution.cost} ")
+        print(f"solution length = {len(solution.get_sequence())}")
+        print(f"visited nodes = {len(visited)}")
+        print(f"border = {len(border)}")
+        print("Time = ", finish_time - begin_time)
 
 if __name__ == "__main__":
     main()
