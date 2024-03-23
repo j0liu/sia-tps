@@ -4,7 +4,7 @@ from sokoban import (
     SokobanState, Entity, SokobanNode, 
 )
 from heuristics import (
-    modified_distance_heuristic,distance_heuristic, p_distance_heuristic,
+    modified_distance_heuristic,distance_heuristic,
     manhattan_heuristic, euclidean_heuristic, max_heuristic, 
     manhattan_distance
 )
@@ -25,8 +25,7 @@ heuristics = {
     "euclidean": euclidean_heuristic,
     "max_eucliman": max_heuristic(manhattan_heuristic, euclidean_heuristic),
     "mod_manhattan": partial(modified_distance_heuristic, distance_function=manhattan_distance),
-    "super_manhattan": max_heuristic(manhattan_heuristic, partial(modified_distance_heuristic, distance_function=manhattan_distance)),
-    "p_manhattan": partial(p_distance_heuristic, distance_function=manhattan_distance)
+    "super_manhattan": max_heuristic(manhattan_heuristic, partial(modified_distance_heuristic, distance_function=manhattan_distance))
 }
 
 

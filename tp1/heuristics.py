@@ -11,25 +11,22 @@ def manhattan_distance(p1, p2):
 
 def distance_heuristic(node, distance_function):
     state = node.state
+    player = state.player
     distance = 0
     for box in state.boxes:
         distance += min([distance_function(box, goal) for goal in state.goals])
-    
+    if state.boxes:
+        distance += min([distance_function(player, box) for box in node.state.boxes])
     return distance
 
 def modified_distance_heuristic(node, distance_function):
     state = node.state
+    player = state.player
     distance = 0
     sum_neighbors = lambda matrix, point: sum([ 1 if not can_move(matrix, sum_tuples(point, d)) else 0 for d in [Versor.UP, Versor.LEFT, Versor.RIGHT, Versor.DOWN]])
     for box in state.boxes:
         distance += min([distance_function(box, goal) + sum_neighbors(state.matrix, goal) for goal in state.goals])
         distance += sum_neighbors(state.matrix, box)
-    return distance
-
-def p_distance_heuristic(node, distance_function):
-    state = node.state
-    player = state.player
-    distance = modified_distance_heuristic(node, distance_function)
     if state.boxes:
         distance += min([distance_function(player, box) for box in node.state.boxes])
     return distance

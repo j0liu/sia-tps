@@ -121,11 +121,14 @@ class SokobanState(object):
                 boxes_on_goal.append(t)
         if player is None:
             raise ValueError("Player not found in matrix")
+        boxes = np.array(boxes)
+        goals = np.array(goals)
+        boxes_on_goal = np.array(boxes_on_goal)
         return cls(matrix, goals, boxes, boxes_on_goal, player)
 
 
     def __eq__(self, other):
-        return np.array_equal(self.matrix, other.matrix)
+        return self.player == other.player and np.array_equal(self.boxes, other.boxes)
 
     def __str__(self):
         if self is not None:
