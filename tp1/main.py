@@ -29,7 +29,6 @@ heuristics = {
 }
 
 
-
 def main():
     with open("tp1/sokoban_config.json") as f:
         config = json.load(f)
@@ -61,4 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -139,6 +139,9 @@ class SokobanState(object):
 
     def __eq__(self, other):
         return self.player == other.player and self.boxes == other.boxes and self.boxes_on_goal == other.boxes_on_goal 
+    
+    def __hash__(self) -> int:
+        return hash((self.player, tuple(self.boxes), tuple(self.boxes_on_goal)))
 
     def __str__(self):
         if self is not None:
@@ -194,12 +197,12 @@ class SokobanState(object):
 
 
 class SokobanNode(Node):
-    def __init__(self, state, parent=None, action=None, cost=0):
-        super().__init__(state, parent, action, cost)
+    def __init__(self, state, parent=None, action=None, cost=0, comparator=None):
+        super().__init__(state, parent, action, cost, comparator)
 
     def expand(self):
         return [
-            SokobanNode(self.state.move(action), self, action, self.cost + 1)
+            SokobanNode(self.state.move(action), self, action, self.cost + 1, self.comparator)
             for action in [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
             if self.state.move(action) is not None  
         ]
@@ -207,6 +210,9 @@ class SokobanNode(Node):
     def __str__(self):
         return f"Action: {self.action}, Cost: {self.cost}" 
         # State: {self.state.matrix}"
+    
+    def __hash__(self) -> int:
+        return hash(self.state) 
 
     def get_sequence(self):
         sequence = []
