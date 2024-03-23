@@ -1,12 +1,12 @@
 
-def search(initial_node, h):
+def search(initial_node, h=None):
     border = [initial_node]
     visited = []
     while len(border) > 0:
         current = border.pop(0)
 
         if current.state.is_solution():
-            return current
+            return (current, visited)
 
         visited.append(current)
 
@@ -17,4 +17,4 @@ def search(initial_node, h):
         border.extend(new_nodes)
         border.sort(key=lambda x: x.h)
 
-    return None
+    return (None, visited)

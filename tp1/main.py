@@ -1,47 +1,42 @@
 import numpy as np
-from sokoban import SokobanState, Entity, SokobanNode, manhattan_heuristic, euclidean_heuristic
+import json
+from sokoban import (
+    SokobanState, Entity, SokobanNode, 
+    modified_distance_heuristic,
+    manhattan_heuristic, euclidean_heuristic, max_heuristic, distance_heuristic,
+    manhattan_distance
+)
+from search_methods import bfs, dfs, greedy, astar
+from map_parser import parse_sokoban_level
+from functools import partial
 
-from search_methods.astar import search
+methods = {
+    "dfs": dfs.search,
+    "bfs": bfs.search,
+    "greedy": greedy.search,
+    "A*": astar.search
+}
 
-
-def parse_sokoban_level(level_file):
-    # Define the symbols
-
-    symbols = {
-        '#': Entity.WALL,
-        ' ': Entity.SPACE,
-        '.': Entity.GOAL,
-        '$': Entity.BOX,
-        '@': Entity.PLAYER,
-        '*': Entity.BOX_ON_GOAL,
-        '+': Entity.PLAYER_ON_GOAL
-    }
-
-    # Split the level string into rows
-    with open (level_file, "r") as file:
-        level_string = file.read()
-
-    rows = level_string.split('\n')
-
-    # Parse the level
-    level = []
-    for row in rows:
-        level_row = []
-        for char in row:
-            if char not in symbols:
-                raise ValueError(f"Invalid character '{char}' in level string")
-            level_row.append(symbols.get(char))  # Use 'unknown' for any unexpected character
-        level.append(level_row)
-    
-    return level
+heuristics = {
+    "manhattan": manhattan_heuristic,
+    "euclidean": euclidean_heuristic,
+    "max_eucliman": max_heuristic(manhattan_heuristic, euclidean_heuristic),
+    "mod_manhattan": partial(modified_distance_heuristic, distance_function=manhattan_distance),
+    "super_manhattan": max_heuristic(manhattan_heuristic, partial(modified_distance_heuristic, distance_function=manhattan_distance)),
+}
 
 
 
 def main():
-    # Your Sokoban level
-    sokoban_level = "tp1/levels/lvl4.txt"
-    # Parse the level
-    parsed_level = parse_sokoban_level(sokoban_level)
+    with open("tp1/sokoban_config.json") as f:
+        config = json.load(f)
+
+    SOKOBAN_LEVEL = config["level"] 
+    search = methods[config["method"]]
+    heuristic = heuristics.get(config.get("heuristic", None), None)
+
+    parsed_level = parse_sokoban_level(SOKOBAN_LEVEL)
+
     initial_matrix = np.matrix(parsed_level)
     print(initial_matrix)
 
@@ -50,10 +45,13 @@ def main():
 
     initial_node = SokobanNode(initial_state, None, None, 0)
 
-    solution = search(initial_node, h=manhattan_heuristic)
+    (solution, visited) = search(initial_node, h=heuristic)
+    # (solution, visited) = search(initial_node)
     print(solution.state.matrix)
     print(solution.cost)
     print(solution.get_sequence())
+    print(len(visited))
+    print("fin!!!")
 
 if __name__ == "__main__":
     main()

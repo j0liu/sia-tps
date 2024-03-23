@@ -1,0 +1,9 @@
+{
+    "method": "greedy",
+    "heuristic": "manhattan",
+    "level": "tp1/levels/lvl1.txt",
+    "optimizations": {
+        "corners": true,
+        "axis": true 
+    }
+}
