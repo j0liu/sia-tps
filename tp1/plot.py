@@ -1,6 +1,6 @@
 import json
 
-with open('tp1/metrics/level2.json', 'r') as f:
+with open('tp1/metrics/level3.json', 'r') as f:
     data = json.load(f)
 
 expanded_data = data 
@@ -31,7 +31,7 @@ def plot_grouped_bars_with_annotations(expanded_data):
     metrics = ['cost', 'solution_length', 'visited_nodes', 'border', 'avg_time']
     conditions = list(expanded_data.keys())
 
-    bar_width = 0.15
+    bar_width = 0.25
     opacity = 0.8
 
     for metric_idx, metric in enumerate(metrics):
@@ -45,19 +45,20 @@ def plot_grouped_bars_with_annotations(expanded_data):
                           color=plt.cm.Set1(condition_idx), label=f'{condition}',
                           yerr=stds, capsize=5)
 
-            for bar in bars:
+            for bar_idx, bar in enumerate(bars):
                 height = bar.get_height()
-                ax.annotate(f'{height:.2f}',
+                vertical_offset = 3 + 3*bar_idx % 3  # Adjust vertical position based on bar index
+                ax.annotate(f'{height:.4f}',
                             xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 3), 
+                            xytext=(0, vertical_offset),  # Adjusting vertical offset
                             textcoords="offset points",
                             ha='center', va='bottom')
 
         ax.set_xlabel('Algorithm')
         ax.set_ylabel(metric.capitalize().replace('_', ' '))
         ax.set_title(f'Comparison of {metric.capitalize().replace("_", " ")} across Algorithms and Conditions')
-        ax.set_xticks(index + bar_width / 2)
-        ax.set_xticklabels(algorithms)
+        ax.set_xticks(index + bar_width / 2 * len(conditions))
+        ax.set_xticklabels(algorithms, rotation=45, ha="right")
         ax.legend()
 
         plt.tight_layout()
