@@ -33,12 +33,11 @@ class Entity(object):
     PLAYER_ON_GOAL = 'x'
 
 
-with open("tp1/sokoban_config.json") as f:
-    config = json.load(f)
-OPT_CORNER =config["optimizations"]["corners"]
-OPT_AXIS = config["optimizations"]["axis"]
-DUAL = config["optimizations"]["dual"]
-
+def load_sokoban_config(config):
+    global OPT_CORNER, OPT_AXIS, DUAL
+    OPT_CORNER = config["optimizations"]["corners"]
+    OPT_AXIS = config["optimizations"]["axis"]
+    DUAL = config["optimizations"]["dual"]
 
 def perp(v):
     return (-v[1], v[0])

@@ -1,81 +1,9 @@
-expanded_data = {
-    "NO OPTIMIZATION": {
-        "GREEDY": {
-            "cost": 118, 
-            "solution_length": 119, 
-            "visited_nodes": 5663, 
-            "border": 1357, 
-            "times": ["0:00:01.058909", "0:00:01.074554", "0:00:01.135948", "0:00:01.103778", 
-                      "0:00:01.088385", "0:00:01.087761", "0:00:01.106328", "0:00:01.091877", 
-                      "0:00:01.099153", "0:00:01.120362"]
-        },
-        "DFS": {
-            "cost": 1314, 
-            "solution_length": 1315, 
-            "visited_nodes": 17680, 
-            "border": 542, 
-            "times": ["0:00:01.147028", "0:00:01.154817", "0:00:01.184229", "0:00:01.261553", 
-                      "0:00:01.233698", "0:00:01.223703", "0:00:01.240544", "0:00:01.212293", 
-                      "0:00:01.217086", "0:00:01.188628"]
-        },
-        "BFS": {
-            "cost": 78, 
-            "solution_length": 79, 
-            "visited_nodes": 55627, 
-            "border": 30, 
-            "times": ["0:00:09.323966", "0:00:09.754570", "0:00:15.002703", "0:00:09.501628", 
-                      "0:00:09.478428", "0:00:09.537069", "0:00:09.660153", "0:00:14.181353", 
-                      "0:00:09.704960", "0:00:09.471233"]
-        },
-        "A*": {
-            "cost": 78, 
-            "solution_length": 79, 
-            "visited_nodes": 54788, 
-            "border": 231, 
-            "times": ["0:00:14.636971", "0:00:18.238924", "0:00:15.812331", "0:00:24.980171", 
-                      "0:00:15.761529", "0:00:15.920506", "0:00:16.052490", "0:00:19.052635", 
-                      "0:00:15.825940", "0:00:15.978757"]
-        }
-    },
-    "OPTIMIZED": {
-        "GREEDY": {
-            "cost": 124, 
-            "solution_length": 125, 
-            "visited_nodes": 2219, 
-            "border": 638, 
-            "times": ["0:00:00.315298", "0:00:00.324564", "0:00:00.296999", "0:00:00.282228", 
-                      "0:00:00.280173", "0:00:00.287984", "0:00:00.284147", "0:00:00.283863", 
-                      "0:00:00.282707", "0:00:00.297812"]
-        },
-        "DFS": {
-            "cost": 2132, 
-            "solution_length": 2133, 
-            "visited_nodes": 5460, 
-            "border": 843, 
-            "times": ["0:00:00.512419", "0:00:00.514325", "0:00:00.521339", "0:00:00.511854", 
-                      "0:00:00.519796", "0:00:00.521836", "0:00:00.539880", "0:00:00.538328", 
-                      "0:00:00.523069", "0:00:01.238298"]
-        },
-        "BFS": {
-            "cost": 78, 
-            "solution_length": 79, 
-            "visited_nodes": 26765, 
-            "border": 20, 
-            "times": ["0:00:02.711432", "0:00:02.705289", "0:00:02.728708", "0:00:02.850390", 
-                    "0:00:02.841017", "0:00:03.983269", "0:00:07.608654", "0:00:03.438811", 
-                    "0:00:02.727752", "0:00:02.790730"]
-        },
-        "A*": {
-            "cost": 78, 
-            "solution_length": 79, 
-            "visited_nodes": 26374, 
-            "border": 113, 
-            "times": ["0:00:03.826317", "0:00:03.922265", "0:00:05.388885", "0:00:06.976151", 
-                    "0:00:03.981094", "0:00:03.933396", "0:00:03.940700", "0:00:03.944230", 
-                    "0:00:04.004559", "0:00:04.038126"]
-        }
-    }
-}
+import json
+
+with open('tp1/metrics/level2.json', 'r') as f:
+    data = json.load(f)
+
+expanded_data = data 
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -94,7 +22,7 @@ def get_time_stats(times):
 def plot_grouped_bars_with_annotations(expanded_data):
     for condition in expanded_data:
         for algo in expanded_data[condition]:
-            times = expanded_data[condition][algo]['times']
+            times = expanded_data[condition][algo]['time']
             times_in_seconds = [convert_time_to_seconds(t) for t in times]
             expanded_data[condition][algo]['avg_time'] = np.mean(times_in_seconds)
             expanded_data[condition][algo]['time_std'] = np.std(times_in_seconds)
