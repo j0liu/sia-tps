@@ -10,11 +10,12 @@ def convert_time_to_seconds(time_str):
     hours, minutes, seconds = map(float, time_str.split(":"))
     return hours * 3600 + minutes * 60 + seconds
 
-# Compute avg_time for each condition
+# Compute avg_time and its standard deviation for each condition
 for condition in data:
     times = data[condition]['time']
     times_in_seconds = [convert_time_to_seconds(t) for t in times]
     data[condition]['avg_time'] = np.mean(times_in_seconds)
+    data[condition]['time_std'] = np.std(times_in_seconds)
 
 # Metrics to plot
 metrics = ['visited_nodes', 'border', 'avg_time']
@@ -29,8 +30,14 @@ for metric in metrics:
     fig, ax = plt.subplots()
     
     values = [data[condition][metric] for condition in data]
-    bars = ax.bar(index, values, bar_width, alpha=opacity, color='b')
     
+    if metric == 'avg_time':
+        # Include error bars for avg_time
+        errors = [data[condition]['time_std'] for condition in data]
+        bars = ax.bar(index, values, bar_width, alpha=opacity, color='b', yerr=errors)
+    else:
+        bars = ax.bar(index, values, bar_width, alpha=opacity, color='b')
+
     ax.set_xlabel('Conditions')
     ax.set_ylabel(metric.capitalize().replace('_', ' '))
     ax.set_title(f'Comparison of {metric.capitalize().replace("_", " ")} across Heuristics')
