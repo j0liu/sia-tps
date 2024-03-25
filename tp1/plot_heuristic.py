@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load the JSON data
-with open('tp1/metrics/heuristic_results.json') as f:
+with open('tp1/metrics/heuristic_results_lvl2.json') as f:
     data = json.load(f)
 
 def convert_time_to_seconds(time_str):
@@ -14,11 +14,11 @@ def convert_time_to_seconds(time_str):
 for condition in data:
     times = data[condition]['time']
     times_in_seconds = [convert_time_to_seconds(t) for t in times]
-    data[condition]['avg_time'] = np.mean(times_in_seconds)
+    data[condition]['avg_time (s)'] = np.mean(times_in_seconds)
     data[condition]['time_std'] = np.std(times_in_seconds)
 
 # Metrics to plot
-metrics = ['visited_nodes', 'border', 'avg_time']
+metrics = ['visited_nodes', 'border', 'avg_time (s)']
 
 # Plotting setup
 bar_width = 0.35
@@ -31,7 +31,7 @@ for metric in metrics:
     
     values = [data[condition][metric] for condition in data]
     
-    if metric == 'avg_time':
+    if metric == 'avg_time (s)':
         # Include error bars for avg_time
         errors = [data[condition]['time_std'] for condition in data]
         bars = ax.bar(index, values, bar_width, alpha=opacity, color='b', yerr=errors)
