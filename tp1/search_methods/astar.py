@@ -3,7 +3,10 @@ import heapq
 def search(initial_node, h=None):
     border = []
     border_set = set()
-    initial_node.comparator = lambda n1, n2: (n1.cost + h(n1), h(n1)) < (n2.cost + h(n2), h(n2))
+
+    initial_node.h = h(initial_node)
+    initial_node.comparator = lambda n1, n2: (n1.f(), n1.h) < (n2.f(), n2.h)
+
     heapq.heappush(border, initial_node)
     border_set.add(initial_node)
 
@@ -19,7 +22,7 @@ def search(initial_node, h=None):
 
         new_nodes = [x for x in current.expand() if x not in visited and x not in border_set]
         for node in new_nodes:
-            # node.h = h(node)
+            node.h = h(node)
             heapq.heappush(border, node)
             border_set.add(node)
 

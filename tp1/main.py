@@ -4,9 +4,9 @@ from sokoban import (
     SokobanState, Entity, SokobanNode, load_sokoban_config
 )
 from heuristics import (
-    modified_distance_heuristic,distance_heuristic,
+    d_heuristic, md_heuristic, dp_heuristic, mdp_heuristic,
     manhattan_heuristic, euclidean_heuristic, max_heuristic, 
-    manhattan_distance
+    manhattan_distance, euclidean_distance
 )
 from search_methods import bfs, dfs, greedy, astar
 from map_parser import parse_sokoban_level
@@ -21,11 +21,12 @@ methods = {
 }
 
 heuristics = {
-    "manhattan": manhattan_heuristic,
-    "euclidean": euclidean_heuristic,
-    "max_eucliman": max_heuristic(manhattan_heuristic, euclidean_heuristic),
-    "mod_manhattan": partial(modified_distance_heuristic, distance_function=manhattan_distance),
-    "super_manhattan": max_heuristic(manhattan_heuristic, partial(modified_distance_heuristic, distance_function=manhattan_distance))
+    "euclidean": partial(d_heuristic, distance_function=euclidean_distance),
+    "euclidean+p": euclidean_heuristic, 
+    "manhattan": partial(d_heuristic, distance_function=manhattan_distance),
+    "manhattan+p": manhattan_heuristic
+    # "mod_manhattan+p": partial(mdp_heuristic, distance_function=manhattan_distance),
+    # "max_manhattan+p": max_heuristic(manhattan_heuristic, partial(mdp_heuristic, distance_function=manhattan_distance))
 }
 
 
@@ -46,20 +47,18 @@ def single():
     print(initial_state)
 
     #Run it 10 times to get the time, visited, border and cost
-    times = []
-    for _ in range(10):
-        initial_node = SokobanNode(initial_state, None, None, 0)
+    initial_node = SokobanNode(initial_state, None, None, 0)
 
-        begin_time = datetime.now()
-        (solution, visited, border) = search(initial_node, h=heuristic)
-        finish_time = datetime.now()
+    begin_time = datetime.now()
+    (solution, visited, border) = search(initial_node, h=heuristic)
+    finish_time = datetime.now()
 
-        print(f"cost = {solution.cost} ")
-        print(f"solution length = {len(solution.get_sequence())}")
-        print(f"visited nodes = {len(visited)}")
-        print(f"border = {len(border)}")
-        print("Time = ", finish_time - begin_time)
-        times.append(str(finish_time - begin_time))
+    print(f"cost = {solution.cost} ")
+    print(f"solution length = {len(solution.get_sequence())}")
+    print(f"visited nodes = {len(visited)}")
+    print(f"border = {len(border)}")
+    print("Time = ", finish_time - begin_time)
+    print("Solution = ", solution.get_sequence())
 
 def test_multiple():
     with open("tp1/sokoban_config.json") as f:
@@ -116,5 +115,53 @@ def test_multiple():
         json.dump(results, f)
 
 
+def test_heuristics():
+    with open("tp1/sokoban_config.json") as f:
+        config = json.load(f)
+
+    SOKOBAN_LEVEL = config["level"] 
+    search = methods[config["method"]]
+    load_sokoban_config(config)
+    print(config)
+
+    parsed_level = parse_sokoban_level(SOKOBAN_LEVEL)
+
+    initial_matrix = np.matrix(parsed_level)
+    initial_state = SokobanState.from_matrix(initial_matrix)
+    print(initial_state)
+
+    TRIES = 2
+    results = {}
+    #Run it 10 times to get the time, visited, border and cost
+    for heuristic in heuristics:
+        search = methods[config["method"]]
+        heuristic_function = heuristics[heuristic]
+        heuristic_result = {"time": []}
+
+        for _ in range(TRIES):
+            initial_node = SokobanNode(initial_state, None, None, 0)
+
+            begin_time = datetime.now()
+            (solution, visited, border) = search(initial_node, h=heuristic_function)
+            finish_time = datetime.now()
+
+            print(f"cost = {solution.cost} ")
+            heuristic_result["cost"] = solution.cost
+            print(f"solution length = {len(solution.get_sequence())}")
+            heuristic_result["solution_length"] = len(solution.get_sequence())
+            print(f"visited nodes = {len(visited)}")
+            heuristic_result["visited_nodes"] = len(visited)
+            print(f"border = {len(border)}")
+            heuristic_result["border"] = len(border)
+            print("Time = ", finish_time - begin_time)
+            heuristic_result["time"].append(str(finish_time - begin_time))
+        
+        results[heuristic] = heuristic_result
+
+
+    with open("tp1/heuristic_results.json", "w") as f:
+        json.dump(results, f)
+
+
 if __name__ == "__main__":
-    test_multiple()
+    single()
