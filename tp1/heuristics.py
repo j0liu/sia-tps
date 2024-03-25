@@ -35,8 +35,8 @@ def dp_heuristic(node, distance_function):
     state = node.state
     player = state.player
     distance = d_heuristic(node, distance_function)
-    if len(state.boxes) > 0 :
-        distance += min([distance_function(player, box) for box in state.boxes]) - 1
+    total_boxes = state.boxes + state.boxes_on_goal
+    distance += max(0, min([distance_function(player, box) for box in total_boxes]) - 2)
     return distance
 
 def mdp_heuristic(node, distance_function):

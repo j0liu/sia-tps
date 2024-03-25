@@ -154,10 +154,10 @@ class SokobanState(object):
 
 
     def is_solution(self):
-        for _, cell in np.ndenumerate(self.matrix):
-                if cell == Entity.GOAL or cell == Entity.PLAYER_ON_GOAL or cell == Entity.BOX:
-                    return False
-        return True
+        # for _, cell in np.ndenumerate(self.matrix):
+        #         if cell == Entity.GOAL or cell == Entity.PLAYER_ON_GOAL or cell == Entity.BOX:
+        #             return False
+        return len(self.boxes) == 0
 
     def move(self, action, ignore_dead_states=False):
         new_matrix = self.matrix.copy()

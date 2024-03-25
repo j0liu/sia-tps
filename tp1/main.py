@@ -24,9 +24,9 @@ heuristics = {
     "euclidean": partial(d_heuristic, distance_function=euclidean_distance),
     "euclidean+p": euclidean_heuristic, 
     "manhattan": partial(d_heuristic, distance_function=manhattan_distance),
-    "manhattan+p": manhattan_heuristic
-    # "mod_manhattan+p": partial(mdp_heuristic, distance_function=manhattan_distance),
-    # "max_manhattan+p": max_heuristic(manhattan_heuristic, partial(mdp_heuristic, distance_function=manhattan_distance))
+    "manhattan+p": manhattan_heuristic,
+    "mod_manhattan+p": partial(mdp_heuristic, distance_function=manhattan_distance),
+    "max_manhattan+p": max_heuristic(manhattan_heuristic, partial(mdp_heuristic, distance_function=manhattan_distance))
 }
 
 
@@ -130,7 +130,7 @@ def test_heuristics():
     initial_state = SokobanState.from_matrix(initial_matrix)
     print(initial_state)
 
-    TRIES = 2
+    TRIES = 10
     results = {}
     #Run it 10 times to get the time, visited, border and cost
     for heuristic in heuristics:
@@ -164,4 +164,6 @@ def test_heuristics():
 
 
 if __name__ == "__main__":
-    single()
+    # single()
+    # test_multiple()
+    test_heuristics()

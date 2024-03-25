@@ -1,10 +1,10 @@
 {
-    "method": "greedy",
-    "heuristic": "manhattan",
-    "level": "tp1/levels/lvl9.txt",
+    "method": "A*",
+    "heuristic": "manhattan+p",
+    "level": "tp1/levels/lvl4.txt",
     "optimizations": {
-        "corners": false,
-        "axis": false,
-        "dual": false
+        "corners": true,
+        "axis": true,
+        "dual": true
     }
 }
