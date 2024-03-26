@@ -1,6 +1,6 @@
 import json
 
-with open('tp1/metrics/level3.json', 'r') as f:
+with open('metrics/level3.json', 'r') as f:
     data = json.load(f)
 
 expanded_data = data 

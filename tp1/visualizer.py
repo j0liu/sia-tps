@@ -16,7 +16,7 @@ def visualize(initial_state, sequence):
     input()
 
 if __name__ == "__main__":
-    with open("tp1/sokoban_config.json") as f:
+    with open("sokoban_config.json") as f:
         config = json.load(f)
     SOKOBAN_LEVEL = config["level"] 
     parsed_level = parse_sokoban_level(SOKOBAN_LEVEL)

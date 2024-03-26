@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load the JSON data
-with open('tp1/metrics/heuristic_results_lvl2.json') as f:
+with open('metrics/heuristic_results_lvl2.json') as f:
     data = json.load(f)
 
 def convert_time_to_seconds(time_str):

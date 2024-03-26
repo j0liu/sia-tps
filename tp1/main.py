@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 import json
 from sokoban import (
     SokobanState, Entity, SokobanNode, load_sokoban_config
@@ -31,7 +32,7 @@ heuristics = {
 
 
 def single():
-    with open("tp1/sokoban_config.json") as f:
+    with open("sokoban_config.json") as f:
         config = json.load(f)
 
     SOKOBAN_LEVEL = config["level"] 
@@ -61,7 +62,7 @@ def single():
     print("Solution = ", solution.get_sequence())
 
 def test_multiple():
-    with open("tp1/sokoban_config.json") as f:
+    with open("sokoban_config.json") as f:
         config = json.load(f)
 
     SOKOBAN_LEVEL = config["level"] 
@@ -111,12 +112,12 @@ def test_multiple():
         config["optimizations"]["dual"] = not config["optimizations"]["dual"] 
         load_sokoban_config(config)
 
-    with open("tp1/results.json", "w") as f:
+    with open("results.json", "w") as f:
         json.dump(results, f)
 
 
 def test_heuristics():
-    with open("tp1/sokoban_config.json") as f:
+    with open("sokoban_config.json") as f:
         config = json.load(f)
 
     SOKOBAN_LEVEL = config["level"] 
@@ -159,11 +160,18 @@ def test_heuristics():
         results[heuristic] = heuristic_result
 
 
-    with open("tp1/heuristic_results.json", "w") as f:
+    with open("heuristic_results.json", "w") as f:
         json.dump(results, f)
 
 
 if __name__ == "__main__":
-    # single()
-    # test_multiple()
-    test_heuristics()
+    if len(sys.argv) != 2:
+        print("Usage: python main.py <single|multiple|heuristics>")
+        sys.exit(1)
+
+    if sys.argv[1] == "single":
+        single()
+    elif sys.argv[1] == "multiple":
+        test_multiple()
+    elif sys.argv[1] == "heuristics":
+        test_heuristics()
