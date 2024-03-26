@@ -1,10 +1,10 @@
 {
     "method": "A*",
     "heuristic": "manhattan+p",
-    "level": "tp1/levels/lvl4.txt",
+    "level": "levels/lvl4.txt",
     "optimizations": {
-        "corners": true,
-        "axis": true,
-        "dual": true
+        "corners": false,
+        "axis": false,
+        "dual": false
     }
 }
