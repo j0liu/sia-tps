@@ -1,0 +1,14 @@
+{
+    "initial_population_size": <number>,
+    "class": <warrior|archer|defender|infiltrate>,
+    "max_iterations": <natural|0>,
+    "mutation": <gene|multigene>, // falta ver (no) uniforme
+    "crossover" : <onepoint|twopoint|uniform|annular>,
+    "stopping_condition": <max_generations|structure|content|optimal_environment>,
+    "selection_coefficient": <proportion>,
+    "selection1": <elite|roulette|universal|boltzmann|tournament|ranking>,
+    "selection2": <elite|roulette|universal|boltzmann|tournament|ranking>,
+    "replace_coefficient": <proportion>,
+    "replace1: <traditional|young|gap>,
+    "replace2": <traditional|young|gap>
+}

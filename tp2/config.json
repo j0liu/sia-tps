@@ -1,0 +1,14 @@
+{
+    "initial_population_size": 100,
+    "class": "warrior",
+    "max_iterations": "1000",
+    "mutation": "gene",
+    "crossover" : "onepoint",
+    "stopping_condition": "max_generations",
+    "selection_coefficient": 1,
+    "selection1": "elite",
+    "selection2": "elite",
+    "replace_coefficient": 1,
+    "replace1": "traditional",
+    "replace2": "traditional"
+}
