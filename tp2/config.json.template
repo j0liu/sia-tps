@@ -5,6 +5,7 @@
     "max_iterations": <natural|0>,
     "mutation": <gene|multigene>, // falta ver (no) uniforme
     "mutation_rate": <proportion>,
+    "pairing" : <staggered>
     "crossover" : <onepoint|twopoint|uniform|annular>,
     "stopping_condition": <max_generations|structure|content|optimal_environment>,
     "replace: <traditional|young|gap>,

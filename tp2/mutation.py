@@ -10,3 +10,5 @@ def mutate_gene(genotype, mutation_rate, gene_range):
     
     return genotype_copy
 
+def mutate_none(genotype, mutation_rate, gene_range):
+    return genotype

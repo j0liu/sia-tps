@@ -5,6 +5,7 @@
     "max_iterations": 100,
     "mutation": "gene",
     "mutation_rate": 0.1,
+    "pairing" : "staggered",
     "crossover" : "onepoint",
     "stopping_condition": "max_generations",
     "replace": "traditional",

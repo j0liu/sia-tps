@@ -7,6 +7,7 @@ import selection
 import mutation
 import replacement
 import crossover as co
+import pairing
 
 CLASS_MAP = {
     "warrior": PlayerClass.WARRIOR,
@@ -22,7 +23,8 @@ CROSSOVER_MAP = {
 MUTATION_MAP = {
   "gene": mutation.mutate_gene,
   "multigene": None,
-  "uniform": None
+  "uniform": None,
+  "none": mutation.mutate_none
 }
 
 SELECTION_MAP = {
@@ -35,6 +37,10 @@ REPLACE_MAP = {
 
 STOPPING_MAP = {
     "quantity" : None
+}
+
+PAIRING_MAP = {
+    "staggered": pairing.staggered,
 }
 
 populations_list = []
@@ -59,19 +65,13 @@ def max_iterations(max_iterations):
     return iterations >= max_iterations
 
 
-def pair_genotypes(population, crossover):
-    children_genotypes = []
-    # TODO: Other pair methods?
-    for i in range(0, len(population), 2):
-        p1 = population[i]
-        p2 = population[i+1]
-        children_genotypes.extend(crossover(p1.genotype, p2.genotype))
-    return children_genotypes
+
 
 def iterate(population, config):
     player_class = CLASS_MAP[config["class"]]
     children_count = config["children"]
     stopping_condition = partial(max_iterations, config["max_iterations"])
+    pair_genotypes = PAIRING_MAP[config["pairing"]]
     crossover = CROSSOVER_MAP[config["crossover"]]
     mutate = MUTATION_MAP[config["mutation"]]
     mutation_rate = config["mutation_rate"]
@@ -84,7 +84,7 @@ def iterate(population, config):
     iterations = 0
     while not stopping_condition():
         parents = select1(population, children_count) # TODO: Consider selection2
-        children_genotypes = pair_genotypes(parents, crossover)
+        children_genotypes = pair_genotypes([p.genotype for p in parents], crossover)
         children = [Player(player_class, mutate(genotype, mutation_rate, PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
         population = replace(population, children, select3)
         populations_list.append(population)
