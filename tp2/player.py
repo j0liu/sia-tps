@@ -20,6 +20,7 @@ class GeneDomain:
     HEIGHT = (1.3, 2.0)
 
 PLAYER_GENE_DOMAINS = [GeneDomain.HEIGHT, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE]
+SEPARATOR = ';'
 
 class Player(object):
     def __init__(self, player_class, genotype) -> None:
@@ -29,6 +30,7 @@ class Player(object):
             raise ValueError("Invalid height value")
 
         if any([i < 0 for i in genotype[1:]]): 
+            print(genotype)
             raise ValueError("Invalid items")
 
         self.genotype = genotype if sum(genotype[1:]) == 150 else np.concatenate((genotype[0:1], normalize(genotype[1:], 150)))
@@ -73,3 +75,22 @@ class Player(object):
     
     def __repr__(self):
         return self.__str__()
+    
+    def serialize(self):
+        return SEPARATOR.join([str(i) for i in self.genotype])
+    
+def read_population(file_name, player_class):
+    with open(file_name, "r") as f:
+        lines = f.readlines()
+        population = []
+        for line in lines:
+            attributes = line.split(SEPARATOR)
+            assert len(attributes) == 6
+            genotype = [float(i) for i in attributes]
+            population.append(Player(player_class, np.array(genotype)))
+        return population
+    
+def write_population(file_name, population):
+    with open(file_name, "w") as f:
+        for player in population:
+            f.write(player.serialize() + "\n")

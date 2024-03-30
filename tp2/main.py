@@ -2,7 +2,13 @@ import json
 import random
 import numpy as np
 from functools import partial
-from player import Player, PlayerClass, PLAYER_GENE_DOMAINS
+from player import (
+    Player,
+    PlayerClass, 
+    PLAYER_GENE_DOMAINS,
+    read_population,
+    write_population
+)
 import selection
 import mutation
 import replacement
