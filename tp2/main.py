@@ -1,8 +1,12 @@
 import json
 import random
-from player import Player, PlayerClass
+import numpy as np
 from functools import partial
-
+from player import Player, PlayerClass, PLAYER_GENE_DOMAINS
+import selection
+import mutation
+import replacement
+import crossover as co
 
 CLASS_MAP = {
     "warrior": PlayerClass.WARRIOR,
@@ -12,21 +16,21 @@ CLASS_MAP = {
 }
 
 CROSSOVER_MAP = {
-    "one-point": None
+    "onepoint": co.one_point_crossover,
 }
 
 MUTATION_MAP = {
-  "gene": None,
+  "gene": mutation.mutate_gene,
   "multigene": None,
   "uniform": None
 }
 
 SELECTION_MAP = {
-    "elite" : None
+    "elite" : selection.elite,
 }
 
 REPLACE_MAP = {
-    "traditional": None
+    "traditional": replacement.traditional,
 }
 
 STOPPING_MAP = {
@@ -35,6 +39,7 @@ STOPPING_MAP = {
 
 populations_list = []
 iterations = 0
+
 
 def generate_population(population_size, player_class):
     population = []
@@ -45,22 +50,46 @@ def generate_population(population_size, player_class):
         stats = nums.copy()
         for i in range(1,5):
             stats[i] = nums[i] - nums[i-1] 
-        p = Player(player_class, h, tuple(stats))
+        p = Player(player_class, np.array([h] + stats))
         population.append(p)
     return population
 
-def max_iterations(max_iterations, current_iteration):
-    return current_iteration >= max_iterations
+def max_iterations(max_iterations):
+    global iterations
+    return iterations >= max_iterations
 
 
-def iterate(population, stopping_condition, crossover, mutation, selection1, selection2, replace1, replace2):
+def pair_genotypes(population, crossover):
+    children_genotypes = []
+    # TODO: Other pair methods?
+    for i in range(0, len(population), 2):
+        p1 = population[i]
+        p2 = population[i+1]
+        children_genotypes.extend(crossover(p1.genotype, p2.genotype))
+    return children_genotypes
+
+def iterate(population, config):
+    player_class = CLASS_MAP[config["class"]]
+    children_count = config["children"]
+    stopping_condition = partial(max_iterations, config["max_iterations"])
+    crossover = CROSSOVER_MAP[config["crossover"]]
+    mutate = MUTATION_MAP[config["mutation"]]
+    mutation_rate = config["mutation_rate"]
+    replace = REPLACE_MAP[config["replace"]]
+    select1 = SELECTION_MAP[config["selection1"]]
+    select2 = SELECTION_MAP[config["selection2"]]
+    select3 = SELECTION_MAP[config["selection3"]]
+    select4 = SELECTION_MAP[config["selection4"]]
+    global iterations
+    iterations = 0
     while not stopping_condition():
-        # Evaluate
-        # Selection
-        # Crossover
-        # Mutation
-        # Replace
-        pass 
+        parents = select1(population, children_count) # TODO: Consider selection2
+        children_genotypes = pair_genotypes(parents, crossover)
+        children = [Player(player_class, mutate(genotype, mutation_rate, PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
+        population = replace(population, children, select3)
+        populations_list.append(population)
+        iterations += 1
+    return populations_list
 
 
 def main():
@@ -71,15 +100,10 @@ def main():
     PLAYER_CLASS = CLASS_MAP[config["class"]]
 
     population = generate_population(POPULATION_SIZE, PLAYER_CLASS)
-    # print(population)
-    iterate(population, 
-            partial(max_iterations, config["max_iterations"]),
-            CROSSOVER_MAP[config["crossover"]],
-            SELECTION_MAP[config["selection1"]], SELECTION_MAP[config["selection2"]], 
-            REPLACE_MAP[config["replace1"]], REPLACE_MAP[config["replace2"]], 
-            MUTATION_MAP[config["mutation"]])
-
-
+    result = iterate(population, config)
+    for g in result:
+        print("generation_________________________________________________________________")
+        print(max(g, key=lambda p: p.fitness))
 
 
 
