@@ -1,3 +1,13 @@
 def traditional(population, children, select):
-    new_population = select(population + children, len(population))
-    return select(new_population, len(population))
+    return select(population + children, len(population))
+
+def young_bias(population, children, select):
+    children_len = len(children)
+    population_len = len(population)
+    return select(children, population_len) if children_len > population_len else children + select(population, population_len - children_len)
+    
+def generational_gap(population, children, select, coef):
+    pass
+    
+    
+    

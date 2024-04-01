@@ -10,5 +10,17 @@ def mutate_gene(genotype, mutation_rate, gene_range):
     
     return genotype_copy
 
+def mutate_multigene_limited(genotype, mutation_rate, gene_range):
+    # TODO
+    pass
+    
+def mutate_multigene_uniform(genotype, mutation_rate, gene_range):
+    # TODO
+    pass
+
+def mutate_complete(genotype, mutation_rate, gene_range):
+    # TODO
+    pass
+
 def mutate_none(genotype, mutation_rate, gene_range):
     return genotype

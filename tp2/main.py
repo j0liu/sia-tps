@@ -12,7 +12,7 @@ from player import (
 import selection
 import mutation
 import replacement
-import crossover as co
+import crossover
 import pairing
 
 CLASS_MAP = {
@@ -23,7 +23,10 @@ CLASS_MAP = {
 }
 
 CROSSOVER_MAP = {
-    "onepoint": co.one_point_crossover,
+    "onepoint": crossover.one_point,
+    "twopoint": crossover.two_point,
+    "anular": crossover.anular,
+    "uniform": crossover.uniform,
 }
 
 MUTATION_MAP = {
@@ -35,10 +38,18 @@ MUTATION_MAP = {
 
 SELECTION_MAP = {
     "elite" : selection.elite,
+    "roulette" : selection.roulette,
+    "universal" : selection.universal,
+    "ranking" : selection.ranking,
+    "boltzmann" : selection.boltzmann,
+    "deterministic_tournament" : selection.deterministic_tournament,
+    "probabilistic_tournament" : selection.probabilistic_tournament,
 }
 
 REPLACE_MAP = {
     "traditional": replacement.traditional,
+    "young_bias": replacement.young_bias,
+    "generational_gap": replacement.generational_gap,
 }
 
 STOPPING_MAP = {
