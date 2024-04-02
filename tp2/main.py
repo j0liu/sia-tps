@@ -14,6 +14,7 @@ import mutation
 import replacement
 import crossover
 import pairing
+import mutation_func
 
 CLASS_MAP = {
     "warrior": PlayerClass.WARRIOR,
@@ -31,8 +32,8 @@ CROSSOVER_MAP = {
 
 MUTATION_MAP = {
   "gene": mutation.mutate_gene,
-  "multigene": None,
-  "uniform": None,
+  "multigene": mutation.mutate_multigene,
+  "multigene_limited": mutation.mutate_multigene_limited,
   "none": mutation.mutate_none
 }
 
@@ -58,6 +59,13 @@ STOPPING_MAP = {
 
 PAIRING_MAP = {
     "staggered": pairing.staggered,
+}
+
+MUTATION_FUNCTION_MAP = {
+    "uniform": mutation_func.uniform,
+    "random": mutation_func.randomize,
+    "decrease": mutation_func.decrease,
+    "increase": mutation_func.increase
 }
 
 populations_list = []
@@ -90,8 +98,9 @@ def iterate(population, config):
     stopping_condition = partial(max_iterations, config["max_iterations"])
     pair_genotypes = PAIRING_MAP[config["pairing"]]
     crossover = CROSSOVER_MAP[config["crossover"]]
-    mutate = MUTATION_MAP[config["mutation"]]
+    mutate = MUTATION_MAP[config["mutation_type"]]
     mutation_rate = config["mutation_rate"]
+    mutation_function = MUTATION_FUNCTION_MAP[config["mutation_function"]]
     replace = REPLACE_MAP[config["replace"]]
     select1 = SELECTION_MAP[config["selection1"]]
     select2 = SELECTION_MAP[config["selection2"]]
@@ -100,12 +109,13 @@ def iterate(population, config):
     global iterations
     iterations = 0
     while not stopping_condition():
+        iterations += 1
         parents = select1(population, children_count) # TODO: Consider selection2
         children_genotypes = pair_genotypes([p.genotype for p in parents], crossover)
-        children = [Player(player_class, mutate(genotype, mutation_rate, PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
+        children = [Player(player_class, mutate(genotype, mutation_function(mutation_rate, generation=iterations),  PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
         population = replace(population, children, select3)
         populations_list.append(population)
-        iterations += 1
+        
     return populations_list
 
 
