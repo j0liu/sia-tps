@@ -1,24 +1,35 @@
 {
     "initial_population_size": 20,
     "children": 10,
-    "class": "warrior",
+    "class": "infiltrate",
     "max_iterations": 100,
     "mutation_type": "multigene",
     "mutation_function": "decrease",
     "mutation_rate": 1,
     "pairing" : "staggered",
-    "crossover" : "onepoint",
+    "crossover" : {
+        "method":"uniform",
+        "params": {
+            "p": 0.5
+        }
+    },
     "stopping_condition": "max_generations",
     "replace": "traditional",
     "selection_coefficient": 0.75,
     "replacement_coefficient": 0.5,
     "selection1": {
-        "method":"universal",
-        "params": {}
+        "method":"boltzmann",
+        "params": {
+            "t0": 100,
+            "tc": 1,
+            "k": 0.1
+        }
     },
     "selection2": {
-        "method":"ranking",
-        "params": {}
+        "method":"deterministic_tournament",
+        "params": {
+            "random_pick_size": 5
+        }
     },
     "selection3": {
         "method":"probabilistic_tournament",

@@ -84,20 +84,24 @@ def generate_population(population_size, player_class):
         population.append(p)
     return population
 
+def with_params(map, method_object):
+    return partial(map[method_object["method"]], params=method_object["params"])
+
+
 def iterate(population, config):
     player_class = CLASS_MAP[config["class"]]
     children_count = config["children"]
     stopping_condition = STOPPING_MAP[config["stopping_condition"]]
     pair_genotypes = PAIRING_MAP[config["pairing"]]
-    crossover = CROSSOVER_MAP[config["crossover"]]
+    crossover = with_params(CROSSOVER_MAP, config["crossover"])
     mutate = MUTATION_MAP[config["mutation_type"]]
     mutation_rate = config["mutation_rate"]
     mutation_function = MUTATION_FUNCTION_MAP[config["mutation_function"]]
     replace = REPLACE_MAP[config["replace"]]
-    selection1 = partial(SELECTION_MAP[config["selection1"]["method"]], params=config["selection1"]["params"])
-    selection2 = partial(SELECTION_MAP[config["selection2"]["method"]], params=config["selection2"]["params"])
-    selection3 = partial(SELECTION_MAP[config["selection3"]["method"]], params=config["selection3"]["params"])
-    selection4 = partial(SELECTION_MAP[config["selection4"]["method"]], params=config["selection4"]["params"])
+    selection1 = with_params(SELECTION_MAP, config["selection1"])
+    selection2 = with_params(SELECTION_MAP, config["selection2"])
+    selection3 = with_params(SELECTION_MAP, config["selection3"])
+    selection4 = with_params(SELECTION_MAP, config["selection4"])
     
     pair_select = partial(selection.composite, selection_method1=selection1, selection_method2=selection2, coef_method1=config["selection_coefficient"])
     replacement_select = partial(selection.composite, selection_method1=selection3, selection_method2=selection4, coef_method1=config["replacement_coefficient"])
