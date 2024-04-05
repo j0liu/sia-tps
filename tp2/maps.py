@@ -24,7 +24,7 @@ CROSSOVER_MAP = {
 MUTATION_MAP = {
   "gene": mutation.mutate_gene,
   "multigene": mutation.mutate_multigene,
-  "multigene_limited": mutation.mutate_multigene_limited,
+#   "multigene_limited": mutation.mutate_multigene_limited,
   "none": mutation.mutate_none
 }
 
