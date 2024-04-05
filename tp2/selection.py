@@ -21,19 +21,19 @@ def roulette(population, sample_size, iterations, params, pseudo_fitness_functio
     accumulated_fitness = [sum(relative_fitness[:i+1]) for i in range(len(relative_fitness))]
     for i in range(sample_size):
         r = random_function(random.uniform(0, 1), i)
-        for j in len(population):
+        for j in range(len(population)):
             if r < accumulated_fitness[j]:
                 selection.append(population[j])
                 break
     return selection
 
 def universal(population, sample_size, iterations, params):
-    return roulette(population, sample_size, iterations, random_function=lambda x,y: (x+y)/sample_size)
+    return roulette(population, sample_size, iterations, params, random_function=lambda x,y: (x+y)/sample_size)
 
 def ranking(population, sample_size, iterations, params):
     population_copy = population.copy()
     population_copy.sort(key=lambda x: x.fitness, reverse=True)
-    return roulette(population_copy, sample_size, iterations, lambda p: 1 - population.index(p) / len(population))
+    return roulette(population_copy, sample_size, iterations, params, pseudo_fitness_function=lambda p: 1 - population.index(p) / len(population))
     
 
 def boltzmann(population, sample_size, iterations, params):
@@ -41,8 +41,8 @@ def boltzmann(population, sample_size, iterations, params):
     tc = params['tc']
     k = params['k']
     temperature = tc + (t0 - tc) * math.exp(-k * iterations) 
-    avg = numpy.average(math.exp(p.fitness / temperature) for p in population)
-    return roulette(population, sample_size, iterations, lambda p: math.exp(p.fitness / temperature) / avg)
+    avg = numpy.average([math.exp(p.fitness / temperature) for p in population])
+    return roulette(population, sample_size, iterations, params, pseudo_fitness_function=lambda p: math.exp(p.fitness / temperature) / avg)
     
 
 def deterministic_tournament(population, sample_size, iterations, params):#, random_pick_size):

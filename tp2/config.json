@@ -3,8 +3,8 @@
     "children": 10,
     "class": "warrior",
     "max_iterations": 100,
-    "mutation_type": "multigene_limited",
-    "mutation_function": "increase",
+    "mutation_type": "multigene",
+    "mutation_function": "decrease",
     "mutation_rate": 1,
     "pairing" : "staggered",
     "crossover" : "onepoint",
@@ -13,19 +13,23 @@
     "selection_coefficient": 0.75,
     "replacement_coefficient": 0.5,
     "selection1": {
-        "method":"elite",
+        "method":"universal",
         "params": {}
     },
     "selection2": {
-        "method":"elite",
+        "method":"ranking",
         "params": {}
     },
     "selection3": {
-        "method":"elite",
+        "method":"probabilistic_tournament",
         "params": {}
     },
     "selection4": {
-        "method":"elite",
-        "params": {}
+        "method":"boltzmann",
+        "params": {
+            "t0": 100,
+            "tc": 1,
+            "k": 0.1
+        }
     }
 }
