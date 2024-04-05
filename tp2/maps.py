@@ -28,6 +28,13 @@ MUTATION_MAP = {
   "none": mutation.mutate_none
 }
 
+MUTATION_FUNCTION_MAP = {
+    "uniform": mutation_func.uniform,
+    "random": mutation_func.randomize,
+    "decrease": mutation_func.decrease,
+    "increase": mutation_func.increase
+}
+
 SELECTION_MAP = {
     "elite" : selection.elite,
     "roulette" : selection.roulette,
@@ -52,11 +59,7 @@ STOPPING_MAP = {
 
 PAIRING_MAP = {
     "staggered": pairing.staggered,
+    "inverted": pairing.inverted,
+    "parallel": pairing.parallel
 }
 
-MUTATION_FUNCTION_MAP = {
-    "uniform": mutation_func.uniform,
-    "random": mutation_func.randomize,
-    "decrease": mutation_func.decrease,
-    "increase": mutation_func.increase
-}

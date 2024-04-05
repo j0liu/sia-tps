@@ -13,7 +13,7 @@
         }
     }
     "stopping_condition": {
-        "method": <max_generations|structure|content|optimal_environment>,
+        "method": <max_generations|structure|content|around_optimal>,
         "params": {
             "max_generations": <natural>, #max_generations
             "streak_length" : <natural>, #structure, content,

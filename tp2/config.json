@@ -13,12 +13,12 @@
         }
     },
     "stopping_condition": {
-        "method": "structure",
+        "method": "content",
         "params": {
             "max_generations": 100,
-            "streak_length": 10,
-            "similarity": 0.8, 
-            "threshold": 30
+            "streak_length": 20,
+            "similarity": 0.9, 
+            "threshold": 35
         }
     },
     "replace": "traditional",

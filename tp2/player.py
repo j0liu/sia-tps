@@ -84,6 +84,9 @@ class Player(object):
     def __hash__(self):
         return hash(tuple(self.genotype))
     
+    def __lt__(self, other):
+        return self.fitness < other.fitness
+    
 def read_population(file_name, player_class):
     with open(file_name, "r") as f:
         lines = f.readlines()

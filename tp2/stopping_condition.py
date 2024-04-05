@@ -1,4 +1,5 @@
 from math import isclose
+last_max = None
 
 def max_generations(iterations, population_list, params):
     max_generations = params['max_generations']
@@ -42,8 +43,8 @@ def content(iterations, population_list, params):
     global current_streak 
     streak_length = params['streak_length']
     
-    current_max = max(population_list[-1])
-    if isclose(current_max, last_max, rel_tol=1e-8):
+    current_max = max(p.fitness for p in population_list[-1])
+    if last_max != None and isclose(current_max, last_max, rel_tol=1e-8):
         current_streak += 1
     else:
         last_max = current_max
@@ -53,4 +54,4 @@ def content(iterations, population_list, params):
 
 def around_optimus_prime(iterations, population_list, params):
     threshold = params['threshold']
-    return max(population_list[-1]) >= threshold
+    return max(p.fitness for p in population_list[-1]) >= threshold

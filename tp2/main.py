@@ -48,7 +48,7 @@ def iterate(population, config):
     pair_select = partial(selection.composite, selection_method1=selection1, selection_method2=selection2, coef_method1=config["selection_coefficient"])
     replacement_select = partial(selection.composite, selection_method1=selection3, selection_method2=selection4, coef_method1=config["replacement_coefficient"])
     
-    populations_list = []
+    populations_list = [population]
     iterations = 0
     while not stopping_condition(iterations, populations_list):
         iterations += 1
