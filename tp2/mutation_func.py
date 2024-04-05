@@ -10,4 +10,4 @@ def decrease(mutation_rate, generation):
     return 1/(generation+1)
 
 def increase(mutation_rate, generation):
-    return generation+1/100
+    return min(1,(generation+1)/100)

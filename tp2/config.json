@@ -1,5 +1,5 @@
 {
-    "initial_population_size": 100,
+    "initial_population_size": 20,
     "children": 10,
     "class": "warrior",
     "max_iterations": 100,

@@ -16,7 +16,7 @@ class ATTRIBUTES(object):
     HEALTH = 5
 
 class GeneDomain:
-    ATTRIBUTE = (0, 150)
+    ATTRIBUTE = (0, 150.0)
     HEIGHT = (1.3, 2.0)
 
 PLAYER_GENE_DOMAINS = [GeneDomain.HEIGHT, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE, GeneDomain.ATTRIBUTE]
@@ -33,10 +33,9 @@ class Player(object):
             print(genotype)
             raise ValueError("Invalid items")
 
-        self.genotype = genotype if sum(genotype[1:]) == 150 else np.concatenate((genotype[0:1], normalize(genotype[1:], 150)))
+        self.genotype = np.concatenate((genotype[0:1], normalize(genotype[1:], 150)))
         
-        self.h, self.str_items, self.agi_items, self.exp_items, self.res_items, self.health_items = genotype 
-    
+        self.h, self.str_items, self.agi_items, self.exp_items, self.res_items, self.health_items = self.genotype 
         self.fitness = self.atk_coef*self.attack() + self.def_coef*self.defense()
 
 

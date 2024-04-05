@@ -15,6 +15,7 @@ import replacement
 import crossover
 import pairing
 import mutation_func
+import stopping_condition as sc
 
 CLASS_MAP = {
     "warrior": PlayerClass.WARRIOR,
@@ -49,12 +50,14 @@ SELECTION_MAP = {
 
 REPLACE_MAP = {
     "traditional": replacement.traditional,
-    "young_bias": replacement.young_bias,
-    "generational_gap": replacement.generational_gap,
+    "young_bias": replacement.young_bias
 }
 
 STOPPING_MAP = {
-    "quantity" : None
+    "max_generations" : sc.max_generations, 
+    "structure" : sc.structure,
+    "content" : sc.content,
+    "around_optimal" : sc.around_optimus_prime
 }
 
 PAIRING_MAP = {
@@ -67,10 +70,6 @@ MUTATION_FUNCTION_MAP = {
     "decrease": mutation_func.decrease,
     "increase": mutation_func.increase
 }
-
-populations_list = []
-iterations = 0
-
 
 def generate_population(population_size, player_class):
     population = []
@@ -85,35 +84,29 @@ def generate_population(population_size, player_class):
         population.append(p)
     return population
 
-def max_iterations(max_iterations):
-    global iterations
-    return iterations >= max_iterations
-
-
-
-
 def iterate(population, config):
     player_class = CLASS_MAP[config["class"]]
     children_count = config["children"]
-    stopping_condition = partial(max_iterations, config["max_iterations"])
+    stopping_condition = STOPPING_MAP[config["stopping_condition"]]
     pair_genotypes = PAIRING_MAP[config["pairing"]]
     crossover = CROSSOVER_MAP[config["crossover"]]
     mutate = MUTATION_MAP[config["mutation_type"]]
     mutation_rate = config["mutation_rate"]
     mutation_function = MUTATION_FUNCTION_MAP[config["mutation_function"]]
     replace = REPLACE_MAP[config["replace"]]
-    select1 = SELECTION_MAP[config["selection1"]]
-    select2 = SELECTION_MAP[config["selection2"]]
-    select3 = SELECTION_MAP[config["selection3"]]
-    select4 = SELECTION_MAP[config["selection4"]]
-    global iterations
+    
+    pair_select = partial(selection.composite, selection_method1=SELECTION_MAP[config["selection1"]], selection_method2=SELECTION_MAP[config["selection2"]], coef_method1=config["selection_coefficient"])
+    replacement_select = partial(selection.composite, selection_method1=SELECTION_MAP[config["selection3"]], selection_method2=SELECTION_MAP[config["selection4"]], coef_method1=config["selection_coefficient"])
+    
+    populations_list = []
     iterations = 0
-    while not stopping_condition():
+    while not stopping_condition(config["max_iterations"], iterations, populations_list):
         iterations += 1
-        parents = select1(population, children_count) # TODO: Consider selection2
+
+        parents = pair_select(population, children_count)
         children_genotypes = pair_genotypes([p.genotype for p in parents], crossover)
         children = [Player(player_class, mutate(genotype, mutation_function(mutation_rate, generation=iterations),  PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
-        population = replace(population, children, select3)
+        population = replace(population, children, replacement_select)
         populations_list.append(population)
         
     return populations_list
