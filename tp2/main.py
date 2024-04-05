@@ -33,7 +33,7 @@ def with_params(map, method_object):
 def iterate(population, config):
     player_class = CLASS_MAP[config["class"]]
     children_count = config["children"]
-    stopping_condition = STOPPING_MAP[config["stopping_condition"]]
+    stopping_condition = with_params(STOPPING_MAP, config["stopping_condition"])
     pair_genotypes = PAIRING_MAP[config["pairing"]]
     crossover = with_params(CROSSOVER_MAP, config["crossover"])
     mutate = MUTATION_MAP[config["mutation_type"]]
@@ -50,7 +50,7 @@ def iterate(population, config):
     
     populations_list = []
     iterations = 0
-    while not stopping_condition(config["max_iterations"], iterations, populations_list):
+    while not stopping_condition(iterations, populations_list):
         iterations += 1
 
         parents = pair_select(population, children_count, iterations)
@@ -74,7 +74,7 @@ def main():
     for g in result:
         print("generation_________________________________________________________________")
         print(max(g, key=lambda p: p.fitness))
-
+    print(len(result))
 
 
 if __name__ == "__main__":

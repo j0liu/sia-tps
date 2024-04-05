@@ -1,20 +1,35 @@
 {
-    "initial_population_size": <number>,
-    "children": <number>,
+    "initial_population_size": <natural>,
+    "children": <natural>,
     "class": <warrior|archer|defender|infiltrate>,
-    "max_iterations": <natural|0>,
-    "mutation": <gene|multigene>, // falta ver (no) uniforme
+    "mutation": <gene|multigene>,
+    "mutation_function": <>,
     "mutation_rate": <proportion>,
     "pairing" : <staggered>
-    "crossover" : <onepoint|twopoint|uniform|annular>,
-    "stopping_condition": <max_generations|structure|content|optimal_environment>,
+    "crossover" : {
+        "method": <onepoint|twopoint|uniform|annular>,
+        "params": {
+            "p": <proportion> #uniform
+        }
+    }
+    "stopping_condition": {
+        "method": <max_generations|structure|content|optimal_environment>,
+        "params": {
+            "max_generations": <natural>, #max_generations
+            "streak_length" : <natural>, #structure, content
+            "threshold" : <float> #around_optimus_prime
+        }
+    }
     "replace: <traditional|young|gap>,
     "selection_coefficient": <proportion>,
     "replacement_coefficient": <proportion>,
     ["selection" + i]: {
         "method": <elite|roulette|universal|boltzmann|tournament|ranking>,
         "params": {
-            
+            "t0": <number>, #boltzmann
+            "tc": <number>, #boltzmann
+            "k": <number>, #boltzmann
+            "random_pick_size": <natural> #deterministic_tournament
         }
     }
 }

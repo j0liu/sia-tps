@@ -1,10 +1,9 @@
 {
     "initial_population_size": 20,
     "children": 10,
-    "class": "infiltrate",
-    "max_iterations": 100,
+    "class": "warrior",
     "mutation_type": "multigene",
-    "mutation_function": "decrease",
+    "mutation_function": "increase",
     "mutation_rate": 1,
     "pairing" : "staggered",
     "crossover" : {
@@ -13,7 +12,14 @@
             "p": 0.5
         }
     },
-    "stopping_condition": "max_generations",
+    "stopping_condition": {
+        "method": "structure",
+        "params": {
+            "max_generations": 100,
+            "streak_length": 10,
+            "threshold": 0.9
+        }
+    },
     "replace": "traditional",
     "selection_coefficient": 0.75,
     "replacement_coefficient": 0.5,

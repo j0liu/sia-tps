@@ -78,6 +78,12 @@ class Player(object):
     def serialize(self):
         return SEPARATOR.join([str(i) for i in self.genotype])
     
+    def __eq__(self, other):
+        return np.array_equal(self.genotype, other.genotype)
+
+    def __hash__(self):
+        return hash(tuple(self.genotype))
+    
 def read_population(file_name, player_class):
     with open(file_name, "r") as f:
         lines = f.readlines()
