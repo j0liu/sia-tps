@@ -16,7 +16,8 @@
         "method": <max_generations|structure|content|optimal_environment>,
         "params": {
             "max_generations": <natural>, #max_generations
-            "streak_length" : <natural>, #structure, content
+            "streak_length" : <natural>, #structure, content,
+            "similarity": <proportion>, #structure
             "threshold" : <float> #around_optimus_prime
         }
     }

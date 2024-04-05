@@ -23,6 +23,7 @@ def _get_intersection_bag(bag1, bag2):
 
 def structure(iterations, population_list, params):
     streak_length = params['streak_length']
+    similarity = params['similarity']
     if iterations < streak_length:
         return False
 
@@ -31,7 +32,7 @@ def structure(iterations, population_list, params):
         current_bag = _get_population_bag(population_list[-i])
         intersection_bag, count = _get_intersection_bag(intersection_bag, current_bag)
 
-        if count/len(population_list[0]) < 0.95: # TODO: Consider a parameter
+        if count/len(population_list[0]) < similarity: # TODO: Consider a parameter
             return False
     return True
 

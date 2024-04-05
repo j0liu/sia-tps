@@ -17,7 +17,8 @@
         "params": {
             "max_generations": 100,
             "streak_length": 10,
-            "threshold": 0.9
+            "similarity": 0.8, 
+            "threshold": 30
         }
     },
     "replace": "traditional",
