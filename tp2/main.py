@@ -94,19 +94,23 @@ def iterate(population, config):
     mutation_rate = config["mutation_rate"]
     mutation_function = MUTATION_FUNCTION_MAP[config["mutation_function"]]
     replace = REPLACE_MAP[config["replace"]]
+    selection1 = partial(SELECTION_MAP[config["selection1"]["method"]], params=config["selection1"]["params"])
+    selection2 = partial(SELECTION_MAP[config["selection2"]["method"]], params=config["selection2"]["params"])
+    selection3 = partial(SELECTION_MAP[config["selection3"]["method"]], params=config["selection3"]["params"])
+    selection4 = partial(SELECTION_MAP[config["selection4"]["method"]], params=config["selection4"]["params"])
     
-    pair_select = partial(selection.composite, selection_method1=SELECTION_MAP[config["selection1"]], selection_method2=SELECTION_MAP[config["selection2"]], coef_method1=config["selection_coefficient"])
-    replacement_select = partial(selection.composite, selection_method1=SELECTION_MAP[config["selection3"]], selection_method2=SELECTION_MAP[config["selection4"]], coef_method1=config["selection_coefficient"])
+    pair_select = partial(selection.composite, selection_method1=selection1, selection_method2=selection2, coef_method1=config["selection_coefficient"])
+    replacement_select = partial(selection.composite, selection_method1=selection3, selection_method2=selection4, coef_method1=config["replacement_coefficient"])
     
     populations_list = []
     iterations = 0
     while not stopping_condition(config["max_iterations"], iterations, populations_list):
         iterations += 1
 
-        parents = pair_select(population, children_count)
+        parents = pair_select(population, children_count, iterations)
         children_genotypes = pair_genotypes([p.genotype for p in parents], crossover)
         children = [Player(player_class, mutate(genotype, mutation_function(mutation_rate, generation=iterations),  PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
-        population = replace(population, children, replacement_select)
+        population = replace(population, children, replacement_select, iterations)
         populations_list.append(population)
         
     return populations_list

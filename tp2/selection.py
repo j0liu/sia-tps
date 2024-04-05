@@ -1,18 +1,20 @@
 import random
-def composite(population, sample_size, selection_method1, selection_method2, coef_method1):
+import math
+import numpy
+def composite(population, sample_size, iterations, selection_method1, selection_method2, coef_method1):
     sample_size1 = int(coef_method1 * sample_size)
     
-    parents1 = selection_method1(population, sample_size1)
-    parents2 = selection_method2(population, sample_size - sample_size1)
+    parents1 = selection_method1(population, sample_size1, iterations)
+    parents2 = selection_method2(population, sample_size - sample_size1, iterations)
     return parents1 + parents2
 
 
-def elite(population, sample_size):
+def elite(population, sample_size, iterations, params):
     population.sort(key=lambda x: x.fitness, reverse=True)
     return population[:sample_size]
 
 
-def roulette(population, sample_size, pseudo_fitness_function = lambda p: p.fitness, random_function = lambda x,y: x):
+def roulette(population, sample_size, iterations, params, pseudo_fitness_function = lambda p: p.fitness, random_function = lambda x,y: x):
     selection = []
     sum_fitness = sum([pseudo_fitness_function(p) for p in population]) 
     relative_fitness = [p.fitness / sum_fitness for p in population]    
@@ -25,21 +27,26 @@ def roulette(population, sample_size, pseudo_fitness_function = lambda p: p.fitn
                 break
     return selection
 
-def universal(population, sample_size):
-    return roulette(population, sample_size, random_function=lambda x,y: (x+y)/sample_size)
+def universal(population, sample_size, iterations, params):
+    return roulette(population, sample_size, iterations, random_function=lambda x,y: (x+y)/sample_size)
 
-def ranking(population, sample_size):
+def ranking(population, sample_size, iterations, params):
     population_copy = population.copy()
     population_copy.sort(key=lambda x: x.fitness, reverse=True)
-    return roulette(population_copy, sample_size, lambda p: 1 - population.index(p) / len(population))
+    return roulette(population_copy, sample_size, iterations, lambda p: 1 - population.index(p) / len(population))
     
 
-def boltzmann(population, sample_size):
-    # TODO
-    pass
+def boltzmann(population, sample_size, iterations, params):
+    t0 = params['t0']
+    tc = params['tc']
+    k = params['k']
+    temperature = tc + (t0 - tc) * math.exp(-k * iterations) 
+    avg = numpy.average(math.exp(p.fitness / temperature) for p in population)
+    return roulette(population, sample_size, iterations, lambda p: math.exp(p.fitness / temperature) / avg)
     
 
-def deterministic_tournament(population, sample_size, random_pick_size):
+def deterministic_tournament(population, sample_size, iterations, params):#, random_pick_size):
+    random_pick_size = params['random_pick_size']
     selection = []
     for _ in range(sample_size):
         sample = random.sample(population, random_pick_size)
@@ -47,7 +54,7 @@ def deterministic_tournament(population, sample_size, random_pick_size):
     return selection
     
     
-def probabilistic_tournament(population, sample_size):
+def probabilistic_tournament(population, sample_size, iterations, params):
     threshold = random.uniform(0.5, 1)
     selection = []
     while len(selection) < sample_size:
@@ -56,9 +63,3 @@ def probabilistic_tournament(population, sample_size):
         element = max(sample, key=lambda x: x.fitness) if r < threshold else min(sample, key=lambda x: x.fitness)
         selection.append(element)
     return selection
-
-
-
-
-
-

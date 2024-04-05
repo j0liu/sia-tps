@@ -10,10 +10,22 @@
     "crossover" : "onepoint",
     "stopping_condition": "max_generations",
     "replace": "traditional",
-    "selection_coefficient": 1,
-    "replace_coefficient": 1,
-    "selection1": "elite",
-    "selection2": "elite",
-    "selection3": "elite",
-    "selection4": "elite"
+    "selection_coefficient": 0.75,
+    "replacement_coefficient": 0.5,
+    "selection1": {
+        "method":"elite",
+        "params": {}
+    },
+    "selection2": {
+        "method":"elite",
+        "params": {}
+    },
+    "selection3": {
+        "method":"elite",
+        "params": {}
+    },
+    "selection4": {
+        "method":"elite",
+        "params": {}
+    }
 }

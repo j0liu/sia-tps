@@ -10,9 +10,11 @@
     "stopping_condition": <max_generations|structure|content|optimal_environment>,
     "replace: <traditional|young|gap>,
     "selection_coefficient": <proportion>,
-    "replace_coefficient": <proportion>,
-    "selection1": <elite|roulette|universal|boltzmann|tournament|ranking>,
-    "selection2": <elite|roulette|universal|boltzmann|tournament|ranking>,
-    "selection3": <elite|roulette|universal|boltzmann|tournament|ranking>,
-    "selection4": <elite|roulette|universal|boltzmann|tournament|ranking>
+    "replacement_coefficient": <proportion>,
+    ["selection" + i]: {
+        "method": <elite|roulette|universal|boltzmann|tournament|ranking>,
+        "params": {
+            
+        }
+    }
 }
