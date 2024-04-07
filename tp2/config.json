@@ -3,7 +3,7 @@
     "children": 10,
     "class": "warrior",
     "mutation_type": "multigene",
-    "mutation_function": "increase",
+    "mutation_function": "decrease",
     "mutation_rate": 1,
     "pairing" : "staggered",
     "crossover" : {

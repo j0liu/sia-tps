@@ -3,6 +3,7 @@ import json
 from main import generate_population, iterate
 import matplotlib.pyplot as plt
 import numpy as np
+from player import PlayerClass
 
 def perform_crossover_analysis(config, character_class):
 
@@ -73,41 +74,63 @@ def perform_mutation_analysis(config, character_class):
     plot_results("Mutation Method", "Avg Iterations", character_class, mutation_methods, avg_iterations_per_method, std_iterations_per_method, False)
     plot_results("Mutation Method", "Avg Fitness", character_class, mutation_methods, avg_fitness_per_method, std_fitness_per_method, True)
 
-# def perform_selection_analysis(config, character_class):
+
+
+def perform_selection_analysis(config, character_class):
+        method_arguments = {
+            "elite": {},
+            "roulette": {},
+            "universal": {},
+            "ranking": {},
+            "boltzmann": {'t0': 100, 'tc': 1, 'k': 0.1},    
+            "deterministic_tournament": {"random_pick_size": 10},
+            "probabilistic_tournament": {}
+        }
     
-#         selection_methods = list(SELECTION_MAP.keys())
+        selection_methods = list(SELECTION_MAP.keys())
     
-#         avg_iterations_per_method = []
-#         avg_fitness_per_method = []
-#         std_iterations_per_method = []  # For standard deviation of iterations
-#         std_fitness_per_method = []     # For standard deviation of fitness
-#         i = 0
-#         for method in selection_methods:
-#             iterations_list = []
-#             fitness_list = []
-#             i+=1
+        avg_iterations_per_method = []
+        avg_fitness_per_method = []
+        std_iterations_per_method = []  # For standard deviation of iterations
+        std_fitness_per_method = []     # For standard deviation of fitness
+        i = 0
+
+        config["selection_coefficient"] = 1
+        config["selection2"]["method"] = "elite"
+        config["selection2"]["params"] = {} 
+        config["selection3"]["method"] = "elite"
+        config["selection3"]["params"] = {}
+        config["selection4"]["method"] = "elite"
+        config["selection4"]["params"] = {}     
+
+
+        for method in selection_methods:
+            # Cambiar la config para cada method
+
+            iterations_list = []
+            fitness_list = []
+            i+=1
+            config["selection1"]["method"] = method
+            config["selection1"]["params"] = method_arguments[method]
+            # Perform multiple runs for reliability
+            for _ in range(50):  # Assuming 50 runs as specified
+                # Generate initial population and run the simulation
+                population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
+                populations_list = iterate(population, config)
+                # Calculate and store the results of this run
+                iterations_list.append(len(populations_list))
+                fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
     
-#             # Perform multiple runs for reliability
-#             for _ in range(50):  # Assuming 50 runs as specified
-#                 # Modify config for current selection method
-#                 config[f"selection{i}"]["method"] = method
-#                 # Generate initial population and run the simulation
-#                 population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
-#                 populations_list = iterate(population, config)
-#                 # Calculate and store the results of this run
-#                 iterations_list.append(len(populations_list))
-#                 fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
-    
-#             # Calculate averages for this method
-#             avg_iterations_per_method.append(np.mean(iterations_list))
-#             avg_fitness_per_method.append(np.mean(fitness_list))
-#             # Calculate standard deviations for this method
-#             std_iterations_per_method.append(np.std(iterations_list))
-#             std_fitness_per_method.append(np.std(fitness_list))
+            # Calculate averages for this method
+            avg_iterations_per_method.append(np.mean(iterations_list))
+            avg_fitness_per_method.append(np.mean(fitness_list))
+            # Calculate standard deviations for this method
+            std_iterations_per_method.append(np.std(iterations_list))
+            std_fitness_per_method.append(np.std(fitness_list))
         
-#         # Update the plot function calls to include standard deviations
-#         plot_results("Selection Method", "Avg Iterations", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, False)
-#         plot_results("Selection Method", "Avg Fitness", character_class, selection_methods, avg_fitness_per_method, std_fitness_per_method, True)
+        # Update the plot function calls to include standard deviations
+        plot_results("Selection Method", "Avg Iterations", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, False)
+        plot_results("Selection Method", "Avg Fitness", character_class, selection_methods, avg_fitness_per_method, std_fitness_per_method, True)
 
 def perform_replacement_analysis(config, character_class):
     
@@ -172,23 +195,35 @@ def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_
         else:
             plt.text(bar.get_x() + bar.get_width() / 1.5, height, f'{height:.0f}', ha='center', va='bottom')
 
-    plt.legend([y])
+    # plt.legend([y])
     plt.tight_layout()
     plt.show()
 
 
-def main():
+analysis_map = {
+    "crossover" : perform_crossover_analysis,
+    "replacement": perform_replacement_analysis,
+    "mutation": perform_mutation_analysis,
+    "selection": perform_selection_analysis
+}
+
+def main(analysis_names, class_name):
     with open("tp2/config.json") as config_file:
         config = json.load(config_file)
 
-    for character_class in CLASS_MAP.keys():
-        print(f"Analyzing for class: {character_class}")
-        config["class"] = character_class  # Set the current class in the config
+    classes = CLASS_MAP.keys() if class_name == "all" else [class_name]
+    for character_class in classes:
+        for analysis_name in analysis_names:
+            print(f"Analyzing for class: {character_class}")
+            config["class"] = character_class  # Set the current class in the config
+            analysis_map[analysis_name](config, character_class)        
 
-        # Perform crossover and mutation analysis for the current class
-        perform_replacement_analysis(config, character_class)
-
-
+import sys
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        main(analysis_map.keys(), "all")
+    elif len(sys.argv) == 2:
+        main(analysis_map.keys(), sys.argv[1])
+    else:
+        main(sys.argv[2:], sys.argv[1])
