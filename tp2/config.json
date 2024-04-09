@@ -7,7 +7,7 @@
     "mutation_rate": 1,
     "pairing" : "staggered",
     "crossover" : {
-        "method":"uniform",
+        "method":"onepoint",
         "params": {
             "p": 0.5
         }
@@ -16,35 +16,34 @@
         "method": "structure",
         "params": {
             "max_generations": 100,
-            "streak_length": 10,
+            "streak_length": 20,
             "similarity": 0.6,
             "threshold": 35
         }
     },
     "replace": "traditional",
-    "selection_coefficient": 1,
-    "replacement_coefficient": 1,
+    "selection_coefficient": 0.5,
+    "replacement_coefficient": 0.5,
     "selection1": {
-        "method":"ranking",
+        "method":"deterministic_tournament",
         "params": {
+            "random_pick_proportion": 0.4
         }
     },
     "selection2": {
-        "method":"deterministic_tournament",
+        "method":"roulette",
         "params": {
-            "random_pick_size": 5
         }
     },
     "selection3": {
-        "method":"probabilistic_tournament",
-        "params": {}
+        "method":"deterministic_tournament",
+        "params": {
+            "random_pick_proportion": 0.4
+        }
     },
     "selection4": {
-        "method":"boltzmann",
+        "method":"universal",
         "params": {
-            "t0": 100,
-            "tc": 1,
-            "k": 0.1
         }
     }
 }

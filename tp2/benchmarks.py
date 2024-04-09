@@ -38,6 +38,7 @@ def perform_crossover_analysis(config, character_class):
     # Update the plot function calls to include standard deviations
     plot_results("Crossover Method", "Avg Iterations", character_class, crossover_methods, avg_iterations_per_method, std_iterations_per_method, False)
     plot_results("Crossover Method", "Avg Fitness", character_class, crossover_methods, avg_fitness_per_method, std_fitness_per_method, True)
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 def perform_mutation_analysis(config, character_class):
 
@@ -73,6 +74,7 @@ def perform_mutation_analysis(config, character_class):
     # Update the plot function calls to include standard deviations
     plot_results("Mutation Method", "Avg Iterations", character_class, mutation_methods, avg_iterations_per_method, std_iterations_per_method, False)
     plot_results("Mutation Method", "Avg Fitness", character_class, mutation_methods, avg_fitness_per_method, std_fitness_per_method, True)
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 def perform_all_selection_analysis(config, character_class):
     method_arguments = {
@@ -154,7 +156,7 @@ def perform_selection_analysis(config, character_class, method_arguments):
     # Update the plot function calls to include standard deviations
     plot_results("Selection Method", "Avg Iterations", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, False)
     plot_results("Selection Method", "Avg Fitness", character_class, selection_methods, avg_fitness_per_method, std_fitness_per_method, True)
-
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 def perform_replacement_analysis(config, character_class):
     
@@ -190,6 +192,7 @@ def perform_replacement_analysis(config, character_class):
         # Update the plot function calls to include standard deviations
         plot_results("Replacement Method", "Avg Iterations", character_class, replacement_methods, avg_iterations_per_method, std_iterations_per_method, False)
         plot_results("Replacement Method", "Avg Fitness", character_class, replacement_methods, avg_fitness_per_method, std_fitness_per_method, True)
+        return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_digits):
     plt.figure()
@@ -215,23 +218,30 @@ def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_
     for bar in bars:
         height = bar.get_height()
         if show_digits:
-            plt.text(bar.get_x() + bar.get_width() / 1.5, height, f'{height:.2f}', ha='center', va='bottom')
+            plt.text(bar.get_x() + bar.get_width() / 1, height, f'{height:.2f}', ha='center', va='bottom')
         else:
-            plt.text(bar.get_x() + bar.get_width() / 1.5, height, f'{height:.0f}', ha='center', va='bottom')
+            plt.text(bar.get_x() + bar.get_width() / 1, height, f'{height:.0f}', ha='center', va='bottom')
 
     # plt.legend([y])
     plt.tight_layout()
     plt.show()
-
-
 
 analysis_map = {
     "crossover" : perform_crossover_analysis,
     "replacement": perform_replacement_analysis,
     "mutation": perform_mutation_analysis,
     "selection": perform_all_selection_analysis,
-    "boltzmann": perform_boltzmann_analysis,
-    "deterministic_tournament": perform_deterministic_tournament_analysis
+    # "boltzmann": perform_boltzmann_analysis,
+    # "deterministic_tournament": perform_deterministic_tournament_analysis
+}
+
+analysis_to_map = {
+    "crossover": CROSSOVER_MAP,
+    "mutation": MUTATION_MAP,
+    "selection": SELECTION_MAP,  # Assuming SELECTION_MAP exists and is relevant
+    "replacement": REPLACE_MAP,
+    # "boltzmann": SELECTION_MAP,  # Example, adjust based on actual use
+    # "deterministic_tournament": SELECTION_MAP,  # Example, adjust based on actual use
 }
 
 def main(analysis_names, class_name):
@@ -239,11 +249,26 @@ def main(analysis_names, class_name):
         config = json.load(config_file)
 
     classes = CLASS_MAP.keys() if class_name == "all" else [class_name]
+    all_results = {name: [] for name in analysis_names}  # Initialize a dict to hold results for each analysis type
+
     for character_class in classes:
         for analysis_name in analysis_names:
             print(f"Analyzing for class: {character_class}")
             config["class"] = character_class  # Set the current class in the config
-            analysis_map[analysis_name](config, character_class)        
+            results = analysis_map[analysis_name](config, character_class)
+            all_results[analysis_name].append(results)        
+
+    # Compute averages across all character classes for each analysis type
+    for analysis_name, results in all_results.items():
+        method_keys = list(analysis_to_map[analysis_name].keys()) if analysis_name in analysis_to_map else []
+        avg_iterations = np.mean([res[0] for res in results], axis=0)
+        avg_fitness = np.mean([res[1] for res in results], axis=0)
+        std_iterations = np.mean([res[2] for res in results], axis=0)
+        std_fitness = np.mean([res[3] for res in results], axis=0)
+
+        # Now you can plot the averaged results
+        plot_results(analysis_name, "Avg Iterations", "All Characters", method_keys, avg_iterations, std_iterations, False)
+        plot_results(analysis_name, "Avg Fitness", "All Characters", method_keys, avg_fitness, std_fitness, True)
 
 import sys
 
