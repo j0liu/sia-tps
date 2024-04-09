@@ -32,7 +32,7 @@ def with_params(map, method_object):
 
 def iterate(population, config):
     player_class = CLASS_MAP[config["class"]]
-    children_count = config["children"]
+    parents_count = config["parents"]
     stopping_condition = with_params(STOPPING_MAP, config["stopping_condition"])
     pair_genotypes = PAIRING_MAP[config["pairing"]]
     crossover = with_params(CROSSOVER_MAP, config["crossover"])
@@ -51,11 +51,11 @@ def iterate(population, config):
     populations_list = [population]
     iterations = 0
 
-    
+
     while not stopping_condition(iterations, populations_list):
         iterations += 1
 
-        parents = pair_select(population, children_count, iterations)
+        parents = pair_select(population, parents_count, iterations)
         children_genotypes = pair_genotypes([p.genotype for p in parents], crossover)
         children = [Player(player_class, mutate(genotype, mutation_function(mutation_rate, generation=iterations),  PLAYER_GENE_DOMAINS)) for genotype in children_genotypes]
         population = replace(population, children, replacement_select, iterations)

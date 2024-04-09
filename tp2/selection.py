@@ -11,7 +11,10 @@ def composite(population, sample_size, iterations, selection_method1, selection_
 
 def elite(population, sample_size, iterations, params):
     population.sort(key=lambda x: x.fitness, reverse=True)
-    return population[:sample_size]
+    population_size = len(population)
+    result = population * (sample_size // population_size) + population[:sample_size % population_size]
+    assert len(result) == sample_size
+    return result
 
 
 def roulette(population, sample_size, iterations, params, pseudo_fitness_function = lambda p: p.fitness, random_function = lambda x,y: x):
@@ -40,10 +43,10 @@ def boltzmann(population, sample_size, iterations, params):
     t0 = params['t0']
     tc = params['tc']
     k = params['k']
-    temperature = tc + (t0 - tc) * math.exp(-k * iterations) 
+    temperature = tc + (t0 - tc) * math.exp(-k * iterations)
     avg = numpy.average([math.exp(p.fitness / temperature) for p in population])
     return roulette(population, sample_size, iterations, params, pseudo_fitness_function=lambda p: math.exp(p.fitness / temperature) / avg)
-    
+
 
 def deterministic_tournament(population, sample_size, iterations, params):#, random_pick_size):
     random_pick_size = params['random_pick_size']
