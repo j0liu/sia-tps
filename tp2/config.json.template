@@ -1,6 +1,6 @@
 {
     "initial_population_size": <natural>,
-    "children": <natural>,
+    "parents": <natural>,
     "class": <warrior|archer|defender|infiltrate>,
     "mutation": <gene|multigene>,
     "mutation_function": <>,
@@ -30,7 +30,8 @@
             "t0": <number>, #boltzmann
             "tc": <number>, #boltzmann
             "k": <number>, #boltzmann
-            "random_pick_size": <natural> #deterministic_tournament
+            "random_pick_size": <natural>, #deterministic_tournament
+            "random_pick_proportion": <proportion> #deterministic_tournament
         }
     }
 }

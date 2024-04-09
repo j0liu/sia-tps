@@ -1,6 +1,6 @@
 {
-    "initial_population_size": 15,
-    "parents": 8,
+    "initial_population_size": 25,
+    "parents": 12,
     "class": "warrior",
     "mutation_type": "multigene",
     "mutation_function": "decrease",
@@ -16,7 +16,7 @@
         "method": "structure",
         "params": {
             "max_generations": 100,
-            "streak_length": 4,
+            "streak_length": 10,
             "similarity": 0.6,
             "threshold": 35
         }

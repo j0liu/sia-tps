@@ -49,7 +49,10 @@ def boltzmann(population, sample_size, iterations, params):
 
 
 def deterministic_tournament(population, sample_size, iterations, params):#, random_pick_size):
-    random_pick_size = params['random_pick_size']
+    # random_pick_size = params['random_pick_size']
+    random_pick_proportion = params.get('random_pick_proportion', None)
+    random_pick_size = int(random_pick_proportion * len(population)) if random_pick_proportion is not None else params['random_pick_size']
+
     selection = []
     for _ in range(sample_size):
         sample = random.sample(population, random_pick_size)

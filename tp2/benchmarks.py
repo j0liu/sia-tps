@@ -90,8 +90,8 @@ def perform_all_selection_analysis(config, character_class):
 def perform_boltzmann_analysis(config, character_class):
     method_arguments = {
         "elite": {},
-        "boltzmann 1": {'t0': 100, 'tc': 1, 'k': 0.1},
-        "boltzmann 2": {'t0': 100, 'tc': 50, 'k': 0.1},
+        "boltzmann 1": {'t0': 100, 'tc': 1, 'k': 10},
+        "boltzmann 2": {'t0': 500, 'tc': 50, 'k': 0.01},
         "boltzmann 3": {'t0': 10, 'tc': 1, 'k': 1},
         "boltzmann 4": {'t0': 1000, 'tc': 10, 'k': 1},
     }
@@ -101,14 +101,13 @@ def perform_boltzmann_analysis(config, character_class):
 def perform_deterministic_tournament_analysis(config, character_class):
     method_arguments = {
         "elite": {},
-        "deterministic_tournament 1": {"random_pick_size": 10},
-        "deterministic_tournament 2": {"random_pick_size": 10},
-        "deterministic_tournament 3": {"random_pick_size": 10},
-        "deterministic_tournament 4": {"random_pick_size": 10},
-        "deterministic_tournament 5": {"random_pick_size": 10},
+        "deterministic_tournament 1": {"random_pick_size": 2},
+        "deterministic_tournament 1": {"random_pick_size": 4},
+        "deterministic_tournament 2": {"random_pick_proportion": 0.1},
+        "deterministic_tournament 3": {"random_pick_proportion": 0.2},
+        "deterministic_tournament 4": {"random_pick_proportion": 0.5},
     }
     perform_selection_analysis(config, character_class, method_arguments)
-
 
 def perform_selection_analysis(config, character_class, method_arguments):
     selection_methods = list(method_arguments.keys())
