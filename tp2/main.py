@@ -50,6 +50,8 @@ def iterate(population, config):
     
     populations_list = [population]
     iterations = 0
+
+    
     while not stopping_condition(iterations, populations_list):
         iterations += 1
 

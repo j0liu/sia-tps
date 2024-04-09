@@ -62,4 +62,3 @@ PAIRING_MAP = {
     "inverted": pairing.inverted,
     "parallel": pairing.parallel
 }
-

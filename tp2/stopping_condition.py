@@ -44,7 +44,7 @@ def content(iterations, population_list, params):
     streak_length = params['streak_length']
     
     current_max = max(p.fitness for p in population_list[-1])
-    if last_max != None and isclose(current_max, last_max, rel_tol=1e-8):
+    if len(population_list) > 1 and last_max != None and isclose(current_max, last_max, rel_tol=1e-8):
         current_streak += 1
     else:
         last_max = current_max

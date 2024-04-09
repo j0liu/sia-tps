@@ -1,8 +1,8 @@
 {
-    "initial_population_size": 20,
-    "children": 10,
+    "initial_population_size": 50,
+    "children": 26,
     "class": "warrior",
-    "mutation_type": "multigene",
+    "mutation_type": "gene",
     "mutation_function": "decrease",
     "mutation_rate": 1,
     "pairing" : "staggered",
@@ -13,23 +13,20 @@
         }
     },
     "stopping_condition": {
-        "method": "content",
+        "method": "structure",
         "params": {
             "max_generations": 100,
-            "streak_length": 20,
-            "similarity": 0.9, 
+            "streak_length": 3,
+            "similarity": 0.5,
             "threshold": 35
         }
     },
     "replace": "traditional",
-    "selection_coefficient": 0.75,
-    "replacement_coefficient": 0.5,
+    "selection_coefficient": 1,
+    "replacement_coefficient": 1,
     "selection1": {
-        "method":"boltzmann",
+        "method":"ranking",
         "params": {
-            "t0": 100,
-            "tc": 1,
-            "k": 0.1
         }
     },
     "selection2": {

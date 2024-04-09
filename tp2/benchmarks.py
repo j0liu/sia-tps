@@ -82,7 +82,7 @@ def perform_selection_analysis(config, character_class):
             "roulette": {},
             "universal": {},
             "ranking": {},
-            "boltzmann": {'t0': 100, 'tc': 1, 'k': 0.1},    
+            "boltzmann": {'t0': 100, 'tc': 1, 'k': 0.1},
             "deterministic_tournament": {"random_pick_size": 10},
             "probabilistic_tournament": {}
         }
@@ -198,6 +198,7 @@ def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_
     # plt.legend([y])
     plt.tight_layout()
     plt.show()
+
 
 
 analysis_map = {
