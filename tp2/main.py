@@ -11,7 +11,7 @@ from player import (
 )
 import selection
 from maps import CLASS_MAP, CROSSOVER_MAP, MUTATION_MAP, MUTATION_FUNCTION_MAP, REPLACE_MAP, SELECTION_MAP, PAIRING_MAP, STOPPING_MAP
-
+import matplotlib.pyplot as plt
 
 def generate_population(population_size, player_class):
     population = []
@@ -63,6 +63,16 @@ def iterate(population, config):
         
     return populations_list
 
+def plot_genealogy(genealogy):
+    max_fitnesses = [max(p.fitness for p in g) for g in genealogy]
+    fig = plt.figure()
+    ax = plt.axes()
+
+    x = [i for i in range(len(max_fitnesses))]
+    ax.plot(x, max_fitnesses)
+    plt.show()
+
+
 
 def main():
     with open("tp2/config.json") as config:
@@ -77,6 +87,7 @@ def main():
         print("generation_________________________________________________________________")
         print(max(g, key=lambda p: p.fitness))
     print(len(result))
+    plot_genealogy(result)
 
 
 if __name__ == "__main__":
