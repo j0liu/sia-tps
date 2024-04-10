@@ -62,3 +62,23 @@ PAIRING_MAP = {
     "inverted": pairing.inverted,
     "parallel": pairing.parallel
 }
+
+DETERMINISTIC_MAP = {
+    "elite": {},
+    "deterministic_tournament 1": {"random_pick_size": 2},
+    "deterministic_tournament 2": {"random_pick_size": 4},
+    "deterministic_tournament 3": {"random_pick_proportion": 0.1},
+    "deterministic_tournament 4": {"random_pick_proportion": 0.2},
+    "deterministic_tournament 5": {"random_pick_proportion": 0.5},
+    "deterministic_tournament 7": {"random_pick_proportion": 0.9},
+}
+
+BOLTZMANN_MAP = {
+    "elite": {},
+    "boltzmann 1": {'t0': 100, 'tc': 1, 'k': 0.1},
+    "boltzmann 2": {'t0': 500, 'tc': 50, 'k': 0.01},
+    "boltzmann 3": {'t0': 10, 'tc': 1, 'k': 1},
+    "boltzmann 4": {'t0': 1000, 'tc': 10, 'k': 1},
+    "boltzmann 5": {'t0': 1000, 'tc': 100, 'k': 1},
+    "boltzmann 6": {'t0': 1000, 'tc': 500, 'k': 1},
+}
