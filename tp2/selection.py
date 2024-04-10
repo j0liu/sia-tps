@@ -19,8 +19,8 @@ def elite(population, sample_size, iterations, params):
 
 def roulette(population, sample_size, iterations, params, pseudo_fitness_function = lambda p: p.fitness, random_function = lambda x,y: x):
     selection = []
-    sum_fitness = sum([pseudo_fitness_function(p) for p in population]) 
-    relative_fitness = [p.fitness / sum_fitness for p in population]    
+    sum_pseudo_fitness = sum([pseudo_fitness_function(p) for p in population]) 
+    relative_fitness = [pseudo_fitness_function(p) / sum_pseudo_fitness for p in population]
     accumulated_fitness = [sum(relative_fitness[:i+1]) for i in range(len(relative_fitness))]
     for i in range(sample_size):
         r = random_function(random.uniform(0, 1), i)
