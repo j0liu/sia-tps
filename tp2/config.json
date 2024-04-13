@@ -3,11 +3,11 @@
     "parents": 12,
     "class": "warrior",
     "mutation_type": "multigene",
-    "mutation_function": "decrease",
-    "mutation_rate": 1,
+    "mutation_function": "uniform",
+    "mutation_rate": 0.5,
     "pairing" : "staggered",
     "crossover" : {
-        "method":"onepoint",
+        "method":"twopoint",
         "params": {
             "p": 0.5
         }

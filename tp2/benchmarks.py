@@ -198,6 +198,41 @@ def perform_replacement_analysis(config, character_class):
         plot_general_results("Replacement", character_class, replacement_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
         return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
+def perform_mutation_func_analysis(config, character_class):
+    functions = list(MUTATION_FUNCTION_MAP.keys())
+
+    avg_iterations_per_method = []
+    avg_fitness_per_method = []
+    std_iterations_per_method = []  # For standard deviation of iterations
+    std_fitness_per_method = []     # For standard deviation of fitness
+
+    for fun in functions:
+        iterations_list = []
+        fitness_list = []
+
+        # Perform multiple runs for reliability
+        for _ in range(50):  # Assuming 50 runs as specified
+            # Modify config for current replacement method
+            config["mutation_function"] = fun
+            # Generate initial population and run the simulation
+            population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
+            populations_list = iterate(population, config)
+            # Calculate and store the results of this run
+            iterations_list.append(len(populations_list))
+            fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
+
+        # Calculate averages for this method
+        avg_iterations_per_method.append(np.mean(iterations_list))
+        avg_fitness_per_method.append(np.mean(fitness_list))
+        # Calculate standard deviations for this method
+        std_iterations_per_method.append(np.std(iterations_list))
+        std_fitness_per_method.append(np.std(fitness_list))
+
+    # Update the plot function calls to include standard deviations
+    plot_results("Mutation function", "Avg Iterations", character_class, functions, avg_iterations_per_method, std_iterations_per_method, False)
+    plot_results("Mutation function", "Avg Fitness", character_class, functions, avg_fitness_per_method, std_fitness_per_method, True)
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
+
 def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_digits):
     plt.figure()
     index = np.arange(len(crossover_methods))
@@ -299,6 +334,7 @@ analysis_to_map = {
     "replacement": REPLACE_MAP,
     "boltzmann": BOLTZMANN_MAP,  # Example, adjust based on actual use
     "deterministic_tournament": DETERMINISTIC_MAP,  # Example, adjust based on actual use
+    "mutationfunction": MUTATION_FUNCTION_MAP
 }
 
 def main(analysis_names, class_name):
