@@ -22,7 +22,7 @@
         }
     },
     "replace": "traditional",
-    "selection_coefficient": 0.5,
+    "selection_coefficient": 1,
     "replacement_coefficient": 0.5,
     "selection1": {
         "method":"deterministic_tournament",
