@@ -60,7 +60,9 @@ STOPPING_MAP = {
 PAIRING_MAP = {
     "staggered": pairing.staggered,
     "inverted": pairing.inverted,
-    "parallel": pairing.parallel
+    "parallel": pairing.parallel,
+    "complete": pairing.complete,
+    "alpha": pairing.alpha
 }
 
 DETERMINISTIC_MAP = {

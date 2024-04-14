@@ -5,7 +5,7 @@
     "mutation": <gene|multigene>,
     "mutation_function": <>,
     "mutation_rate": <proportion>,
-    "pairing" : <staggered>
+    "pairing" : <staggered|inverted|parallel|complete|alpha>
     "crossover" : {
         "method": <onepoint|twopoint|uniform|annular>,
         "params": {
