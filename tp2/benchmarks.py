@@ -9,7 +9,7 @@ ITERATIONS = 50
 
 def perform_crossover_analysis(config, character_class):
 
-    crossover_methods = list(CROSSOVER_MAP.keys())
+    methods = list(CROSSOVER_MAP.keys())
 
     avg_iterations_per_method = []
     avg_fitness_per_method = []
@@ -19,7 +19,7 @@ def perform_crossover_analysis(config, character_class):
 
     population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
 
-    for method in crossover_methods:
+    for method in methods:
         print(method)
         genealogies = []
         iterations_list = []
@@ -42,8 +42,8 @@ def perform_crossover_analysis(config, character_class):
         std_fitness_per_method.append(np.std(fitness_list))
 
     # Update the plot function calls to include standard deviations
-    plot_general_results("Crossover", character_class, crossover_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
-    plot_evolution(character_class, genealogies_per_method, crossover_methods)
+    plot_general_results("Crossover", character_class, methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_evolution(character_class, genealogies_per_method, methods)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 def perform_mutation_analysis(config, character_class):
@@ -74,7 +74,7 @@ def perform_mutation_analysis(config, character_class):
             fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
             genealogies.append([max(p.fitness for p in g) for g in populations_list])
         genealogies_per_method.append(genealogies)
-
+        print("min ", min(iterations_list),"max ", max(iterations_list),"avg ", np.mean(iterations_list),"std ", np.std(iterations_list))
         # Calculate averages for this method
         avg_iterations_per_method.append(np.mean(iterations_list))
         avg_fitness_per_method.append(np.mean(fitness_list))
@@ -108,9 +108,7 @@ def perform_crossover_selection_analysis(config, character_class, method_argumen
     std_fitness_per_method = []     # For standard deviation of fitness
     genealogies_per_method = []
 
-    config["selection_coefficient"] = 1
-    config["selection2"]["method"] = "elite"
-    config["selection2"]["params"] = {}
+    config["selection_coefficient"] = 0.5
     config["replacement_coefficient"] = 1
     config["selection3"]["method"] = "elite"
     config["selection3"]["params"] = {}
@@ -128,6 +126,8 @@ def perform_crossover_selection_analysis(config, character_class, method_argumen
         fitness_list = []
         config["selection1"]["method"] = method
         config["selection1"]["params"] = method_arguments[method_instance]
+        config["selection2"]["method"] = method
+        config["selection2"]["params"] = method_arguments[method_instance]
         # Perform multiple runs for reliability
         for _ in range(ITERATIONS):  # Assuming 50 runs as specified
             # Generate initial population and run the simulation
@@ -197,15 +197,12 @@ def perform_replacement_selection_analysis(config, character_class, method_argum
     genealogies_per_method = []
 
     config["selection_coefficient"] = 1
-    config["selection2"]["method"] = "elite"
-    config["selection2"]["params"] = {}
-    config["replacement_coefficient"] = 1
-    config["selection4"]["method"] = "elite"
-    config["selection4"]["params"] = {}     
     config["selection1"]["method"] = "elite"
     config["selection1"]["params"] = {}
+    config["selection2"]["method"] = "elite"
+    config["selection2"]["params"] = {}
+    config["replacement_coefficient"] = 0.5
     population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
-
 
     for method_instance in selection_methods:
         # Cambiar la config para cada method
@@ -216,6 +213,8 @@ def perform_replacement_selection_analysis(config, character_class, method_argum
         fitness_list = []
         config["selection3"]["method"] = method
         config["selection3"]["params"] = method_arguments[method_instance]
+        config["selection4"]["method"] = method
+        config["selection4"]["params"] = method_arguments[method_instance]
         # Perform multiple runs for reliability
         for _ in range(ITERATIONS):  # Assuming 50 runs as specified
             # Generate initial population and run the simulation
@@ -319,9 +318,9 @@ def perform_mutation_func_analysis(config, character_class):
     plot_evolution(character_class, genealogies_per_method, functions)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
-def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_digits):
+def plot_results(x, y, character_class, methods, data, std_devs, show_digits):
     plt.figure()
-    index = np.arange(len(crossover_methods))
+    index = np.arange(len(methods))
     bar_width = 0.35
 
     # Define a list of colors to cycle through
@@ -329,14 +328,14 @@ def plot_results(x, y, character_class, crossover_methods, data, std_devs, show_
               'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
 
     # Ensure we have enough colors by repeating the list if necessary
-    if len(crossover_methods) > len(colors):
-        colors = colors * (len(crossover_methods) // len(colors) + 1)
+    if len(methods) > len(colors):
+        colors = colors * (len(methods) // len(colors) + 1)
 
-    bars = plt.bar(index, data, bar_width, yerr=std_devs, color=colors[:len(crossover_methods)], capsize=5)
+    bars = plt.bar(index, data, bar_width, yerr=std_devs, color=colors[:len(methods)], capsize=5)
 
     plt.xlabel(x)
     plt.ylabel(y)
-    plt.xticks(index, crossover_methods, rotation=45)
+    plt.xticks(index, methods, rotation=45)
     plt.title(f"{x} per {y} for {character_class}")
 
     # Adding the number on top of each bar
@@ -358,9 +357,9 @@ def plot_general_results(aspect, character_class, methods, avg_iterations_per_me
     plt.show()
 
 
-def subplot_results(figure, axis, x, y, character_class, crossover_methods, data, std_devs, show_digits):
+def subplot_results(figure, axis, x, y, character_class, methods, data, std_devs, show_digits):
     #plt.figure()
-    index = np.arange(len(crossover_methods))
+    index = np.arange(len(methods))
     bar_width = 0.35
 
     # Define a list of colors to cycle through
@@ -368,15 +367,15 @@ def subplot_results(figure, axis, x, y, character_class, crossover_methods, data
               'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
 
     # Ensure we have enough colors by repeating the list if necessary
-    if len(crossover_methods) > len(colors):
-        colors = colors * (len(crossover_methods) // len(colors) + 1)
-
-    bars = axis.bar(index, data, bar_width, yerr=std_devs, color=colors[:len(crossover_methods)], capsize=5)
+    if len(methods) > len(colors):
+        colors = colors * (len(methods) // len(colors) + 1)
+    std_devs = [min(data[i], std_devs[i]) for i in range(len(std_devs))]
+    bars = axis.bar(index, data, bar_width, yerr=std_devs, color=colors[:len(methods)], capsize=5)
 
     plt.sca(axis)
     plt.xlabel(x)
     plt.ylabel(y)
-    plt.xticks(index, crossover_methods, rotation=45)
+    plt.xticks(index, methods, rotation=45)
     plt.title(f"{x} per {y} for {character_class}")
 
     # Adding the number on top of each bar
@@ -418,10 +417,11 @@ analysis_map = {
 analysis_to_map = {
     "crossover": CROSSOVER_MAP,
     "mutation": MUTATION_MAP,
-    "selection": SELECTION_MAP,  # Assuming SELECTION_MAP exists and is relevant
     "replacement": REPLACE_MAP,
+    "crossover_selection": SELECTION_MAP,  # Assuming SELECTION_MAP exists and is relevant
     "boltzmann": BOLTZMANN_MAP,  # Example, adjust based on actual use
     "deterministic_tournament": DETERMINISTIC_MAP,  # Example, adjust based on actual use
+    "replacement_selection": SELECTION_MAP,
     "mutation_function": MUTATION_FUNCTION_MAP
 }
 

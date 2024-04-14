@@ -1,13 +1,13 @@
 {
     "initial_population_size": 25,
-    "parents": 12,
+    "parents": 20,
     "class": "warrior",
     "mutation_type": "multigene",
-    "mutation_function": "uniform",
-    "mutation_rate": 0.5,
+    "mutation_function": "increase",
+    "mutation_rate": 0.5, 
     "pairing" : "staggered",
     "crossover" : {
-        "method":"twopoint",
+        "method":"onepoint",
         "params": {
             "p": 0.5
         }
@@ -22,7 +22,7 @@
         }
     },
     "replace": "traditional",
-    "selection_coefficient": 1,
+    "selection_coefficient": 0.5,
     "replacement_coefficient": 0.5,
     "selection1": {
         "method":"deterministic_tournament",
