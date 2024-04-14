@@ -196,11 +196,11 @@ def perform_replacement_selection_analysis(config, character_class, method_argum
     std_fitness_per_method = []     # For standard deviation of fitness
     genealogies_per_method = []
 
-    config["selection_coefficient"] = 1
+    config["selection_coefficient"] = 0.5
     config["selection1"]["method"] = "elite"
     config["selection1"]["params"] = {}
-    config["selection2"]["method"] = "elite"
-    config["selection2"]["params"] = {}
+    config["selection2"]["method"] = "deterministic_tournament"
+    config["selection2"]["params"] = { "random_pick_proportion": 0.4 }
     config["replacement_coefficient"] = 0.5
     population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
 
@@ -318,6 +318,54 @@ def perform_mutation_func_analysis(config, character_class):
     plot_evolution(character_class, genealogies_per_method, functions)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
+
+stopping_condition_map = {
+    "max_generations": {"max_generations": 100},
+    "structure": {"streak_length": 20, "similarity": 0.6},
+    "content": {"streak_length": 20},
+    # "around_optimal": {"threshold": 100}
+}
+
+def perform_stopping_analysis(config, character_class):
+    functions = list(stopping_condition_map.keys())
+
+    avg_iterations_per_method = []
+    avg_fitness_per_method = []
+    std_iterations_per_method = []  # For standard deviation of iterations
+    std_fitness_per_method = []     # For standard deviation of fitness
+    genealogies_per_method = []
+    
+    population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
+
+    for cond in stopping_condition_map:
+        print(cond)
+        genealogies = []
+        iterations_list = []
+        fitness_list = []
+
+        for _ in range(ITERATIONS):  # Assuming 50 runs as specified
+            # Modify config for current replacement method
+            config["stopping_condition"]["method"] = cond
+            config["stopping_condition"]["params"] = stopping_condition_map[cond]
+            # Generate initial population and run the simulation
+            populations_list = iterate(population, config)
+            # Calculate and store the results of this run
+            iterations_list.append(len(populations_list))
+            fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
+            genealogies.append([max(p.fitness for p in g) for g in populations_list])
+        genealogies_per_method.append(genealogies)
+        # Calculate averages for this method
+        avg_iterations_per_method.append(np.mean(iterations_list))
+        avg_fitness_per_method.append(np.mean(fitness_list))
+        # Calculate standard deviations for this method
+        std_iterations_per_method.append(np.std(iterations_list))
+        std_fitness_per_method.append(np.std(fitness_list))
+
+    plot_general_results("Stopping condition", character_class, functions, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_evolution(character_class, genealogies_per_method, functions)
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
+
+        
 def plot_results(x, y, character_class, methods, data, std_devs, show_digits):
     plt.figure()
     index = np.arange(len(methods))
@@ -412,6 +460,7 @@ analysis_map = {
     "deterministic_tournament": perform_deterministic_tournament_analysis,
     "replacement_selection": perform_all_replacement_selection_analysis,
     "mutation_function": perform_mutation_func_analysis,
+    "stopping_condition": perform_stopping_analysis
 }
 
 analysis_to_map = {
@@ -422,7 +471,8 @@ analysis_to_map = {
     "boltzmann": BOLTZMANN_MAP,  # Example, adjust based on actual use
     "deterministic_tournament": DETERMINISTIC_MAP,  # Example, adjust based on actual use
     "replacement_selection": SELECTION_MAP,
-    "mutation_function": MUTATION_FUNCTION_MAP
+    "mutation_function": MUTATION_FUNCTION_MAP,
+    "stopping_condition": stopping_condition_map
 }
 
 def main(analysis_names, class_name):
