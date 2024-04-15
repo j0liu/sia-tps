@@ -11,7 +11,8 @@ CLASS_MAP = {
     "warrior": PlayerClass.WARRIOR,
     "archer": PlayerClass.ARCHER,
     "defender": PlayerClass.DEFENDER,
-    "infiltrate": PlayerClass.INFILTRATE
+    "infiltrate": PlayerClass.INFILTRATE,
+    # "wizard": PlayerClass.WIZARD
 }
 
 CROSSOVER_MAP = {
@@ -33,7 +34,7 @@ MUTATION_FUNCTION_MAP = {
     "random": mutation_func.randomize,
     "decrease": mutation_func.decrease,
     "increase": mutation_func.increase,
-    "oscilating_increase": mutation_func.oscilating_increase
+    "oscillating_increase": mutation_func.oscillating_increase
 }
 
 SELECTION_MAP = {

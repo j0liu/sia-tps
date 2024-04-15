@@ -6,6 +6,7 @@ class PlayerClass(object):
     ARCHER = (0.9, 0.1)
     DEFENDER = (0.1, 0.9)
     INFILTRATE = (0.8, 0.3)
+    # WIZARD = (0.49, 0.51)
 
 class ATTRIBUTES(object):
     HEIGHT = 0
@@ -70,7 +71,7 @@ class Player(object):
         return (self.resistence_p() + self.experience_p()) * self.health_p() * self.dem()
     
     def __str__(self):
-        return f"Player: h:{self.h}, s{self.str_items}, a{self.agi_items}, e{self.exp_items}, r{self.res_items}, hp{self.health_items}, fitness:{self.fitness}"
+        return f"Player: h:{self.h}, s{self.str_items}, a{self.agi_items}, e{self.exp_items}, r{self.res_items}, hp{self.health_items}, atk:{self.attack()}, def:{self.defense()}, fitness:{self.fitness}"
     
     def __repr__(self):
         return self.__str__()

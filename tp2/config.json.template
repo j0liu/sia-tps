@@ -4,7 +4,7 @@
     "parents": <natural>,
     "class": <warrior|archer|defender|infiltrate>,
     "mutation": <gene|multigene>,
-    "mutation_function": <uniform|increase|decrease|random|oscilating_increase>,
+    "mutation_function": <uniform|increase|decrease|random|oscillating_increase>,
     "mutation_rate": <proportion>,
     "pairing" : <staggered|inverted|parallel|complete|alpha>
     "crossover" : {
