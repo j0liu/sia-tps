@@ -520,7 +520,7 @@ analysis_to_map = {
 }
 
 def main(analysis_names, class_name):
-    with open("tp2/config.json") as config_file:
+    with open("config.json") as config_file:
         config = json.load(config_file)
 
     classes = CLASS_MAP.keys() if class_name == "all" else [class_name]

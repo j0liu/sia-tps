@@ -76,7 +76,7 @@ def plot_genealogy(genealogy):
 
 
 def main():
-    with open("tp2/config.json") as config:
+    with open("config.json") as config:
         config = json.load(config)
 
     POPULATION_SIZE = config["initial_population_size"] 
