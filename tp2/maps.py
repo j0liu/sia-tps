@@ -32,7 +32,8 @@ MUTATION_FUNCTION_MAP = {
     "uniform": mutation_func.uniform,
     "random": mutation_func.randomize,
     "decrease": mutation_func.decrease,
-    "increase": mutation_func.increase
+    "increase": mutation_func.increase,
+    "oscilating_increase": mutation_func.oscilating_increase
 }
 
 SELECTION_MAP = {

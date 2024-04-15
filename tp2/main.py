@@ -12,6 +12,7 @@ from player import (
 import selection
 from maps import CLASS_MAP, CROSSOVER_MAP, MUTATION_MAP, MUTATION_FUNCTION_MAP, REPLACE_MAP, SELECTION_MAP, PAIRING_MAP, STOPPING_MAP
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 def generate_population(population_size, player_class):
     population = []
@@ -80,14 +81,30 @@ def main():
 
     POPULATION_SIZE = config["initial_population_size"] 
     PLAYER_CLASS = CLASS_MAP[config["class"]]
+    ITERATIONS = config["iterations"]
 
+    # print(Player(PlayerClass.WARRIOR, np.array([1.915, 74.814, 74.532, 0.654, 0, 0])))
+
+    begin_time = datetime.now()
     population = generate_population(POPULATION_SIZE, PLAYER_CLASS)
-    result = iterate(population, config)
-    for g in result:
-        print("generation_________________________________________________________________")
-        print(max(g, key=lambda p: p.fitness))
-    print(len(result))
+    max_list = []
+    for i in range(ITERATIONS):
+        result = iterate(population, config)
+        max_elem = max([max(generation, key=lambda p: p.fitness) for generation in result])
+        max_list.append(max_elem)
+        population = result[-1]
+        # print("max fitness: ", max_elem.fitness)
+    
+    print("max max: ", max(max_list, key=lambda p: p.fitness))
+    end_time = datetime.now()
+    print("Time: ", end_time - begin_time)
+
+    # for g in result:
+    #     print("generation_________________________________________________________________")
+    #     print(max(g, key=lambda p: p.fitness))
+    # print(len(result))
     plot_genealogy(result)
+
 
 
 if __name__ == "__main__":

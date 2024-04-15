@@ -1,9 +1,10 @@
 {
+    "iterations": 1,
     "initial_population_size": 25,
     "parents": 20,
-    "class": "warrior",
+    "class": "archer",
     "mutation_type": "multigene",
-    "mutation_function": "increase",
+    "mutation_function": "oscilating_increase",
     "mutation_rate": 0.5, 
     "pairing" : "staggered",
     "crossover" : {
@@ -13,12 +14,12 @@
         }
     },
     "stopping_condition": {
-        "method": "structure",
+        "method": "around_optimal",
         "params": {
             "max_generations": 100,
-            "streak_length": 20,
-            "similarity": 0.6,
-            "threshold": 35
+            "streak_length": 50,
+            "similarity": 0.8,
+            "threshold": 61.8857
         }
     },
     "replace": "traditional",

@@ -1,9 +1,10 @@
 {
+    "iterations": <natural>
     "initial_population_size": <natural>,
     "parents": <natural>,
     "class": <warrior|archer|defender|infiltrate>,
     "mutation": <gene|multigene>,
-    "mutation_function": <>,
+    "mutation_function": <uniform|increase|decrease|random|oscilating_increase>,
     "mutation_rate": <proportion>,
     "pairing" : <staggered|inverted|parallel|complete|alpha>
     "crossover" : {
@@ -18,7 +19,7 @@
             "max_generations": <natural>, #max_generations
             "streak_length" : <natural>, #structure, content,
             "similarity": <proportion>, #structure
-            "threshold" : <float> #around_optimus_prime
+            "threshold" : <float> #around_optimal
         }
     }
     "replace: <traditional|young|gap>,

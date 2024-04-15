@@ -3,7 +3,7 @@ from utils import normalize
 
 class PlayerClass(object):
     WARRIOR = (0.6, 0.4)
-    ARCHER = (0.9, 0.4)
+    ARCHER = (0.9, 0.1)
     DEFENDER = (0.1, 0.9)
     INFILTRATE = (0.8, 0.3)
 
