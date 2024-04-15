@@ -1,4 +1,4 @@
-from maps import CLASS_MAP, CROSSOVER_MAP, MUTATION_MAP, MUTATION_FUNCTION_MAP, REPLACE_MAP, SELECTION_MAP, PAIRING_MAP, STOPPING_MAP, BOLTZMANN_MAP, DETERMINISTIC_MAP
+from maps import CLASS_MAP, CROSSOVER_MAP, MUTATION_MAP, MUTATION_FUNCTION_MAP, REPLACE_MAP, SELECTION_MAP, PAIRING_MAP, STOPPING_MAP, BOLTZMANN_MAP, DETERMINISTIC_MAP, REPLACEMENT_PARENTS_MAP
 import json
 from main import generate_population, iterate
 import matplotlib.pyplot as plt
@@ -42,7 +42,7 @@ def perform_crossover_analysis(config, character_class):
         std_fitness_per_method.append(np.std(fitness_list))
 
     # Update the plot function calls to include standard deviations
-    plot_general_results("Crossover", character_class, methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_general_results("Crossover Method", character_class, methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
     plot_evolution(character_class, genealogies_per_method, methods)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
@@ -83,9 +83,50 @@ def perform_mutation_analysis(config, character_class):
         std_fitness_per_method.append(np.std(fitness_list))
     
     # Update the plot function calls to include standard deviations
-    plot_general_results("Mutation", character_class, mutation_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_general_results("Mutation Method", character_class, mutation_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
     plot_evolution(character_class, genealogies_per_method, mutation_methods)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
+
+def perform_mutation_func_analysis(config, character_class):
+    functions = list(MUTATION_FUNCTION_MAP.keys())
+
+    avg_iterations_per_method = []
+    avg_fitness_per_method = []
+    std_iterations_per_method = []  # For standard deviation of iterations
+    std_fitness_per_method = []     # For standard deviation of fitness
+    genealogies_per_method = []
+    
+    population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
+
+    for fun in functions:
+        print(fun)
+        genealogies = []
+        iterations_list = []
+        fitness_list = []
+
+        # Perform multiple runs for reliability
+        for _ in range(ITERATIONS):  # Assuming 50 runs as specified
+            # Modify config for current replacement method
+            config["mutation_function"] = fun
+            # Generate initial population and run the simulation
+            populations_list = iterate(population, config)
+            # Calculate and store the results of this run
+            iterations_list.append(len(populations_list))
+            fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
+            genealogies.append([max(p.fitness for p in g) for g in populations_list])
+        genealogies_per_method.append(genealogies)
+        # Calculate averages for this method
+        avg_iterations_per_method.append(np.mean(iterations_list))
+        avg_fitness_per_method.append(np.mean(fitness_list))
+        # Calculate standard deviations for this method
+        std_iterations_per_method.append(np.std(iterations_list))
+        std_fitness_per_method.append(np.std(fitness_list))
+
+    # Update the plot function calls to include standard deviations
+    plot_general_results("Mutation function", character_class, functions, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_evolution(character_class, genealogies_per_method, functions)
+    return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
+
 
 def perform_all_crossover_selection_analysis(config, character_class):
     method_arguments = {
@@ -145,7 +186,7 @@ def perform_crossover_selection_analysis(config, character_class, method_argumen
         std_fitness_per_method.append(np.std(fitness_list))
     
     # Update the plot function calls to include standard deviations
-    plot_general_results("Selection", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_general_results("Selection Method", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
     plot_evolution(character_class, genealogies_per_method, selection_methods)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
@@ -232,7 +273,7 @@ def perform_replacement_selection_analysis(config, character_class, method_argum
         std_fitness_per_method.append(np.std(fitness_list))
     
     # Update the plot function calls to include standard deviations
-    plot_general_results("Selection", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_general_results("Selection Method", character_class, selection_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
     plot_evolution(character_class, genealogies_per_method, selection_methods)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
@@ -274,23 +315,23 @@ def perform_replacement_analysis(config, character_class):
             std_fitness_per_method.append(np.std(fitness_list))
     
         # Update the plot function calls to include standard deviations
-        plot_general_results("Replacement", character_class, replacement_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+        plot_general_results("Replacement Method", character_class, replacement_methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
         plot_evolution(character_class, genealogies_per_method, replacement_methods)
         return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
-def perform_mutation_func_analysis(config, character_class):
-    functions = list(MUTATION_FUNCTION_MAP.keys())
+
+def perform_parents_analysis(config, character_class):
+    parents_map = list(REPLACEMENT_PARENTS_MAP.keys())
 
     avg_iterations_per_method = []
     avg_fitness_per_method = []
     std_iterations_per_method = []  # For standard deviation of iterations
     std_fitness_per_method = []     # For standard deviation of fitness
     genealogies_per_method = []
-    
     population = generate_population(config["initial_population_size"], CLASS_MAP[config["class"]])
 
-    for fun in functions:
-        print(fun)
+    for parent_count in parents_map:
+        print("parents",parent_count)
         genealogies = []
         iterations_list = []
         fitness_list = []
@@ -298,13 +339,14 @@ def perform_mutation_func_analysis(config, character_class):
         # Perform multiple runs for reliability
         for _ in range(ITERATIONS):  # Assuming 50 runs as specified
             # Modify config for current replacement method
-            config["mutation_function"] = fun
+            config["parents"] = int(parent_count)
             # Generate initial population and run the simulation
             populations_list = iterate(population, config)
             # Calculate and store the results of this run
             iterations_list.append(len(populations_list))
             fitness_list.append(max(max(p.fitness for p in generation) for generation in populations_list))
             genealogies.append([max(p.fitness for p in g) for g in populations_list])
+        
         genealogies_per_method.append(genealogies)
         # Calculate averages for this method
         avg_iterations_per_method.append(np.mean(iterations_list))
@@ -314,8 +356,8 @@ def perform_mutation_func_analysis(config, character_class):
         std_fitness_per_method.append(np.std(fitness_list))
 
     # Update the plot function calls to include standard deviations
-    plot_general_results("Mutation function", character_class, functions, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
-    plot_evolution(character_class, genealogies_per_method, functions)
+    plot_general_results("Parent count", character_class, parents_map, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method)
+    plot_evolution(character_class, genealogies_per_method, parents_map)
     return avg_iterations_per_method, avg_fitness_per_method, std_iterations_per_method, std_fitness_per_method
 
 
@@ -400,8 +442,8 @@ def plot_results(x, y, character_class, methods, data, std_devs, show_digits):
 
 def plot_general_results(aspect, character_class, methods, avg_iterations_per_method, std_iterations_per_method, avg_fitness_per_method, std_fitness_per_method):
     figure, axis = plt.subplots(1,2, figsize=(16, 8))
-    subplot_results(figure, axis[0], f"{aspect} Method", "Avg Iterations", character_class, methods, avg_iterations_per_method, std_iterations_per_method, False)
-    subplot_results(figure, axis[1], f"{aspect} Method", "Avg Fitness", character_class, methods, avg_fitness_per_method, std_fitness_per_method, True)
+    subplot_results(figure, axis[0], f"{aspect}", "Avg Iterations", character_class, methods, avg_iterations_per_method, std_iterations_per_method, False)
+    subplot_results(figure, axis[1], f"{aspect}", "Avg Fitness", character_class, methods, avg_fitness_per_method, std_fitness_per_method, True)
     plt.show()
 
 
@@ -460,7 +502,8 @@ analysis_map = {
     "deterministic_tournament": perform_deterministic_tournament_analysis,
     "replacement_selection": perform_all_replacement_selection_analysis,
     "mutation_function": perform_mutation_func_analysis,
-    "stopping_condition": perform_stopping_analysis
+    "stopping_condition": perform_stopping_analysis,
+    "parents" : perform_parents_analysis
 }
 
 analysis_to_map = {
@@ -472,7 +515,8 @@ analysis_to_map = {
     "deterministic_tournament": DETERMINISTIC_MAP,  # Example, adjust based on actual use
     "replacement_selection": SELECTION_MAP,
     "mutation_function": MUTATION_FUNCTION_MAP,
-    "stopping_condition": stopping_condition_map
+    "stopping_condition": stopping_condition_map,
+    "parents": REPLACEMENT_PARENTS_MAP
 }
 
 def main(analysis_names, class_name):

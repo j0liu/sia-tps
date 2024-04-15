@@ -85,3 +85,13 @@ BOLTZMANN_MAP = {
     "boltzmann 5": {'t0': 1000, 'tc': 100, 'k': 1},
     "boltzmann 6": {'t0': 1000, 'tc': 500, 'k': 1},
 }
+
+REPLACEMENT_PARENTS_MAP = {
+    "4" : { "children" : 4 },
+    "8" : { "children" : 8 },
+    "10" : { "children" : 10 },
+    "12" : { "children" : 12 },
+    "16" : { "children" : 16 },
+    "18" : { "children" : 18 },
+    "20" : { "children" : 20 },
+}

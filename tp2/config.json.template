@@ -22,7 +22,7 @@
             "threshold" : <float> #around_optimal
         }
     }
-    "replace: <traditional|young|gap>,
+    "replace: <traditional|young_bias>,
     "selection_coefficient": <proportion>,
     "replacement_coefficient": <proportion>,
     ["selection" + i]: {

@@ -22,11 +22,11 @@
             "threshold": 61.8857
         }
     },
-    "replace": "traditional",
+    "replace": "young_bias",
     "selection_coefficient": 0.5,
     "replacement_coefficient": 0.5,
     "selection1": {
-        "method":"deterministic_tournament",
+        "method":"elite",
         "params": {
             "random_pick_proportion": 0.4
         }

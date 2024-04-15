@@ -1,3 +1,4 @@
+# #children = #parents
 def staggered(parents_genotypes, crossover):
     children_genotypes = []
     for i in range(0, len(parents_genotypes), 2):
@@ -6,7 +7,7 @@ def staggered(parents_genotypes, crossover):
         children_genotypes.extend(crossover(g1, g2))
     return children_genotypes
 
-
+# #children = #parents
 def inverted(parents_genotypes, crossover):
     children_genotypes = []
     for i in range(0, int(len(parents_genotypes)/2)):
@@ -15,6 +16,7 @@ def inverted(parents_genotypes, crossover):
         children_genotypes.extend(crossover(g1, g2))
     return children_genotypes
 
+# #children = #parents
 def parallel(parents_genotypes, crossover):
     children_genotypes = []
     middle = int(len(parents_genotypes)/2)
@@ -24,6 +26,7 @@ def parallel(parents_genotypes, crossover):
         children_genotypes.extend(crossover(g1, g2))
     return children_genotypes
 
+# #children = #parents * (#parents - 1) / 2
 def complete(parents_genotypes, crossover):
     children_genotypes = []
     for i in range(0, len(parents_genotypes)):
@@ -33,6 +36,7 @@ def complete(parents_genotypes, crossover):
             children_genotypes.extend(crossover(g1, g2))
     return children_genotypes
 
+# #children = 2 * (#parents - 1)
 def alpha(parents_genotypes, crossover):
     children_genotypes = []
     for i in range(1, len(parents_genotypes)):
