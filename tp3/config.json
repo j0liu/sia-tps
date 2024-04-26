@@ -1,0 +1,7 @@
+{
+    "limit": 100,
+    "learning_rate": 0.1,
+    "bias": 32, 
+    "epsilon": 0.00000001,
+    "k": 5
+}
