@@ -1,7 +1,8 @@
 {
-    "limit": 100,
-    "learning_rate": 0.1,
-    "bias": 32, 
-    "epsilon": 0.00000001,
-    "k": 5
+    "limit": 500,
+    "learning_rate": 0.01,
+    "bias": 5,
+    "epsilon": 0.001,
+    "k": 2,
+    "beta" : 0.01
 }

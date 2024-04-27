@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 from functools import partial
-
+from plot import plotxy
 
 #puntos en el plano: n = 2
 #inputs p x n , expected p x 1
@@ -13,7 +13,6 @@ def train_perceptron(config : dict, inputs : np.matrix, expected : np.array, act
 
     i = 0
     w = np.concatenate((np.array([config['bias']]), (np.random.rand(dim-1)))) # pesos
-    error = None
     min_error = sys.maxsize
     w_min = None
     while min_error > config['epsilon'] and i < config['limit']:
@@ -21,13 +20,15 @@ def train_perceptron(config : dict, inputs : np.matrix, expected : np.array, act
         h = np.dot(inputs[mu],w)
         o = activation_function(h) 
 
-        delta_w = config['learning_rate'] * (expected[mu] - o) * inputs[mu] * deriv_activation_function(h)
-        w += delta_w
+        delta_w = config['learning_rate'] * (expected[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
+        w = np.concatenate((w[:1], w[1:] + delta_w))
         # error_o = 0.5 * np.sum((expected[mu] - o[mu]) ** 2)
         error = error_function(inputs, expected, w, activation_function)
         if error < min_error:
             min_error = error
             w_min = w
+        #plotxy(inputs[:,1],expected,w,delta_w)
         i += 1
     return w_min
+
 
