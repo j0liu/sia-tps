@@ -16,7 +16,8 @@ def ejercicio_1():
 
     def step_error(inputs : np.array, expected : np.array, w : np.array, activation_function):
         o = lambda x: activation_function(np.dot(x, w))
-        return sum(o(inputs[mu]) != expected[mu] for mu in range(len(expected))) / len(expected)
+        error = sum(o(inputs[mu]) != expected[mu] for mu in range(len(expected))) / len(expected)
+        return error
 
     w_and = train_perceptron(config, inputs, expected_and, step_function, step_error)
     w_or  = train_perceptron(config, inputs, expected_or, step_function, step_error)
@@ -25,3 +26,7 @@ def ejercicio_1():
 
     print(f"x2 = {-w_and[1]/w_and[2]}*x1 + {-w_and[0]/w_and[2]}")
     print(f"x2 = {-w_or[1]/w_or[2]}*x1 + {-w_or[0]/w_or[2]}")
+
+
+if __name__ == "__main__":
+    ejercicio_1()

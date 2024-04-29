@@ -2,13 +2,19 @@ import numpy as np
 import sys
 from functools import partial
 from plot import plotxy
+import json
+
+with open("tp3/config.json") as f:
+    config = json.load(f)
+
+
 
 #puntos en el plano: n = 2
-#inputs p x n , expected p x 1
+#x p x n , expected p x 1
 #activation_function: theta
 #expected: tzeta
 #se debe tomar epsilon 0 para step
-def train_perceptron(config : dict, inputs : np.array, expected : np.array, activation_function, error_function, deriv_activation_function = lambda x: 1):
+def train_perceptron(config : dict, inputs : np.array, expected_results : np.array, activation_function, error_function, deriv_activation_function = lambda x: 1):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
 
     i = 0
@@ -20,19 +26,19 @@ def train_perceptron(config : dict, inputs : np.array, expected : np.array, acti
         h = np.dot(inputs[mu],w)
         o = activation_function(h)
 
-        delta_w = config['learning_rate'] * (expected[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
-        w = np.concatenate((w[:1], w[1:] + delta_w))
-        # error_o = 0.5 * np.sum((expected[mu] - o[mu]) ** 2)
-        error = error_function(inputs, expected, w, activation_function)
+        delta_w = config['learning_rate'] * (expected_results[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
+        w += delta_w
+        # error_o = 0.5 * np.sum((expected_results[mu] - o[mu]) ** 2)
+        error = error_function(inputs, expected_results, w, activation_function)
         if error < min_error:
             min_error = error
             w_min = w
-        #plotxy(inputs[:,1],expected,w,delta_w)
+        #plotxy(inputs[:,1],expected_results,w,delta_w)
         i += 1
     return w_min
 
 
-def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected : np.array, activation_function, error_function, deriv_activation_function = lambda x: 1):
+def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, error_function, deriv_activation_function = lambda x: 1):
     """
     inputs: np.array - matrix of shape p x n, of inputs
     layer_sizes: np.array - array of shape m, with layer sizes
@@ -55,47 +61,45 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
     level = 0
     while min_error > config['epsilon'] and i < config['limit']:
         mu = np.random.randint(0, p)
-        h = np.dot(inputs[mu],w)
-        values = forward_propagation(config, inputs, layer_sizes, w, activation_function, deriv_activation_function)
-        o = values[-1]
+        # h = np.dot(inputs[mu],w)
+        values = forward_propagation(inputs[mu], layer_sizes, w, activation_function)
+        # o = values[-1]
 
-        delta_w = config['learning_rate'] * (expected[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
-        w = np.concatenate((w[:1], w[1:] + delta_w))
-        # error_o = 0.5 * np.sum((expected[mu] - o[mu]) ** 2)
-        error = error_function(inputs, expected, w, activation_function)
+        # delta_w = config['learning_rate'] * (expected_results[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
+        delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], activation_function, deriv_activation_function)
+        w += delta_w
+        error = error_function(inputs, expected_results, w, activation_function)
         if error < min_error:
             min_error = error
             w_min = w
         i += 1
     return w_min
 
-def forward_propagation(config : dict, inputs : np.array, layer_sizes : np.array, w : np.array, activation_function, deriv_activation_function):
+def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, activation_function):
     network_width = max(layer_sizes)
-    values = np.zeros((len(layer_sizes+1, network_width)))
-    values[0] = np.pad(inputs, (0, network_width - len(inputs)), 'constant')
+    values = np.zeros((len(layer_sizes)+1, network_width))
+    values[0] = np.pad(x, (0, network_width - len(x)), 'constant')
     for m in range(1, len(layer_sizes)):
         for j in range(layer_sizes[m]):
-            values[m][j] = activation_function(np.dot(values[m-1], w[m][j]))
+            values[m][j] = activation_function(np.dot(values[m-1], w[m-1][j]))
     return values
 
-def backward_propagation(config : dict, inputs : np.array, layer_sizes : np.array, w : np.array, expected : np.array, values : np.array, activation_function, deriv_activation_function):
-    learning_rate = config['learning_rate']
+def backward_propagation(learning_rate : float, values : np.array, layer_sizes : np.array, w : np.array, expected : np.array, activation_function, deriv_activation_function):
     network_width = max(layer_sizes)
 
-    deltas = np.zeros((len(layer_sizes-1, network_width)))
-    delta_ws = np.zeros((len(layer_sizes-1, network_width)))
+    deltas = np.zeros((len(layer_sizes)-1, network_width))
+    delta_ws = np.zeros((len(layer_sizes)-1, network_width, network_width))
     expected = np.pad(expected, (0, network_width - len(expected)), 'constant')
 
     #base case
-    der_act_h = np.array([deriv_activation_function(np.dot(values[-2], w[-1][i])) for i in layer_sizes[-1]]) #deriv_activation_function(h)
+    der_act_h = np.array([deriv_activation_function(np.dot(values[-2], w[-1][i])) for i in range(layer_sizes[-1])]) #deriv_activation_function(h)
     deltas[-1] = (expected - values[-1]) * der_act_h
     delta_ws[-1] = learning_rate * deltas[-1] * values[-1]
 
     for m in range(len(deltas)-2, -1, -1):
         for j in range(layer_sizes[m]):
             h = np.dot(values[m], w[m][j])
-            deltas[m][j] = (deltas[m+1] * w[m+1][j]) * deriv_activation_function(h)
-            delta_ws[m][j] = learning_rate * deltas[m][j] * values[m][j]
+            deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * deriv_activation_function(h)
+            delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
     
     return delta_ws
-    

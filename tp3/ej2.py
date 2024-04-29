@@ -6,16 +6,15 @@ from perceptron import train_perceptron
 import csv
 import activation_functions as af
 
-
 with open("tp3/config.json") as f:
     config = json.load(f)
-
 
 def simple_error(inputs : np.array, expected : np.array, w : np.array, activation_function):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
     o = lambda x: activation_function(np.dot(x, w))
     val = 0.5 * sum((expected[mu] - o(inputs[mu]))**2 for mu in range(p))
     return val
+
 
 def ejercicio_2():
     with open("tp3/data.csv") as f:
@@ -55,7 +54,7 @@ def process_k_fold_cross_validation_results(results, activation_function, denorm
     for (w, test) in results:
         errors.append(error_function(test[:, :-1], denormalize_function(test[:, -1]), w, lambda x: denormalize_function(activation_function(x))))
         print(w)
-    print(errors)
+    print(f"Error: {np.mean(errors)}")
 
 
 def k_fold_cross_validation(config, inputs, activation_function, error_function, deriv_activation_function = lambda x: 1):
