@@ -2,19 +2,12 @@ import numpy as np
 import sys
 from functools import partial
 import json
-from perceptron import train_perceptron
+from perceptron import train_perceptron, simple_error
 import csv
 import activation_functions as af
 
 with open("tp3/config.json") as f:
     config = json.load(f)
-
-def simple_error(inputs : np.array, expected : np.array, w : np.array, activation_function):
-    p, dim = inputs.shape # p puntos en el plano, dim dimensiones
-    o = lambda x: activation_function(np.dot(x, w))
-    val = 0.5 * sum((expected[mu] - o(inputs[mu]))**2 for mu in range(p))
-    return val
-
 
 def ejercicio_2():
     with open("tp3/data.csv") as f:
@@ -27,7 +20,7 @@ def ejercicio_2():
     
     print("linear")
     # Linear
-    linear_results = k_fold_cross_validation(config, inputs, af.id, simple_error, af.one)
+    linear_results = k_fold_cross_validation(config, inputs, af.id, simple_error, deriv_activation_function=af.one)
     process_k_fold_cross_validation_results(linear_results, af.id, af.id, simple_error)
 
     print("tanh")
@@ -51,10 +44,13 @@ def analyze_simple_method(config : dict, inputs : np.array, activation_function,
 
 def process_k_fold_cross_validation_results(results, activation_function, denormalize_function, error_function):
     errors = []
-    for (w, test) in results:
+    train_errors = []
+    for (w, test, train) in results:
         errors.append(error_function(test[:, :-1], denormalize_function(test[:, -1]), w, lambda x: denormalize_function(activation_function(x))))
+        train_errors.append(error_function(train[:, :-1], denormalize_function(train[:, -1]), w, lambda x: denormalize_function(activation_function(x))))
         print(w)
-    print(f"Error: {np.mean(errors)}")
+    print(f"Error medio con test: {np.mean(errors)}")
+    print(f"Error medio con train: {np.mean(train)}")
 
 
 def k_fold_cross_validation(config, inputs, activation_function, error_function, deriv_activation_function = lambda x: 1):
@@ -67,7 +63,7 @@ def k_fold_cross_validation(config, inputs, activation_function, error_function,
         test = inputs[i*fold_size:(i+1)*fold_size]
         train = np.concatenate((inputs[:i*fold_size], inputs[(i+1)*fold_size:]), axis=0)
         w = train_perceptron(config, train[:, :-1], train[:, -1], activation_function, error_function, deriv_activation_function)
-        results.append((w, test))
+        results.append((w, test, train))
 
     return results
 
