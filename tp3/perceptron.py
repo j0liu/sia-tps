@@ -25,7 +25,7 @@ from simplePerceptronPlotter import plot_decision_boundary
 #activation_function: theta
 #expected: tzeta
 #se debe tomar epsilon 0 para step
-def train_perceptron(config : dict, inputs : np.array, expected_results : np.array, activation_function, error_function = simple_error, deriv_activation_function = lambda x: 1):
+def train_perceptron(config : dict, inputs : np.array, expected_results : np.array, activation_function, title, error_function = simple_error, deriv_activation_function = lambda x: 1):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
 
     i = 0
@@ -47,7 +47,7 @@ def train_perceptron(config : dict, inputs : np.array, expected_results : np.arr
         i += 1
         w_list.append(w.copy())
     print("iteraciones:", i)
-    plot_decision_boundary(w_list, inputs, expected_results)
+    plot_decision_boundary(w_list, inputs, expected_results, title)
     return w_min
     
 
