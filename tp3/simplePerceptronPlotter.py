@@ -16,10 +16,7 @@ def plot_decision_boundary(w_list, inputs, expected, title, folder='tp3/plots'):
         # Set up the figure
         fig, ax = plt.subplots()
         
-
-
-        # print(f"x2 = {-w[1]/w[2]}*x1 + {-w[0]/w[2]}")
-        #add title
+        # Add title
         ax.set_title(title)
         
         #Plot the decision boundary
@@ -38,8 +35,8 @@ def plot_decision_boundary(w_list, inputs, expected, title, folder='tp3/plots'):
         ax.axvline(0, color='black', linewidth=0.5)
         ax.grid(True)
         ax.set_title('Decision Boundary')
-        ax.set_xlabel('x1')
-        ax.set_ylabel('x2')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
 
         # Show legend and plot
         ax.legend()
@@ -55,8 +52,8 @@ def create_gif_from_folder(type, folder_path, output_gif_name, duration=500):
     if not os.path.exists(folder_path+'/'+type):
         raise ValueError(f"The specified folder does not exist: {folder_path+'/'+type}")
     
-    if not os.path.exists('tp3/gifs/' + type):
-        os.makedirs('tp3/gifs/' + type)
+    if not os.path.exists('tp3/plots/gifs/' + type):
+        os.makedirs('tp3/plots/gifs/' + type)
     
     # Get all image files in the folder, sorted to maintain order
     files = sorted([os.path.join(folder_path+'/'+type, f) for f in os.listdir(folder_path+'/'+type) if f.endswith('.png')])
@@ -65,5 +62,19 @@ def create_gif_from_folder(type, folder_path, output_gif_name, duration=500):
     images = [Image.open(file) for file in files]
     
     # Save the images as a GIF
-    images[0].save(f'tp3/gifs/{type}/{output_gif_name}', save_all=True, append_images=images[1:], duration=duration, loop=0)
+    images[0].save(f'tp3/plots/gifs/{type}/{output_gif_name}', save_all=True, append_images=images[1:], duration=duration, loop=0)
 
+def plot_errors(errors, type):
+
+    if not os.path.exists('tp3/plots/errors'):
+        os.makedirs('tp3/plots/errors')
+
+    fig, ax = plt.subplots()
+    ax.plot(errors)
+    ax.grid(True)
+    ax.set_yscale('linear')
+    ax.set_title(f'{type} Errors')
+    ax.set_xlabel('Iteration')
+    ax.set_ylabel('Error')
+    plt.savefig(f'tp3/plots/errors/{type}.png')
+    plt.close(fig)

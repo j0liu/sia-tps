@@ -19,7 +19,7 @@ def simple_error(inputs : np.array, expected : np.array, w : np.array, activatio
     val = 0.5 * sum((expected[mu] - o(inputs[mu]))**2 for mu in range(p))
     return val
 
-from simplePerceptronPlotter import plot_decision_boundary
+from simplePerceptronPlotter import plot_decision_boundary, plot_errors
 #puntos en el plano: n = 2
 #x p x n , expected p x 1
 #activation_function: theta
@@ -33,6 +33,7 @@ def train_perceptron(config : dict, inputs : np.array, expected_results : np.arr
     min_error = sys.maxsize
     w_min = None
     w_list = []
+    e_list = []
     while min_error > config['epsilon'] and i < config['limit']:
         mu = np.random.randint(0, p)
         h = np.dot(inputs[mu],w)
@@ -45,9 +46,11 @@ def train_perceptron(config : dict, inputs : np.array, expected_results : np.arr
             min_error = error
             w_min = w
         i += 1
-        w_list.append(w.copy())
+        # w_list.append(w.copy())
+        e_list.append(error.copy())
     print("iteraciones:", i)
-    plot_decision_boundary(w_list, inputs, expected_results, title)
+    # plot_decision_boundary(w_list, inputs, expected_results, title)
+    plot_errors(e_list, title)
     return w_min
     
 
