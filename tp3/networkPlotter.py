@@ -27,20 +27,28 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
             for o in range(layer_size_b):
                 line = plt.Line2D([n * h_spacing + left, (n + 1) * h_spacing + left],
                                   [layer_top_a - m * v_spacing, layer_top_b - o * v_spacing],
-                                  c=cmap(norm(weights[n][m][o])), zorder=1)
+                                #   c=cmap(norm(abs(weights[n][m][o]))), zorder=1)
+                                c=cmap(abs(weights[n][m][o])), zorder=1)
                 ax.add_artist(line)
                 # Adding weight annotations
-                if weights:
-                    weight = weights[n][m][o]
-                    x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
-                    y = layer_top_a - m * v_spacing + (layer_top_b - o * v_spacing - layer_top_a + m * v_spacing) * 0.3
-                    ax.text(x, y, f'{weight:.2f}', color='blue', fontsize=8, verticalalignment='center')
+                #if weights != None:
+                weight = weights[n][m][o]
+                x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
+                y = layer_top_a - m * v_spacing + (layer_top_b - o * v_spacing - layer_top_a + m * v_spacing) * 0.3
+                ax.text(x, y, f'{weight:.2f}', color='blue', fontsize=8, verticalalignment='center')
 
 
-def plot_neural_network(layers):
+def plot_neural_network(weights, layer_sizes):
+    transpose_w = []
+    for layer in weights:
+        transpose_w.append(list(map(list, zip(*layer))))
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca()
     ax.axis('off')
+    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, transpose_w)
+    plt.show()
+
+if __name__ == "__main__":
     weights = [
         [
             [-0.47305217, -0.33284312,  0.15336057,  0.0],
@@ -55,7 +63,4 @@ def plot_neural_network(layers):
             [0.0,         0.0,         0.0,          0.0]
         ]
     ]
-    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layers, weights)
-    plt.show()
-
-plot_neural_network([3, 4, 2])
+    plot_neural_network(weights, [3, 4, 2])

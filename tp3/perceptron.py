@@ -5,13 +5,18 @@ from plot import plotxy
 import json
 from utils import pad
 import math
+from networkPlotter import plot_neural_network
 
 with open("tp3/config.json") as f:
     config = json.load(f)
 
 
 def layer_normalize(layer_sizes : np.array):
-    return list(map(lambda x : x+1, layer_normalize))
+    return list(map(lambda x : x+1, layer_sizes))
+
+def hypercube_layers(layer_sizes : np.array):
+    network_width = max(layer_sizes)
+    return [network_width for _ in range(len(layer_sizes))]
 
 def simple_error(inputs : np.array, expected : np.array, w : np.array, activation_function):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
@@ -81,6 +86,7 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
 
     min_error = sys.maxsize
     w_min = None
+    weights_history = [w]
 
     while min_error > config['epsilon'] and i < config['limit']:
         mu = np.random.randint(0, p)
@@ -89,14 +95,16 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
         # o = values[-1]
 
         # delta_w = config['learning_rate'] * (expected_results[mu] - o) * deriv_activation_function(h) * inputs[mu][1:]
-        delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], activation_function, deriv_activation_function)
+        delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], deriv_activation_function)
+
         w += delta_w
         error = multi_error(inputs, expected_results, layer_sizes, w, activation_function)
         if error < min_error:
             min_error = error
             w_min = w
         i += 1
-    return w_min
+        weights_history.append(w.copy())
+    return w_min, weights_history
 
 def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, activation_function):
     network_width = max(layer_sizes)
@@ -108,7 +116,7 @@ def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, acti
             values[m][j] = activation_function(np.dot(values[m-1], w[m-1][j]))
     return values
 
-def backward_propagation(learning_rate : float, values : np.array, layer_sizes : np.array, w : np.array, expected : np.array, activation_function, deriv_activation_function):
+def backward_propagation(learning_rate : float, values : np.array, layer_sizes : np.array, w : np.array, expected : np.array, deriv_activation_function):
     network_width = max(layer_sizes)
 
     deltas = np.zeros((len(layer_sizes)-1, network_width))
@@ -121,9 +129,16 @@ def backward_propagation(learning_rate : float, values : np.array, layer_sizes :
     expected_copy[1:] = pad(expected, network_width-1)
 
     #base case
-    der_act_h = np.array([deriv_activation_function(np.dot(values[-2], w[-1][i])) for i in range(layer_sizes[-1])]) #deriv_activation_function(h)
-    deltas[-1] = (expected_copy - values[-1]) * pad(der_act_h, network_width)
-    delta_ws[-1] = learning_rate * deltas[-1] * values[-2]
+    #der_act_h = np.array([deriv_activation_function(np.dot(values[-2], w[-1][i])) for i in range(layer_sizes[-1])]) #deriv_activation_function(h)
+    #deltas[-1] = (expected_copy - values[-1]) * pad(der_act_h, network_width)
+    #delta_ws[-1] = learning_rate * deltas[-1] * values[-2]
+
+    #initialize deltas
+    for j in range(layer_sizes[-1]):
+        h = np.dot(values[-2], w[-1][j])
+        deltas[-1][j] = (expected_copy[j] - values[-1][j]) * deriv_activation_function(h)
+        delta_ws[-1][j] = learning_rate * deltas[-1][j] * values[-2]
+
 
     for m in range(len(deltas)-2, -1, -1):
         for j in range(layer_sizes[m]):
@@ -133,6 +148,8 @@ def backward_propagation(learning_rate : float, values : np.array, layer_sizes :
             
             delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
     
+    if np.any(abs(delta_ws) > 0.00001):
+        print(delta_ws)
     return delta_ws
 
 
