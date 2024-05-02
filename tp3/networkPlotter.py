@@ -20,32 +20,30 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
             ax.add_artist(circle)
 
     # Edges
-    for n, (layer_size_a, layer_size_b) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
-        layer_top_a = v_spacing * (layer_size_a - 1) / 2. + (top + bottom) / 2.
-        layer_top_b = v_spacing * (layer_size_b - 1) / 2. + (top + bottom) / 2.
-        for m in range(layer_size_a):
-            for o in range(layer_size_b):
+    for n, (layer_size_prev, layer_size_next) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
+        layer_top_a = v_spacing * (layer_size_prev - 1) / 2. + (top + bottom) / 2.
+        layer_top_b = v_spacing * (layer_size_next - 1) / 2. + (top + bottom) / 2.
+        for current in range(layer_size_next):
+            for prev in range(layer_size_prev):
+                cm = cmap(abs(weights[n][current][prev])) if weights is not None else 'black'
                 line = plt.Line2D([n * h_spacing + left, (n + 1) * h_spacing + left],
-                                  [layer_top_a - m * v_spacing, layer_top_b - o * v_spacing],
-                                #   c=cmap(norm(abs(weights[n][m][o]))), zorder=1)
-                                c=cmap(abs(weights[n][m][o])), zorder=1)
+                                  [layer_top_a - prev * v_spacing, layer_top_b - current * v_spacing],
+                                #   c=cmap(norm(abs(weights[n][current][prev]))), zorder=1)
+                                c=cm, zorder=1)
                 ax.add_artist(line)
                 # Adding weight annotations
-                #if weights != None:
-                weight = weights[n][m][o]
-                x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
-                y = layer_top_a - m * v_spacing + (layer_top_b - o * v_spacing - layer_top_a + m * v_spacing) * 0.3
-                ax.text(x, y, f'{weight:.2f}', color='blue', fontsize=8, verticalalignment='center')
+                if weights is not None:
+                    weight = weights[n][current][prev]
+                    x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
+                    y = layer_top_a - prev * v_spacing + (layer_top_b - current * v_spacing - layer_top_a + prev * v_spacing) * 0.3
+                    ax.text(x, y, f'{weight:.2f}', color='blue', fontsize=8, verticalalignment='center')
 
 
 def plot_neural_network(weights, layer_sizes):
-    transpose_w = []
-    for layer in weights:
-        transpose_w.append(list(map(list, zip(*layer))))
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca()
     ax.axis('off')
-    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, transpose_w)
+    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, weights)
     plt.show()
 
 if __name__ == "__main__":
@@ -63,4 +61,5 @@ if __name__ == "__main__":
             [0.0,         0.0,         0.0,          0.0]
         ]
     ]
-    plot_neural_network(weights, [3, 4, 2])
+    plot_neural_network(weights, [4, 4, 4])
+    
