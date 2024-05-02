@@ -63,3 +63,10 @@ def plotxy(inputs, expected, w, delta_w):
     # Customize the view angle so it's easier to see that the scatter points lie
     # on the plane y=0
     plt.show()
+
+def plot_function(f, dom_min, dom_max, title):
+    x = np.linspace(dom_min, dom_max, 100)
+    y = [f(i) for i in x]
+    plt.plot(x, y)
+    plt.title(title)
+    plt.show()

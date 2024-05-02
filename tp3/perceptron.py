@@ -62,7 +62,7 @@ def train_perceptron(config : dict, inputs : np.array, expected_results : np.arr
 
 def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
     for m in range(len(layer_sizes)-1): #sin contar la capa de output
-        for j in range(layer_sizes[m+1]):
+        for j in range(1,layer_sizes[m+1]):
             w[m][j][0] = config['bias']
             w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
 
@@ -86,9 +86,9 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
 
     min_error = sys.maxsize
     w_min = None
-    weights_history = [w]
+    weights_history = [w.copy()]
 
-    while min_error > config['epsilon'] and i < config['limit']:
+    while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
         mu = np.random.randint(0, p)
         # h = np.dot(inputs[mu],w)
         values = forward_propagation(inputs[mu], layer_sizes, w, activation_function)
@@ -98,13 +98,16 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
         delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], deriv_activation_function)
 
         w += delta_w
+        weights_history.append(w.copy())
+
         error = multi_error(inputs, expected_results, layer_sizes, w, activation_function)
         if error < min_error:
+            print("error:", error)
             min_error = error
-            w_min = w
+            w_min = weights_history[-1]
         i += 1
-        weights_history.append(w.copy())
     return w_min, weights_history
+
 
 def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, activation_function):
     network_width = max(layer_sizes)
@@ -147,9 +150,6 @@ def backward_propagation(learning_rate : float, values : np.array, layer_sizes :
             deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * deriv_activation_function(h)
             
             delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
-    
-    if np.any(abs(delta_ws) > 0.00001):
-        print(delta_ws)
     return delta_ws
 
 

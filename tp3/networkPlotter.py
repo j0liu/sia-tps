@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-
+import numpy as np
 def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
     v_spacing = (top - bottom) / float(max(layer_sizes))
     h_spacing = (right - left) / float(len(layer_sizes) - 1)
-    cmap = plt.get_cmap('Blues')  # Get the colormap
+    cmap = plt.get_cmap('brg')  # Get the colormap
 
     # Normalize the weight values to 0-1 for the color mapping
     if weights is not None:
@@ -25,18 +25,22 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
         layer_top_b = v_spacing * (layer_size_next - 1) / 2. + (top + bottom) / 2.
         for current in range(layer_size_next):
             for prev in range(layer_size_prev):
-                cm = cmap(abs(weights[n][current][prev])) if weights is not None else 'black'
-                line = plt.Line2D([n * h_spacing + left, (n + 1) * h_spacing + left],
-                                  [layer_top_a - prev * v_spacing, layer_top_b - current * v_spacing],
-                                #   c=cmap(norm(abs(weights[n][current][prev]))), zorder=1)
-                                c=cm, zorder=1)
-                ax.add_artist(line)
-                # Adding weight annotations
-                if weights is not None:
-                    weight = weights[n][current][prev]
-                    x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
-                    y = layer_top_a - prev * v_spacing + (layer_top_b - current * v_spacing - layer_top_a + prev * v_spacing) * 0.3
-                    ax.text(x, y, f'{weight:.2f}', color='blue', fontsize=8, verticalalignment='center')
+                if weights is None or abs(weights[n][current][prev]) > 0:
+                    #random color
+                    cm = cmap(np.random.rand())
+                    width = 5 * (min(1, max(abs(weights[n][current][prev]),0.2)) if weights is not None else 1)
+                    #cm = cmap(abs(weights[n][current][prev])) if weights is not None else 'black'
+                    #cm = cmap(norm(abs(weights[n][current][prev])))
+                    line = plt.Line2D([n * h_spacing + left, (n + 1) * h_spacing + left],
+                                    [layer_top_a - prev * v_spacing, layer_top_b - current * v_spacing],
+                                    c=cm, zorder=1, linewidth = width)
+                    ax.add_artist(line)
+                    # Adding weight annotations
+                    if weights is not None:
+                        weight = weights[n][current][prev]
+                        x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
+                        y = layer_top_a - prev * v_spacing + (layer_top_b - current * v_spacing - layer_top_a + prev * v_spacing) * 0.3
+                        ax.text(x, y, f'{weight:.5f}', color=cm, fontsize=8, verticalalignment='center')
 
 
 def plot_neural_network(weights, layer_sizes):
@@ -62,4 +66,3 @@ if __name__ == "__main__":
         ]
     ]
     plot_neural_network(weights, [4, 4, 4])
-    

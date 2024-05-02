@@ -10,17 +10,26 @@ def id(x):
 def one(x):
     return 1
 
-def tanh(x, beta):
-    return math.tanh(beta * x)
+def gen_tanh(beta):
+    def tanh(x):
+        return math.tanh(beta * x)
+    return tanh
 
-def tanh_derivative(x, beta):
-    return beta * (1 - math.tanh(x)**2)
+def gen_tanh_derivative(beta):
+    def tanh_derivative(x):
+        return beta * (1 - math.tanh(x)**2)
+    return tanh_derivative
 
-def logistic(x, beta):
-    return 1 / (1 + math.exp(-2*beta*x))
+def gen_logistic(beta):
+    def logistic(x):
+        return 1 / (1 + math.exp(-beta*x))
+    return logistic
 
-def logistic_derivative(x, beta):
-    return 2 * beta * logistic(x, beta) * (1 - logistic(x, beta))
+def gen_logistic_derivative(beta):
+    logistic = gen_logistic(beta)
+    def logistic_derivative(x):
+        return 2 * beta * logistic(x) * (1 - logistic(x))
+    return logistic_derivative
 
 #[x_min, x_max] -> [a,b]
 def normalize(x, x_min, x_max, a, b):
