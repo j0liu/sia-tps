@@ -14,14 +14,13 @@ def output(x, layer_sizes, w, activation_function):
     return forward_propagation(x, layer_sizes, w, activation_function)[-1][1:layer_sizes[-1]]
 
 
-def ejercicio_3():
+def ejercicio_3_xor():
     inputs = np.array([[1, -1, -1], [1, -1, 1], [1, 1, -1], [1, 1, 1]])
     expected_or = np.array([[-1], [1], [1], [-1]])
     activation_function = af.gen_tanh(config['beta'])
     activation_function_derivative = af.gen_tanh_derivative(config['beta'])
-
-    # data = parse_to_matrices('tp3/TP3-ej3-digitos.txt')
     layer_sizes = np.array(layer_normalize([2,2,2,1]))
+
     w_or, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected_or, activation_function, activation_function_derivative)
     print("iterations:", len(weights_history))
     print("initial\n",weights_history[0])
@@ -36,6 +35,24 @@ def ejercicio_3():
     plot_function(activation_function_derivative, -1, 1, "dtanh(x)")
     print()
     
+
+def ejercicio_3_paridad():
+    inputs = parse_to_matrices('tp3/TP3-ej3-digitos.txt')
+    expected = np.array([[1], [-1], [1], [-1], [1], [-1], [1], [-1], [1], [-1]])
+    activation_function = af.gen_tanh(config['beta'])
+    activation_function_derivative = af.gen_tanh_derivative(config['beta'])
+
+    layer_sizes = np.array(layer_normalize([35,2,2,1]))
+
+    w_or, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected, activation_function, activation_function_derivative)
+    print("iterations:", len(weights_history))
+    print("initial\n",weights_history[0])
+    print("val:", multi_error(inputs, expected, layer_sizes, weights_history[0], activation_function))
+    print("minimal\n",w_or)
+    print("val:", multi_error(inputs, expected, layer_sizes, w_or, activation_function))
+    for x in inputs:
+        print("x", x[1:], "f(x)=", output(x, layer_sizes, w_or, activation_function))
+    print()
 
 def parse_to_matrices(filepath, columns=5, rows=7):
     # Initialize a list to store the grid
@@ -54,10 +71,12 @@ def parse_to_matrices(filepath, columns=5, rows=7):
     while start_row + rows <= len(grid):
         # Extract a 5x7 matrix
         matrix = [grid[i][0:columns] for i in range(start_row, start_row + rows)]
+        matrix = np.array(matrix).flatten()
         matrices.append(matrix)
         start_row += rows  # Move to the next set of rows
-    
-    return matrices
+
+    return np.array(matrices)
 
 if __name__ == "__main__":
-    ejercicio_3()
+    #ejercicio_3_xor()
+    ejercicio_3_paridad()
