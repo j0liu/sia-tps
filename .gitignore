@@ -162,3 +162,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 tp3/plots/
+.DS_Store
+tp0/.DS_Store
+tp1/.DS_Store
+tp2/.DS_Store

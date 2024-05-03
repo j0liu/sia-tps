@@ -2,9 +2,10 @@ import numpy as np
 import activation_functions as af
 from perceptron import train_multilayer_perceptron, multi_error, forward_propagation, layer_normalize, hypercube_layers
 import json
-from networkPlotter import plot_neural_network
+from plotNetwork import plot_neural_network
 from plot import plot_function
 import math
+from kfold import analyze_method
 
 with open("tp3/config.json") as f:
     config = json.load(f)
@@ -15,7 +16,7 @@ def output(x, layer_sizes, w, activation_function):
 
 
 def ejercicio_3_xor():
-    inputs = np.array([[1, -1, -1], [1, -1, 1], [1, 1, -1], [1, 1, 1]])
+    inputs = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
     expected_or = np.array([[-1], [1], [1], [-1]])
     activation_function = af.gen_tanh(config['beta'])
     activation_function_derivative = af.gen_tanh_derivative(config['beta'])
@@ -28,7 +29,7 @@ def ejercicio_3_xor():
     print("minimal\n",w_or)
     print("val:", multi_error(inputs, expected_or, layer_sizes, w_or, activation_function))
     for x in inputs:
-        print("x", x[1:], "f(x)=", output(x, layer_sizes, w_or, activation_function))
+        print("x", x, "f(x)=", output(x, layer_sizes, w_or, activation_function))
     plot_neural_network(w_or, layer_sizes)
     plot_neural_network(w_or, hypercube_layers(layer_sizes))
     plot_function(activation_function, -1, 1, "tanh(x)")
@@ -44,15 +45,21 @@ def ejercicio_3_paridad():
 
     layer_sizes = np.array(layer_normalize([35,2,2,1]))
 
-    w_or, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected, activation_function, activation_function_derivative)
-    print("iterations:", len(weights_history))
-    print("initial\n",weights_history[0])
-    print("val:", multi_error(inputs, expected, layer_sizes, weights_history[0], activation_function))
-    print("minimal\n",w_or)
-    print("val:", multi_error(inputs, expected, layer_sizes, w_or, activation_function))
-    for x in inputs:
-        print("x", x[1:], "f(x)=", output(x, layer_sizes, w_or, activation_function))
-    print()
+
+    analyze_method(config, np.copy(inputs), activation_function, activation_function_derivative, -1, 1, multi_error, "paridad")
+
+
+
+
+    # w_or, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected, activation_function, activation_function_derivative)
+    # print("iterations:", len(weights_history))
+    # print("initial\n",weights_history[0])
+    # print("val:", multi_error(inputs, expected, layer_sizes, weights_history[0], activation_function))
+    # print("minimal\n",w_or)
+    # print("val:", multi_error(inputs, expected, layer_sizes, w_or, activation_function))
+    # for x in inputs:
+    #     print("x", x[1:], "f(x)=", output(x, layer_sizes, w_or, activation_function))
+    # print()
 
 def parse_to_matrices(filepath, columns=5, rows=7):
     # Initialize a list to store the grid
@@ -78,5 +85,5 @@ def parse_to_matrices(filepath, columns=5, rows=7):
     return np.array(matrices)
 
 if __name__ == "__main__":
-    #ejercicio_3_xor()
+    # ejercicio_3_xor()
     ejercicio_3_paridad()
