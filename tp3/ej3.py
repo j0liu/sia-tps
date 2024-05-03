@@ -89,5 +89,5 @@ def parse_to_matrices(filepath, columns=5, rows=7):
     return np.array(matrices)
 
 if __name__ == "__main__":
-    # ejercicio_3_xor()
-    ejercicio_3_paridad()
+    ejercicio_3_xor()
+    # ejercicio_3_paridad()

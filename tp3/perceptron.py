@@ -108,10 +108,10 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
         error = multi_error(inputs, expected_results, layer_sizes, w, activation_function)
         if error < min_error:
             min_error = error
+            print("error:", error)
             w_min = weights_history[-1]
         i += 1
-    return w_min, weights_history, i
-
+    return w_min, weights_history
 
 def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, activation_function):
     network_width = max(layer_sizes)

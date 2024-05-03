@@ -26,7 +26,7 @@
         "epsilon": 0.1,
         "k": 5,
         "beta": 3,
-        "optimization": "adam",
+        "optimizer": "adam",
         "b1": 0.9331338848100159,
         "b2": 0.9658289155465659,
         "e": 1e-8

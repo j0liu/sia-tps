@@ -18,12 +18,12 @@ def optimize_parameters(config, inputs, layer_sizes, expected_results, activatio
         config['b2'] += random.uniform(-0.05, 0.05)
         config['learning_rate'] += random.uniform(-0.05, 0.05)
         # Train the model with the updated parameters
-        w_min, weights_history, i = train_multilayer_perceptron(config, inputs, layer_sizes, expected_results, activation_function, deriv_activation_function)
+        w_min, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected_results, activation_function, deriv_activation_function)
         
         # Check if the error is close to 0
         error = multi_error(inputs, expected_results, layer_sizes, w_min, activation_function)
-        if i < config['limit'] and error < config['epsilon'] and error < min_error:
-            min_i = i
+        if len(weights_history) < config['limit'] and error < config['epsilon'] and error < min_error:
+            min_i = len(weights_history)
             min_error = error
             print("NEW BEST PARAMETERS")
             print("NEW ERROR:", error)
