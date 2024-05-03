@@ -65,8 +65,7 @@ def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
             w[m][j][0] = config['bias']
             w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
 
-
-def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1, title = "Titulo"):
+def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1, title="Sin titulo"):
     """
     inputs: np.array - matrix of shape p x n, of inputs
     layer_sizes: np.array - array of shape m, with layer sizes
@@ -83,6 +82,9 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
     w = np.zeros((len(layer_sizes)-1, network_width, network_width))
     initialize_weights(layer_sizes, w, config)
 
+    m = np.zeros_like(w)  # Initialize first moment vector
+    v = np.zeros_like(w)  # Initialize second moment vector 
+
     min_error = sys.maxsize
     w_min = None
     weights_history = [w.copy()]
@@ -93,17 +95,22 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
         values = forward_propagation(inputs[mu], layer_sizes, w, activation_function)
 
         delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], deriv_activation_function)
-
-        w += delta_w
+        if config['optimizer'] == 'adam':
+            m = config['b1'] * m + (1 - config['b1']) * (delta_w/config['learning_rate'])
+            v = config['b2'] * v + (1 - config['b2']) * ((delta_w /config['learning_rate'])** 2)
+            m_hat = m / (1 - config['b1'] ** (i + 1))
+            v_hat = v / (1 - config['b2'] ** (i + 1))
+            w += config['learning_rate'] * m_hat / (np.sqrt(v_hat) + config['e'])
+        else:
+            w += delta_w
         weights_history.append(w.copy())
 
         error = multi_error(inputs, expected_results, layer_sizes, w, activation_function)
         if error < min_error:
-            # print("error:", error)
             min_error = error
             w_min = weights_history[-1]
         i += 1
-    return w_min, weights_history
+    return w_min, weights_history, i
 
 
 def forward_propagation(x : np.array, layer_sizes : np.array, w : np.array, activation_function):
