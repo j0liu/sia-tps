@@ -19,8 +19,8 @@ def ejercicio_1():
         error = sum(o(inputs[mu]) != expected[mu] for mu in range(len(expected))) / len(expected)
         return error
 
-    w_and = train_perceptron(config, inputs, expected_and, step_function, 'AND', step_error)
-    w_or  = train_perceptron(config, inputs, expected_or, step_function, 'OR', step_error)
+    w_and, _ = train_perceptron(config, inputs, expected_and, step_function, 'AND', step_error)
+    w_or, _  = train_perceptron(config, inputs, expected_or, step_function, 'OR', step_error)
     print(w_and)
     print(w_or)
 

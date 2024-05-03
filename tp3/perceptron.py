@@ -29,14 +29,14 @@ def simple_error(inputs : np.array, expected : np.array, w : np.array, activatio
 #activation_function: theta
 #expected: tzeta
 #se debe tomar epsilon 0 para step
-def train_perceptron(config : dict, inputs : np.array, expected_results : np.array, activation_function, title, error_function = simple_error, deriv_activation_function = lambda x: 1):
+def train_perceptron(config : dict, inputs : np.array, expected_results : np.array, activation_function, title="Sin titulo", error_function = simple_error, deriv_activation_function = lambda x: 1):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
 
     i = 0
     w = np.concatenate((np.array([config['bias']]), (np.random.rand(dim-1)))) # pesos
     min_error = sys.maxsize
-    w_min = None
-    w_list = []
+    w_hist = [w.copy()]
+    w_min = w_hist[-1]
     e_list = []
     while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
         mu = np.random.randint(0, p)
@@ -45,18 +45,18 @@ def train_perceptron(config : dict, inputs : np.array, expected_results : np.arr
 
         delta_w = config['learning_rate'] * (expected_results[mu] - o) * deriv_activation_function(h) * inputs[mu]
         w += delta_w
+        w_hist.append(w.copy())
         error = error_function(inputs, expected_results, w, activation_function)
         if error < min_error:
             min_error = error
-            w_min = w
+            w_min = w_hist[-1]
         i += 1
-        # w_list.append(w.copy())
         e_list.append(error.copy())
     print("iteraciones:", i)
     # plot_decision_boundary(w_list, inputs, expected_results, title)
     # plot_errors(e_list, title)
-    return w_min
-    
+    return w_min, w_hist
+
 
 
 def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
@@ -66,7 +66,7 @@ def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
             w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
 
 
-def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1):
+def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1, title = "Titulo"):
     """
     inputs: np.array - matrix of shape p x n, of inputs
     layer_sizes: np.array - array of shape m, with layer sizes
@@ -99,7 +99,7 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
 
         error = multi_error(inputs, expected_results, layer_sizes, w, activation_function)
         if error < min_error:
-            print("error:", error)
+            # print("error:", error)
             min_error = error
             w_min = weights_history[-1]
         i += 1

@@ -4,8 +4,8 @@ from perceptron import train_multilayer_perceptron, multi_error, forward_propaga
 import json
 from plotNetwork import plot_neural_network
 from plot import plot_function
-import math
-from kfold import analyze_method
+from kfold import analyze_method, k_fold_cross_validation, process_k_fold_cross_validation_results
+from functools import partial
 
 with open("tp3/config.json") as f:
     config = json.load(f)
@@ -44,9 +44,13 @@ def ejercicio_3_paridad():
     activation_function_derivative = af.gen_tanh_derivative(config['beta'])
 
     layer_sizes = np.array(layer_normalize([35,2,2,1]))
+    train_function = partial(train_multilayer_perceptron, layer_sizes=layer_sizes)
+    error_function = partial(multi_error, layer_sizes=layer_sizes)
 
 
-    analyze_method(config, np.copy(inputs), activation_function, activation_function_derivative, -1, 1, multi_error, "paridad")
+    # analyze_method(config, np.copy(inputs), expected, activation_function, activation_function_derivative, train_function, -1, 1, error_function, "paridad")
+    multi_results = k_fold_cross_validation(config, train_function, inputs, expected, activation_function, error_function, "multi", deriv_activation_function=activation_function_derivative)
+    process_k_fold_cross_validation_results(multi_results, activation_function, af.id, error_function, "multi")
 
 
 

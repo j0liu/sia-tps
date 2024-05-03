@@ -20,25 +20,27 @@ def ejercicio_2():
     expected = data[:,-1]
 
     beta = config["beta"]
+
+    train_perceptron_function = partial(train_perceptron, error_function=simple_error)
     
     print("linear")
     # Linear
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    linear_results = k_fold_cross_validation(config, train_perceptron, input_copy, expected_copy, af.id, simple_error, "linear", deriv_activation_function=af.one)
+    linear_results = k_fold_cross_validation(config, train_perceptron_function, input_copy, expected_copy, af.id, simple_error, "linear", deriv_activation_function=af.one)
     process_k_fold_cross_validation_results(linear_results, af.id, af.id, simple_error, "linear")
 
     print("tanh")
     # Non linear - tanh
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    analyze_method(config, input_copy, expected_copy, af.gen_tanh(beta), af.gen_tanh_derivative(beta), -1, 1, simple_error, "tanh")
+    analyze_method(config, input_copy, expected_copy, af.gen_tanh(beta), af.gen_tanh_derivative(beta), train_perceptron_function,-1, 1, simple_error, "tanh")
 
     # Non linear - logistic
     print("logistic")
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    analyze_method(config, input_copy, expected_copy, af.gen_logistic(beta), af.gen_logistic_derivative(beta), 0, 1, simple_error, "logistic")
+    analyze_method(config, input_copy, expected_copy, af.gen_logistic(beta), af.gen_logistic_derivative(beta), train_perceptron_function, 0, 1, simple_error, "logistic")
 
 if __name__ == "__main__":
     ejercicio_2()
