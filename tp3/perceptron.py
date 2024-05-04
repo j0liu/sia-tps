@@ -95,7 +95,7 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
         values = forward_propagation(inputs[mu], layer_sizes, w, activation_function)
 
         delta_w = backward_propagation(config["learning_rate"], values, layer_sizes, w, expected_results[mu], deriv_activation_function)
-        if config['optimizer'] == 'adam':
+        if config.get('optimizer', 'gds') == 'adam':
             m = config['b1'] * m + (1 - config['b1']) * (delta_w/config['learning_rate'])
             v = config['b2'] * v + (1 - config['b2']) * ((delta_w /config['learning_rate'])** 2)
             m_hat = m / (1 - config['b1'] ** (i + 1))
@@ -110,6 +110,7 @@ def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : 
             min_error = error
             print("error:", error)
             w_min = weights_history[-1]
+            print(error)
         i += 1
     return w_min, weights_history
 
