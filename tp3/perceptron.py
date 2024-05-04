@@ -63,7 +63,8 @@ def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
     for m in range(len(layer_sizes)-1): #sin contar la capa de output
         for j in range(1,layer_sizes[m+1]):
             w[m][j][0] = config['bias']
-            w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
+            if config['random_start']:
+                w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
 
 def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1, title="Sin titulo"):
     """
