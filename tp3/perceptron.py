@@ -63,7 +63,7 @@ def initialize_weights(layer_sizes : np.array, w : np.array, config : dict):
     for m in range(len(layer_sizes)-1): #sin contar la capa de output
         for j in range(1,layer_sizes[m+1]):
             w[m][j][0] = config['bias']
-            if config['random_start']:
+            if config.get('random_start', True):
                 w[m][j][1:layer_sizes[m]] = np.random.rand(layer_sizes[m]-1)
 
 def train_multilayer_perceptron(config : dict, inputs : np.array, layer_sizes : np.array, expected_results : np.array, activation_function, deriv_activation_function = lambda x: 1, title="Sin titulo"):
@@ -130,17 +130,17 @@ def backward_propagation(learning_rate : float, values : np.array, layer_sizes :
 
     deltas = np.zeros((len(layer_sizes)-1, network_width))
     delta_ws = np.zeros((len(layer_sizes)-1, network_width, network_width))
-    # expected = np.pad(expected, (0, network_width - len(expected)), 'constant')
-
-    # expected = pad(expected, network_width-1)
+    
     expected_copy = np.zeros(network_width)
     expected_copy[0] = 1
-    expected_copy[1:] = pad(expected, network_width-1)
+    #expected_copy2[1:] = pad(expected, network_width-1)
+    expected_copy[1:1+len(expected)] = expected
+    #assert np.allclose(expected_copy, expected_copy2)
 
     #base case
     #der_act_h = np.array([deriv_activation_function(np.dot(values[-2], w[-1][i])) for i in range(layer_sizes[-1])]) #deriv_activation_function(h)
     #deltas[-1] = (expected_copy - values[-1]) * pad(der_act_h, network_width)
-    #delta_ws[-1] = learning_rate * deltas[-1] * values[-2]
+    #delta_ws[-1] = learning_rate * np.outer(deltas[-1], values[-2])
 
     #initialize deltas
     for j in range(layer_sizes[-1]):
