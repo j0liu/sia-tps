@@ -1,7 +1,7 @@
 import numpy as np
 from functools import partial
 from metrics import accuracy, precision, recall, f1_score
-from plotTrainTest import plot_k_fold_errors
+from plotTrainTest import plot_k_fold_errors, plot_metrics
 import activation_functions as af
 from network_abc import NetworkABC
 
@@ -22,7 +22,7 @@ def analyze_method_categorization(config : dict, inputs : np.array, expected: np
 def process_k_fold_cross_validation_results(results, network: NetworkABC, denormalize_function = lambda x: x):
     errors = []
     train_errors = []
-    for (w, test, expected_test, train, expected_train, _, _ ) in results:        
+    for (w, test, expected_test, train, expected_train, _, _, _) in results:        
         # errors.append(network.denormalized_error(test, expected_test, w))
         # train_errors.append(network.denormalized_error(test, expected_train, w))
         errors.append(network.denormalized_error(test, expected_test, w, denormalize_function)/len(test))
@@ -30,25 +30,42 @@ def process_k_fold_cross_validation_results(results, network: NetworkABC, denorm
     # get index of min value in errors
 
     # min_error_index = np.argmin(errors)
-    min_train_error_index = np.argmin(train_errors)
+    min_error_index = np.argmin(errors)
 
-    plot_k_fold_errors(results[min_train_error_index][6], results[min_train_error_index][5], network.title)
+    plot_k_fold_errors(results[min_error_index][6], results[min_error_index][5], network.title)
     print(f"Error medio con test: {np.mean(errors)}")
     print(f"Error medio con train: {np.mean(train_errors)}")
 
     
 def process_k_fold_cross_categorization_results(results, network: NetworkABC, denormalize_function = lambda x : x):
-    for i, (w, test, expected_test, train, expected_train) in enumerate(results):
+    
+    metrics = []
+    for i, (w, test, expected_test, train, expected_train, _, _, _) in enumerate(results):
         train_outputs = denormalize_function(network.output_function(train, w))
         test_outputs = denormalize_function(network.output_function(test, w))
         train_confusion_matrix = get_confusion_matrix(train_outputs, denormalize_function(expected_train))
         test_confusion_matrix = get_confusion_matrix(test_outputs, denormalize_function(expected_test))
-
+        metrics.append(accuracy(test_confusion_matrix) + precision(test_confusion_matrix) + recall(test_confusion_matrix) + f1_score(test_confusion_matrix))
         # print(f"Pesos: {w}")
         print(f"w{i}:")
         print(f"train {len(train)}: Acurracy: {accuracy(train_confusion_matrix)} Precision: {precision(train_confusion_matrix)} Recall: {recall(train_confusion_matrix)} F1 Score: {f1_score(train_confusion_matrix)}")
         print(f"test {len(test)}: Acurracy: {accuracy(test_confusion_matrix)} Precision: {precision(test_confusion_matrix)} Recall: {recall(test_confusion_matrix)} F1 Score: {f1_score(test_confusion_matrix)}")
         # network.export_weights(w, f"tp3/weights/weights_{i}.txt")
+
+    # Select the best 
+    best_index = np.argmax(metrics)
+    metrics_to_plot = []
+    for w in results[best_index][7]:
+        train_outputs = denormalize_function(network.output_function(results[best_index][3], w))
+        test_outputs = denormalize_function(network.output_function(results[best_index][1], w))
+        train_confusion_matrix = get_confusion_matrix(train_outputs, denormalize_function(results[best_index][4]))
+        test_confusion_matrix = get_confusion_matrix(test_outputs, denormalize_function(results[best_index][2]))
+        metrics_to_plot.append([accuracy(test_confusion_matrix), precision(test_confusion_matrix), recall(test_confusion_matrix), f1_score(test_confusion_matrix), accuracy(train_confusion_matrix), precision(train_confusion_matrix), recall(train_confusion_matrix), f1_score(train_confusion_matrix)])
+    
+    plot_metrics(metrics_to_plot, network.title)
+
+
+        
 
 
 
@@ -86,6 +103,6 @@ def k_fold_cross_validation(config, inputs, expected, network: NetworkABC):
         w, w_hist= network.train_function(config, train, train_expected)
         train_e_list = [network.error_function(train, train_expected, w)/len(train) for w in w_hist]
         test_e_list = [network.error_function(test, test_expected, w)/len(test) for w in w_hist]
-        results.append((w, test, test_expected, train, train_expected, train_e_list, test_e_list))
+        results.append((w, test, test_expected, train, train_expected, train_e_list, test_e_list, w_hist))
 
     return results
