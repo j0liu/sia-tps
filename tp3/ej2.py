@@ -24,28 +24,28 @@ def ejercicio_2():
     beta = config["beta"]
 
     # train_perceptron_function = partial(train_perceptron, error_function=simple_error)
-    network = SingleLayerNetwork(af.id, af.one, simple_error)
+    network = SingleLayerNetwork(af.id, af.one, simple_error, title="linear")
     
     print("linear")
     # Linear
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    linear_results = k_fold_cross_validation(config, input_copy, expected_copy, network, "linear")
-    process_k_fold_cross_validation_results(linear_results, network, "linear")
+    linear_results = k_fold_cross_validation(config, input_copy, expected_copy, network)
+    process_k_fold_cross_validation_results(linear_results, network)
 
     print("tanh")
     # Non linear - tanh
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    networkTan = SingleLayerNetwork(af.gen_tanh(beta), af.gen_tanh_derivative(beta), simple_error)
-    analyze_method(config, input_copy, expected_copy, networkTan, -1, 1, "tanh")
+    networkTan = SingleLayerNetwork(af.gen_tanh(beta), af.gen_tanh_derivative(beta), simple_error, (-1,1),title="tanh")
+    analyze_method(config, input_copy, expected_copy, networkTan, min(expected_copy), max(expected_copy))
     
     # Non linear - logistic
     print("logistic")
     input_copy = np.copy(inputs)
     expected_copy = np.copy(expected)
-    networkTan = SingleLayerNetwork(af.gen_logistic(beta), af.gen_logistic_derivative(beta), simple_error)
-    analyze_method(config, input_copy, expected_copy, networkTan, 0, 1, "logistic")
+    networkTan = SingleLayerNetwork(af.gen_logistic(beta), af.gen_logistic_derivative(beta), simple_error, (0,1), title="logistic")
+    analyze_method(config, input_copy, expected_copy, networkTan, min(expected_copy), max(expected_copy))
 
 if __name__ == "__main__":
     ejercicio_2()

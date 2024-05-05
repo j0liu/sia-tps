@@ -3,7 +3,7 @@ import activation_functions as af
 import json
 from plotNetwork import plot_neural_network
 from plot import plot_function
-from kfold import k_fold_cross_validation, process_k_fold_cross_validation_results, analyze_method_categorization
+from kfold import k_fold_cross_validation, process_k_fold_cross_categorization_results, analyze_method_categorization
 from functools import partial
 from multilayer import MultiLayerNetwork, hypercube_layers
 
@@ -14,7 +14,7 @@ def ejercicio_3_xor():
     expected_xor = np.array([[-1], [1], [1], [-1]])
     layer_sizes = [2,2,2,1]
 
-    network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
+    network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), "xor")
 
     w_xor, weights_history = network.train_function(config, inputs, expected_xor)
     print("iterations:", len(weights_history))
@@ -27,8 +27,6 @@ def ejercicio_3_xor():
         print("x", inputs[i], "f(x)=", o)
     plot_neural_network(w_xor, network.layer_sizes)
     plot_neural_network(w_xor, hypercube_layers(network.layer_sizes))
-    # plot_function(network.activation_function, -1, 1, "tanh(x)")
-    # plot_function(network.activation_function_derivative, -1, 1, "dtanh(x)")
     print()
 
 
@@ -51,9 +49,9 @@ def ejercicio_3_paridad():
     print(len(expected))
     
 
-    network = MultiLayerNetwork([35,10,10,1], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
+    network = MultiLayerNetwork([35,10,2,1], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "paridad")
 
-    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1, -1, 1, "paridad")
+    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
 
 
 def ejercicio_3_numeros():
@@ -80,8 +78,8 @@ def ejercicio_3_numeros():
         current_expected[i] = 1
         expected = np.concatenate((expected, np.tile(current_expected, (len(m), 1))))
 
-    network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
-    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1, -1, 1, "digitos")
+    network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "digits")
+    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
 
 
 def ejercicio_3_generar_ruido():
@@ -144,19 +142,18 @@ def print_num(number_array : np.array, width, height):
         print()
 
 if __name__ == "__main__":
-    # import sys
-    # if len(sys.argv) > 1:
-    #     if sys.argv[1] == "xor":
-    #         ejercicio_3_xor()
-    #     elif sys.argv[1] == "paridad":
-    #         ejercicio_3_paridad()
-    #     elif sys.argv[1] == "numeros":
-    #         ejercicio_3_numeros()
-    #     elif sys.argv[1] == "ruido":
-    #         ejercicio_3_generar_ruido()
-
-
-    # ejercicio_3_xor()
-    ejercicio_3_paridad()
-    # ejercicio_3_numeros()
-    # ejercicio_3_generar_ruido()
+    import sys
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "xor":
+            ejercicio_3_xor()
+        elif sys.argv[1] == "paridad":
+            ejercicio_3_paridad()
+        elif sys.argv[1] == "numeros":
+            ejercicio_3_numeros()
+        elif sys.argv[1] == "ruido":
+            ejercicio_3_generar_ruido()
+    else:
+        # ejercicio_3_xor()
+        ejercicio_3_paridad()
+        # ejercicio_3_numeros()
+        # ejercicio_3_generar_ruido()

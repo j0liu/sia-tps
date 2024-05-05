@@ -2,6 +2,7 @@ import numpy as np
 import sys
 from functools import partial
 from plotSimplePerceptron import plot_decision_boundary, plot_errors
+from network_abc import NetworkABC
 
 def simple_error(inputs : np.array, expected : np.array, w : np.array, activation_function):
     p, dim = inputs.shape # p puntos en el plano, dim dimensiones
@@ -14,12 +15,9 @@ def step_error(inputs : np.array, expected : np.array, w : np.array, activation_
     error = sum(o(inputs[mu]) != expected[mu] for mu in range(len(expected))) / len(expected)
     return error
 
-
-
-class SingleLayerNetwork():
-    def __init__(self, activation_function, deriv_activation_function, error_function):
-        self.activation_function = activation_function
-        self.deriv_activation_function = deriv_activation_function
+class SingleLayerNetwork(NetworkABC):
+    def __init__(self, activation_function, deriv_activation_function, error_function, interval = None, title = ""):
+        super().__init__(activation_function, deriv_activation_function, interval, title)
         self.base_error_function = error_function
         
     #puntos en el plano: n = 2
@@ -27,7 +25,7 @@ class SingleLayerNetwork():
     #activation_function: theta
     #expected: tzeta
     #se debe tomar epsilon 0 para step
-    def train_function(self, config : dict, inputs : np.array, expected_results : np.array, title="Sin titulo"):
+    def train_function(self, config : dict, inputs : np.array, expected_results : np.array):
         p, dim = inputs.shape # p puntos en el plano, dim dimensiones
 
         i = 0
@@ -51,19 +49,12 @@ class SingleLayerNetwork():
             i += 1
             e_list.append(error.copy())
         print("iteraciones:", i)
-        # plot_decision_boundary(w_hist, inputs, expected_results, title)
-        # plot_errors(e_list, title)
+        # plot_decision_boundary(w_hist, inputs, expected_results, self.title)
+        # plot_errors(e_list, self.title)
         return w_min, w_hist
     
     def output_function(self, inputs : np.array, w : np.array):
         raise 'Not implemented'
-
-    def denormalized_error(self, inputs : np.array, expected_results : np.array, w : np.array, denormalize_function):
-        aux = self.activation_function
-        self.activation_function = lambda x: denormalize_function(aux(x))
-        error = self.error_function(inputs, denormalize_function(expected_results), w)
-        self.activation_function = aux
-        return error
 
 
     def error_function(self, inputs : np.array, expected_results : np.array, w : np.array):

@@ -16,8 +16,11 @@ def ejercicio_1():
 
     network = SingleLayerNetwork(af.step, af.one, step_error)
 
-    w_and, _ = network.train_function(config, inputs, expected_and, 'AND')
-    w_xor, _  = network.train_function(config, inputs, expected_or, 'XOR')
+    network.title = "AND"
+    w_and, _ = network.train_function(config, inputs, expected_and)
+
+    network.title = "XOR"
+    w_xor, _  = network.train_function(config, inputs, expected_or)
     print(w_and)
     print(w_xor)
 
