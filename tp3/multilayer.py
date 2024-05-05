@@ -7,7 +7,7 @@ from utils import pad
 import math
 import activation_functions as af
 from network_abc import NetworkABC
-from plotNetwork import plot_neural_network
+from plotNetwork import plot_neural_network, create_network_gif
 
 def layer_normalize(layer_sizes : np.array):
     return list(map(lambda x : x+1, layer_sizes))

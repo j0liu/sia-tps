@@ -1,7 +1,7 @@
 import numpy as np 
 import activation_functions as af
 import json
-from plotNetwork import plot_neural_network
+from plotNetwork import plot_neural_network, create_network_gif
 from plot import plot_function
 from kfold import k_fold_cross_validation, process_k_fold_cross_categorization_results, analyze_method_categorization
 from functools import partial
@@ -26,7 +26,7 @@ def ejercicio_3_xor():
     for i, o in enumerate(network.output_function(inputs, w_xor)):
         print("x", inputs[i], "f(x)=", o)
     network.plot_evaluation(inputs, w_xor)
-    plot_neural_network(network.layer_sizes, w_xor)
+    # create_network_gif(network, weights_history, inputs[1], "xor")
     plot_neural_network(hypercube_layers(network.layer_sizes), w_xor)
     print()
 
@@ -161,20 +161,20 @@ def eval_weight():
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "xor":
-            ejercicio_3_xor()
-        elif sys.argv[1] == "paridad":
-            ejercicio_3_paridad()
-        elif sys.argv[1] == "numeros":
-            ejercicio_3_numeros()
-        elif sys.argv[1] == "ruido":
-            ejercicio_3_generar_ruido()
-        elif sys.argv[1] == "eval":
-            eval_weight()
-    else:
-        ejercicio_3_xor()
+    # import sys
+    # if len(sys.argv) > 1:
+    #     if sys.argv[1] == "xor":
+    #         ejercicio_3_xor()
+    #     elif sys.argv[1] == "paridad":
+    #         ejercicio_3_paridad()
+    #     elif sys.argv[1] == "numeros":
+    #         ejercicio_3_numeros()
+    #     elif sys.argv[1] == "ruido":
+    #         ejercicio_3_generar_ruido()
+    #     elif sys.argv[1] == "eval":
+    #         eval_weight()
+    # else:
+    ejercicio_3_xor()
         # ejercicio_3_paridad()
         # ejercicio_3_numeros()
         # eval_weight()

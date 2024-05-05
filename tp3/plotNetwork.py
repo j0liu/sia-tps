@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+import os
+from PIL import Image
 def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights = None, values = None):
     v_spacing = (top - bottom) / float(max(layer_sizes))
     h_spacing = (right - left) / float(len(layer_sizes) - 1)
@@ -46,32 +48,48 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights = None, v
 
 
 def plot_neural_network(layer_sizes, weights=None, values=None):
+    if not os.path.exists('tp3/plots/eje3/networks'):
+        os.makedirs('tp3/plots/eje3/networks')
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca()
     ax.axis('off')
     draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, weights, values)
-    plt.show()
+    # plt.show()
+    plt.savefig(f'tp3/plots/eje3/networks/network.png')
 
-if __name__ == "__main__":
-    weights = [
-        [
-            [-0.47305217, -0.33284312,  0.15336057,  0.0],
-            [-0.91474575, -0.4731593,   0.37041971,  0.0],
-            [0.0,         0.02749187,  0.40582895,  0.0],
-            [0.0,         0.19039888,  0.88222326,  0.0]
-        ],
-        [
-            [0.0,         0.43801127,  0.5622559,   0.94494164],
-            [0.0,         0.8469868,   0.59847222,  0.6251414],
-            [0.0,         0.0,         0.0,          0.0],
-            [0.0,         0.0,         0.0,          0.0]
-        ]
-    ]
 
-    values = [
-        [0.1, 0.2, 0.3, 0.4],
-        [0.5, 0.6, 0.7, 0.8],
-        [0.9, 0.1, 0.2, 0.3]
-    ]
+def create_network_gif(network, weight_history, input, name):
+    gif_images = []
+    if not os.path.exists('tp3/plots/eje3/networks/gif_frames'):
+        os.makedirs('tp3/plots/eje3/networks/gif_frames')
 
-    plot_neural_network([4, 4, 4], weights, values)
+    # for i, weights in enumerate(weight_history[::10]):
+    for i, weights in enumerate(weight_history):
+        fig = plt.figure(figsize=(12, 8))
+        ax = fig.gca()
+        ax.axis('off')
+
+        values = network._forward_propagation(input, weights)
+        
+        draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, network.layer_sizes, weights, values)
+        plt.savefig(f'tp3/plots/eje3/networks/gif_frames/frame_{i}.png')
+        plt.close()
+        
+        # Open the saved image with PIL and append it to the list
+        img = Image.open(f'tp3/plots/eje3/networks/gif_frames/frame_{i}.png')
+        gif_images.append(img)
+    
+    # Save the images as a GIF
+    gif_images[0].save(f'tp3/plots/eje3/networks/{name}.gif',
+                       save_all=True, append_images=gif_images[1:], optimize=False, duration=500, loop=0)
+    
+# def make_gif_from_folder(folder_path, gif_name):
+#     gif_images = []
+#     for i, file in enumerate(sorted(os.listdir(folder_path))):
+#         img = Image.open(f'{folder_path}/{file}')
+#         gif_images.append(img)
+#     gif_images[0].save(f'{folder_path}/{gif_name}.gif',
+#                        save_all=True, append_images=gif_images[1:], optimize=False, duration=100, loop=0)
+    
+# if __name__ == "__main__":
+#     make_gif_from_folder('tp3/plots/eje3/networks/gif_frames', 'xor')
