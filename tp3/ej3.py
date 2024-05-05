@@ -79,7 +79,14 @@ def ejercicio_3_numeros():
         expected = np.concatenate((expected, np.tile(current_expected, (len(m), 1))))
 
     network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "digits")
-    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
+
+    results = analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
+    # option = int(input())
+    
+    # for i in range(10):
+    #     print_num(inputs[10*(i+1)], 5, 7)
+    #     print(network.output_function([inputs[10*(i+1)]], results[option][0]))
+
 
 
 def ejercicio_3_generar_ruido():
@@ -141,6 +148,17 @@ def print_num(number_array : np.array, width, height):
             print(character, end = " ")
         print()
 
+def eval_weight():
+    with open("tp3/config/ej3-digit.json") as f:
+        config = json.load(f)
+    
+    inputs = parse_to_matrices('tp3/TP3-ej3-digitos.txt')
+
+    network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "digits")
+    w = network.import_weights("tp3/weights/weights_0.txt")
+    print(network.output_function([inputs[0]], w))
+
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1:
@@ -152,8 +170,11 @@ if __name__ == "__main__":
             ejercicio_3_numeros()
         elif sys.argv[1] == "ruido":
             ejercicio_3_generar_ruido()
+        elif sys.argv[1] == "eval":
+            eval_weight()
     else:
         # ejercicio_3_xor()
-        ejercicio_3_paridad()
-        # ejercicio_3_numeros()
+        # ejercicio_3_paridad()
+        ejercicio_3_numeros()
+        # eval_weight()
         # ejercicio_3_generar_ruido()

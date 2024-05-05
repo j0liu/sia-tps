@@ -59,3 +59,20 @@ class SingleLayerNetwork(NetworkABC):
 
     def error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
         return self.base_error_function(inputs, expected_results, w, self.activation_function)
+    
+    def export_weights(self, w : np.array, filename : str):
+        with open(filename, 'w') as f:
+            f.write(f"{self.title}, {self.interval}\n")
+            for m in range(len(w)):
+                for j in range(len(w[m])):
+                    f.write(f"{w[m][j]}\n")
+
+    def import_weights(self, filename : str):
+        with open(filename, 'r') as f:
+            f.readline()
+            w = []
+            for m in range(len(self.layer_sizes)-1):
+                w.append([])
+                for j in range(self.layer_sizes[m+1]):
+                    w[m].append(list(map(float, f.readline().split())))
+            return np.array(w)

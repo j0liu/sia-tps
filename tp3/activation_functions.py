@@ -12,17 +12,17 @@ def one(x):
 
 def gen_tanh(beta):
     def tanh(x):
-        return math.tanh(beta * x)
+        return np.tanh(beta * x)
     return tanh
 
 def gen_tanh_derivative(beta):
     def tanh_derivative(x):
-        return beta * (1 - math.tanh(x)**2)
+        return beta * (1 - np.tanh(x)**2)
     return tanh_derivative
 
 def gen_logistic(beta):
     def logistic(x):
-        return 1 / (1 + math.exp(-beta*x))
+        return 1 / (1 + np.exp(-beta*x))
     return logistic
 
 def gen_logistic_derivative(beta):

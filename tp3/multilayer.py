@@ -90,19 +90,24 @@ class MultiLayerNetwork(NetworkABC):
         weights_history = [w.copy()]
 
         while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
-            mu = np.random.randint(0, p)
+            # mu = np.random.randint(0, p)
+            batch_mus = np.random.choice(p, min(p,config.get('batch_size', p)), replace=False)
 
-            values = self._forward_propagation(inputs[mu], w)
-            
-            delta_w = self._backward_propagation(config["learning_rate"], values, w, expected_results[mu])
-            if config.get('optimizer', 'gds') == 'adam':
-                m = config['b1'] * m + (1 - config['b1']) * (delta_w/config['learning_rate'])
-                v = config['b2'] * v + (1 - config['b2']) * ((delta_w /config['learning_rate'])** 2)
-                m_hat = m / (1 - config['b1'] ** (i + 1))
-                v_hat = v / (1 - config['b2'] ** (i + 1))
-                w += config['learning_rate'] * m_hat / (np.sqrt(v_hat) + config['e'])
-            else:
-                w += delta_w
+            resultant_w = w
+            for mu in batch_mus:
+                values = self._forward_propagation(inputs[mu], w)
+                
+                delta_w = self._backward_propagation(config["learning_rate"], values, w, expected_results[mu])
+                if config.get('optimizer', 'gds') == 'adam':
+                    m = config['b1'] * m + (1 - config['b1']) * (delta_w/config['learning_rate'])
+                    v = config['b2'] * v + (1 - config['b2']) * ((delta_w /config['learning_rate'])** 2)
+                    m_hat = m / (1 - config['b1'] ** (i + 1))
+                    v_hat = v / (1 - config['b2'] ** (i + 1))
+                    resultant_w += config['learning_rate'] * m_hat / (np.sqrt(v_hat) + config['e'])
+                else:
+                    resultant_w += delta_w
+                    
+            w = resultant_w
             weights_history.append(w.copy())
 
             error = self.error_function(inputs, expected_results, w)
@@ -129,3 +134,20 @@ class MultiLayerNetwork(NetworkABC):
             for i in range(len(expected_results[mu])):
                 val += 0.5 * (expected_results[mu][i] - output[i])**2
         return val
+
+
+    def export_weights(self, w : np.array, filename : str):
+        with open(filename, 'w+') as f:
+            f.write(f"{self.layer_sizes} {self.title}, {self.interval}\n")
+            for m in range(len(w)):
+                for j in range(self.layer_sizes[m]):
+                    f.write(" ".join(map(str, w[m][j])) + "\n")
+
+    def import_weights(self, filename : str):
+        w = np.zeros((len(self.layer_sizes)-1, self.network_width, self.network_width))
+        with open(filename, 'r') as f:
+            f.readline()
+            for m in range(len(self.layer_sizes)-1):
+                for j in range(self.layer_sizes[m]):
+                    w[m][j] = list(map(float, f.readline().split()))
+        return w

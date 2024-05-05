@@ -22,6 +22,14 @@ class NetworkABC(ABC):
     def error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
         pass
 
+    @abstractmethod
+    def export_weights(self, w : np.array, filename : str):
+        pass
+
+    @abstractmethod
+    def import_weights(self, filename : str):
+        pass
+
     def denormalized_error(self, inputs : np.array, expected_results : np.array, w : np.array, denormalize_function):
         aux = self.activation_function
         self.activation_function = lambda x: denormalize_function(aux(x))
