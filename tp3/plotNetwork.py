@@ -40,7 +40,7 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
                         weight = weights[n][current][prev]
                         x = n * h_spacing + left + 0.05  # Small horizontal offset from the start node
                         y = layer_top_a - prev * v_spacing + (layer_top_b - current * v_spacing - layer_top_a + prev * v_spacing) * 0.3
-                        ax.text(x, y, f'{weight:.5f}', color=cm, fontsize=8, verticalalignment='center')
+                        ax.text(x, y, f'{weight:.5f}', color=cm, bbox=dict(facecolor='white', alpha=0.5, edgecolor=cm), fontsize=8, verticalalignment='center', zorder = 5)
 
 
 def plot_neural_network(weights, layer_sizes):
