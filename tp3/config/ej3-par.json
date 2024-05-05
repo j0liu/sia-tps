@@ -1,10 +1,11 @@
 {
-    "limit": 1000,
+    "limit": 10000,
     "random_start": true,
+    "extra_groups": 5,
     "learning_rate": 0.02,
     "bias": 0,
     "epsilon": 0.1,
-    "k": 30,
+    "k": 5,
     "beta": 1,
     "optimizer": "adam",
     "b1": 0.9331338848100159,

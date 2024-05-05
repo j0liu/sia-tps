@@ -48,12 +48,13 @@ def get_confusion_matrix(outputs, expected_list):
     confusion_matrix = np.zeros((2, 2))
     ones = np.ones(len(outputs[0]))
     for i in range(len(outputs)):
-        output = outputs[i]
-        expected = expected_list[i]
-        confusion_matrix[1][1] += np.sum((ones - output) * (ones - expected)) #tp
+        output = np.round(outputs[i]) # Round to 0 or 1
+        expected = np.round(expected_list[i])
+
+        confusion_matrix[1][1] += np.sum((ones - output) * (ones - expected)) #tn
         confusion_matrix[1][0] += np.sum((ones - output) * expected) #fp
         confusion_matrix[0][1] += np.sum(output * (ones - expected)) #fn
-        confusion_matrix[0][0] += np.sum(expected * output) #tn
+        confusion_matrix[0][0] += np.sum(expected * output) #tp
     return confusion_matrix
 
 

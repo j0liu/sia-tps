@@ -38,7 +38,7 @@ def ejercicio_3_paridad():
 
     for i in range(10):
         # add to inputs
-        m = parse_to_matrices(f'tp3/numeros/{i}.txt')
+        m = parse_to_matrices(f'tp3/numeros/{i}.txt')[0:config.get('extra_groups', 10)]
         inputs = np.concatenate((inputs, m))
         current_expected = np.tile(1 if i % 2 == 0 else 0, (len(m), 1))
         # current_expected = np.zeros(10)
