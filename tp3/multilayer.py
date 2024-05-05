@@ -7,6 +7,7 @@ from utils import pad
 import math
 import activation_functions as af
 from network_abc import NetworkABC
+from plotNetwork import plot_neural_network
 
 def layer_normalize(layer_sizes : np.array):
     return list(map(lambda x : x+1, layer_sizes))
@@ -151,3 +152,8 @@ class MultiLayerNetwork(NetworkABC):
                 for j in range(self.layer_sizes[m]):
                     w[m][j] = list(map(float, f.readline().split()))
         return w
+    
+    def plot_evaluation(self, inputs, w):
+        for i in inputs:
+            values = self._forward_propagation(i, w)
+            plot_neural_network(self.layer_sizes, w, values)

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
-def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
+def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights = None, values = None):
     v_spacing = (top - bottom) / float(max(layer_sizes))
     h_spacing = (right - left) / float(len(layer_sizes) - 1)
     cmap = plt.get_cmap('brg')  # Get the colormap
@@ -18,6 +18,8 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
             circle = plt.Circle((n * h_spacing + left, layer_top - m * v_spacing), v_spacing / 4.,
                                 color='w', ec='k', zorder=4)
             ax.add_artist(circle)
+            if values is not None:
+                ax.text(n * h_spacing + left, layer_top - m * v_spacing, f'{values[n][m]:.3f}', fontsize=14, verticalalignment='center', horizontalalignment='center', zorder = 5)
 
     # Edges
     for n, (layer_size_prev, layer_size_next) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
@@ -43,11 +45,11 @@ def draw_neural_net(ax, left, right, bottom, top, layer_sizes, weights):
                         ax.text(x, y, f'{weight:.5f}', color=cm, bbox=dict(facecolor='white', alpha=0.5, edgecolor=cm), fontsize=8, verticalalignment='center', zorder = 5)
 
 
-def plot_neural_network(weights, layer_sizes):
+def plot_neural_network(layer_sizes, weights=None, values=None):
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca()
     ax.axis('off')
-    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, weights)
+    draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, layer_sizes, weights, values)
     plt.show()
 
 if __name__ == "__main__":
@@ -65,4 +67,11 @@ if __name__ == "__main__":
             [0.0,         0.0,         0.0,          0.0]
         ]
     ]
-    plot_neural_network(weights, [4, 4, 4])
+
+    values = [
+        [0.1, 0.2, 0.3, 0.4],
+        [0.5, 0.6, 0.7, 0.8],
+        [0.9, 0.1, 0.2, 0.3]
+    ]
+
+    plot_neural_network([4, 4, 4], weights, values)

@@ -25,8 +25,9 @@ def ejercicio_3_xor():
     
     for i, o in enumerate(network.output_function(inputs, w_xor)):
         print("x", inputs[i], "f(x)=", o)
-    plot_neural_network(w_xor, network.layer_sizes)
-    plot_neural_network(w_xor, hypercube_layers(network.layer_sizes))
+    network.plot_evaluation(inputs, w_xor)
+    plot_neural_network(network.layer_sizes, w_xor)
+    plot_neural_network(hypercube_layers(network.layer_sizes), w_xor)
     print()
 
 
@@ -173,8 +174,8 @@ if __name__ == "__main__":
         elif sys.argv[1] == "eval":
             eval_weight()
     else:
-        # ejercicio_3_xor()
+        ejercicio_3_xor()
         # ejercicio_3_paridad()
-        ejercicio_3_numeros()
+        # ejercicio_3_numeros()
         # eval_weight()
         # ejercicio_3_generar_ruido()
