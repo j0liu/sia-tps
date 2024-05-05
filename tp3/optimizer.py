@@ -1,7 +1,7 @@
 import random
 import sys
 import numpy as np
-from perceptron import train_multilayer_perceptron, multi_error
+from tp3.single_layer import train_multilayer_perceptron, multi_error
 def optimize_parameters(config, inputs, layer_sizes, expected_results, activation_function, deriv_activation_function):
     min_error = sys.maxsize
     min_i = sys.maxsize

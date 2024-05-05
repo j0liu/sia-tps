@@ -1,5 +1,4 @@
 {
-    "random_start": true,
     "limit": -1,
     "learning_rate": 0.08,
     "bias": 0,

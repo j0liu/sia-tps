@@ -1,33 +1,68 @@
 import numpy as np
 from functools import partial
-from perceptron import train_perceptron
+from metrics import accuracy, precision, recall, f1_score
 from plotTrainTest import plot_k_fold_errors
 import activation_functions as af
 
-def analyze_method(config : dict, inputs : np.array, expected: np.array, activation_function, derivative_function, train_perceptron_function, interval_min, interval_max, error_function, title):
+def analyze_method(config : dict, inputs : np.array, expected: np.array, network, interval_min, interval_max, title):
     min_expected = min(expected)
     max_expected = max(expected)
     expected = af.normalize(expected, min_expected, max_expected, interval_min, interval_max) # Normalization
 
     denormalize = partial(af.denormalize, x_min=min_expected, x_max=max_expected, a=interval_min, b=interval_max)
-    results = k_fold_cross_validation(config, train_perceptron_function,
-                                      inputs, expected, activation_function, error_function, title, derivative_function)
-    process_k_fold_cross_validation_results(results, activation_function, denormalize, error_function, title)
+    results = k_fold_cross_validation(config, inputs, expected, network, title)
+    process_k_fold_cross_validation_results(results, network, title, denormalize)
+
+
+def analyze_method_categorization(config : dict, inputs : np.array, expected: np.array, network, min_expected, max_expected, interval_min, interval_max, title):
+    expected = af.normalize(expected, min_expected, max_expected, interval_min, interval_max) # Normalization
+
+    denormalize = partial(af.denormalize, x_min=min_expected, x_max=max_expected, a=interval_min, b=interval_max)
+    results = k_fold_cross_validation(config, inputs, expected, network, title)
+    process_k_fold_cross_categorization_results(results, network, title, denormalize)
 
 #multi_error(inputs : np.array, expected_results : np.array, layer_sizes : np.array, w : np.array, activation_function)
-def process_k_fold_cross_validation_results(results, activation_function, denormalize_function, error_function, title):
+def process_k_fold_cross_validation_results(results, network, title, denormalize_function = lambda x: x):
     errors = []
     train_errors = []
-    for (w, test, expected_test, train, expected_train) in results:
-        errors.append(error_function(inputs=test, expected_results=denormalize_function(expected_test), w=w, activation_function=lambda x: denormalize_function(activation_function(x))))
-        train_errors.append(error_function(inputs=train, expected_results=denormalize_function(expected_train), w=w, activation_function=lambda x: denormalize_function(activation_function(x))))
-        print(w)
+    for (w, test, expected_test, train, expected_train) in results:        
+        # errors.append(network.denormalized_error(test, expected_test, w))
+        # train_errors.append(network.denormalized_error(test, expected_train, w))
+        errors.append(network.denormalized_error(test, expected_test, w, denormalize_function))
+        train_errors.append(network.denormalized_error(train, expected_train, w, denormalize_function))
     plot_k_fold_errors(errors, train_errors, title)
     print(f"Error medio con test: {np.mean(errors)}")
     print(f"Error medio con train: {np.mean(train)}")
 
+    
+def process_k_fold_cross_categorization_results(results, network, title, denormalize_function = lambda x : x):
+    for (w, test, expected_test, train, expected_train) in results:
+        train_outputs = denormalize_function(network.output_function(train, w))
+        test_outputs = denormalize_function(network.output_function(test, w))
+        train_confusion_matrix = get_confusion_matrix(train_outputs, denormalize_function(expected_train))
+        test_confusion_matrix = get_confusion_matrix(test_outputs, denormalize_function(expected_test))
 
-def k_fold_cross_validation(config, train_perceptron_function, inputs, expected, activation_function, error_function, title, deriv_activation_function = lambda x: 1):
+        # print(f"Pesos: {w}")
+        print()
+        print(f"train: Acurracy: {accuracy(train_confusion_matrix)} Precision: {precision(train_confusion_matrix)} Recall: {recall(train_confusion_matrix)} F1 Score: {f1_score(train_confusion_matrix)}")
+        print(f"test: Acurracy: {accuracy(test_confusion_matrix)} Precision: {precision(test_confusion_matrix)} Recall: {recall(test_confusion_matrix)} F1 Score: {f1_score(test_confusion_matrix)}")
+
+
+def get_confusion_matrix(outputs, expected_list):
+    confusion_matrix = np.zeros((2, 2))
+    ones = np.ones(len(outputs[0]))
+    for i in range(len(outputs)):
+        output = outputs[i]
+        expected = expected_list[i]
+        confusion_matrix[1][1] += np.sum((ones - output) * (ones - expected)) #tp
+        confusion_matrix[1][0] += np.sum((ones - output) * expected) #fp
+        confusion_matrix[0][1] += np.sum(output * (ones - expected)) #fn
+        confusion_matrix[0][0] += np.sum(expected * output) #tn
+    return confusion_matrix
+
+
+    
+def k_fold_cross_validation(config, inputs, expected, network, title):
     # shuffle inputs with their corresponding expected values
     inputs_and_expected = list(zip(inputs, expected))
     np.random.shuffle(inputs_and_expected)
@@ -43,7 +78,7 @@ def k_fold_cross_validation(config, train_perceptron_function, inputs, expected,
         test_expected = expected[i*fold_size:(i+1)*fold_size]
         train = np.concatenate((inputs[:i*fold_size], inputs[(i+1)*fold_size:]), axis=0)
         train_expected = np.concatenate((expected[:i*fold_size], expected[(i+1)*fold_size:]), axis=0)
-        w, _ = train_perceptron_function(config=config, inputs=train, expected_results=train_expected, activation_function=activation_function, deriv_activation_function=deriv_activation_function, title=title)
+        w, _ = network.train_function(config, train, train_expected, title)
         results.append((w, test, test_expected, train, train_expected))
 
     return results

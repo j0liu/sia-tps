@@ -1,58 +1,64 @@
 import numpy as np 
 import activation_functions as af
-from perceptron import train_multilayer_perceptron, multi_error, forward_propagation, layer_normalize, hypercube_layers
 import json
 from plotNetwork import plot_neural_network
 from plot import plot_function
-from kfold import analyze_method, k_fold_cross_validation, process_k_fold_cross_validation_results
+from kfold import k_fold_cross_validation, process_k_fold_cross_validation_results, analyze_method_categorization
 from functools import partial
-
-with open("tp3/config.json") as f:
-    config = json.load(f)
-
-
-def output(x, layer_sizes, w, activation_function):
-    return forward_propagation(x, layer_sizes, w, activation_function)[-1][1:layer_sizes[-1]]
-
+from multilayer import MultiLayerNetwork, hypercube_layers
 
 def ejercicio_3_xor():
+    with open("tp3/config/ej3-xor.json") as f:
+        config = json.load(f)
     inputs = np.array([[-1, -1], [-1, 1], [1, -1], [1, 1]])
-    expected_or = np.array([[-1], [1], [1], [-1]])
-    activation_function = af.gen_tanh(config['beta'])
-    activation_function_derivative = af.gen_tanh_derivative(config['beta'])
-    layer_sizes = np.array(layer_normalize([2,2,2,1]))
+    expected_xor = np.array([[-1], [1], [1], [-1]])
+    layer_sizes = [2,2,2,1]
 
-    w_or, weights_history = train_multilayer_perceptron(config, inputs, layer_sizes, expected_or, activation_function, activation_function_derivative)
+    network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
+
+    w_xor, weights_history = network.train_function(config, inputs, expected_xor)
     print("iterations:", len(weights_history))
-    print("initial\n",weights_history[0])
-    print("val:", multi_error(inputs, expected_or, layer_sizes, weights_history[0], activation_function))
-    print("minimal\n",w_or)
-    print("val:", multi_error(inputs, expected_or, layer_sizes, w_or, activation_function))
-    for x in inputs:
-        print("x", x, "f(x)=", output(x, layer_sizes, w_or, activation_function))
-    plot_neural_network(w_or, layer_sizes)
-    plot_neural_network(w_or, hypercube_layers(layer_sizes))
-    plot_function(activation_function, -1, 1, "tanh(x)")
-    plot_function(activation_function_derivative, -1, 1, "dtanh(x)")
-    print()
+    # print("initial\n",weights_history[0])
+    # print("error:", network.error_function(inputs, expected_xor, weights_history[0]))
+    print("minimal\n", w_xor)
+    print("error:", network.error_function(inputs, expected_xor, w_xor))
     
+    for i, o in enumerate(network.output_function(inputs, w_xor)):
+        print("x", inputs[i], "f(x)=", o)
+    plot_neural_network(w_xor, network.layer_sizes)
+    plot_neural_network(w_xor, hypercube_layers(network.layer_sizes))
+    # plot_function(network.activation_function, -1, 1, "tanh(x)")
+    # plot_function(network.activation_function_derivative, -1, 1, "dtanh(x)")
+    print()
+
 
 def ejercicio_3_paridad():
+    with open("tp3/config/ej3-par.json") as f:
+        config = json.load(f)
     inputs = parse_to_matrices('tp3/TP3-ej3-digitos.txt')
-    expected = np.array([[1], [-1], [1], [-1], [1], [-1], [1], [-1], [1], [-1]])
-    activation_function = af.gen_tanh(config['beta'])
-    activation_function_derivative = af.gen_tanh_derivative(config['beta'])
+    expected = np.array([[1], [0], [1], [0], [1], [0], [1], [0], [1], [0]])
 
-    layer_sizes = np.array(layer_normalize([35,2,2,1]))
-    train_function = partial(train_multilayer_perceptron, layer_sizes=layer_sizes)
-    error_function = partial(multi_error, layer_sizes=layer_sizes)
+    for i in range(10):
+        # add to inputs
+        m = parse_to_matrices(f'tp3/numeros/{i}.txt')
+        inputs = np.concatenate((inputs, m))
+        current_expected = np.tile(1 if i % 2 == 0 else 0, (len(m), 1))
+        # current_expected = np.zeros(10)
+        # current_expected[i] = 1
+        expected = np.concatenate((expected, current_expected))
+    
+    print(expected)
+    print(len(expected))
+    
 
+    network = MultiLayerNetwork([35,10,10,1], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
 
-    # analyze_method(config, np.copy(inputs), expected, activation_function, activation_function_derivative, train_function, -1, 1, error_function, "paridad")
-    multi_results = k_fold_cross_validation(config, train_function, inputs, expected, activation_function, error_function, "multi", deriv_activation_function=activation_function_derivative)
-    process_k_fold_cross_validation_results(multi_results, activation_function, af.id, error_function, "multi")
+    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1, -1, 1, "paridad")
+
 
 def ejercicio_3_numeros():
+    with open("tp3/config/ej3-digit.json") as f:
+        config = json.load(f)
     inputs = parse_to_matrices('tp3/TP3-ej3-digitos.txt')
 
     expected = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -74,18 +80,8 @@ def ejercicio_3_numeros():
         current_expected[i] = 1
         expected = np.concatenate((expected, np.tile(current_expected, (len(m), 1))))
 
-    activation_function = af.gen_tanh(config['beta'])
-    activation_function_derivative = af.gen_tanh_derivative(config['beta'])
-
-    layer_sizes = np.array(layer_normalize([35,10,10]))
-    train_function = partial(train_multilayer_perceptron, layer_sizes=layer_sizes)
-    error_function = partial(multi_error, layer_sizes=layer_sizes)
-
-
-    # analyze_method(config, np.copy(inputs), expected, activation_function, activation_function_derivative, train_function, -1, 1, error_function, "paridad")
-    multi_results = k_fold_cross_validation(config, train_function, inputs, expected, activation_function, error_function, "multi", deriv_activation_function=activation_function_derivative)
-    process_k_fold_cross_validation_results(multi_results, activation_function, af.id, error_function, "multi")
-
+    network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']))
+    analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1, -1, 1, "digitos")
 
 
 def ejercicio_3_generar_ruido():
@@ -106,7 +102,6 @@ def ejercicio_3_generar_ruido():
                     file.write(str(round(pixel, 3)) + " ")
                     if j % 5 == 4   :
                         file.write("\n")
-
 
 
 def parse_to_matrices(filepath, columns=5, rows=7):
@@ -149,7 +144,19 @@ def print_num(number_array : np.array, width, height):
         print()
 
 if __name__ == "__main__":
-    ejercicio_3_xor()
-    # ejercicio_3_paridad()
+    # import sys
+    # if len(sys.argv) > 1:
+    #     if sys.argv[1] == "xor":
+    #         ejercicio_3_xor()
+    #     elif sys.argv[1] == "paridad":
+    #         ejercicio_3_paridad()
+    #     elif sys.argv[1] == "numeros":
+    #         ejercicio_3_numeros()
+    #     elif sys.argv[1] == "ruido":
+    #         ejercicio_3_generar_ruido()
+
+
+    # ejercicio_3_xor()
+    ejercicio_3_paridad()
     # ejercicio_3_numeros()
     # ejercicio_3_generar_ruido()

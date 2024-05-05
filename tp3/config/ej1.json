@@ -1,0 +1,9 @@
+{
+    "ej" : 1,
+    "limit": 1000,
+    "random_start": true,
+    "learning_rate": 0.02,
+    "bias": 0,
+    "epsilon": 0.1,
+    "k": 30
+}
