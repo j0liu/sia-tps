@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 import json
 
-with open("tp3/config/ej2.json") as f:
+with open("tp3/config/ej3-digit.json") as f:
     config = json.load(f)
 
 def plot_k_fold_errors(errors, train_errors, title):
@@ -39,12 +39,13 @@ def plot_metrics(metrics, title):
         ax.plot(range(1, len(metrics) + 1), [m[i + 4] for m in metrics], label=f'Train {metric_name}', color='b')
         # Plot testing data for the metric
         ax.plot(range(1, len(metrics) + 1), [m[i] for m in metrics], label=f'Test {metric_name}', color='r')
-        ax.set_title(f'{metric_name} vs Epoch for {title}')
+        ax.set_title(f'{metric_name} vs Epoch for {title} | K = {config["k"]}')
         ax.set_xlabel('Epoch')
         ax.set_ylabel(metric_name)
+        ax.set_ybound(0, 1.1)
 
         #set ticks every 5
-        ax.xaxis.set_major_locator(plt.MultipleLocator(5))
+        ax.xaxis.set_major_locator(plt.MultipleLocator(10))
         ax.legend()
         plt.savefig(f'{directory}/{title}_{metric_name.lower()}_metrics.png')
         plt.close(fig)  # Close the figure to free up memory

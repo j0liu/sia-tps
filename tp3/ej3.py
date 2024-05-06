@@ -25,8 +25,8 @@ def ejercicio_3_xor():
     
     for i, o in enumerate(network.output_function(inputs, w_xor)):
         print("x", inputs[i], "f(x)=", o)
-    network.plot_evaluation(inputs, w_xor)
-    # create_network_gif(network, weights_history, inputs[1], "xor")
+    # network.plot_evaluation(inputs, w_xor)
+    create_network_gif(network, weights_history, inputs[1], "xor")
     plot_neural_network(hypercube_layers(network.layer_sizes), w_xor)
     print()
 
@@ -73,7 +73,7 @@ def ejercicio_3_numeros():
 
     for i in range(10):
         # add to inputs
-        m = parse_to_matrices(f'tp3/numeros/{i}.txt')
+        m = parse_to_matrices(f'tp3/numeros/{i}.txt')[0:config.get('extra_groups', 10)]
         inputs = np.concatenate((inputs, m))
         current_expected = np.zeros(10)
         current_expected[i] = 1
@@ -174,8 +174,8 @@ if __name__ == "__main__":
     #     elif sys.argv[1] == "eval":
     #         eval_weight()
     # else:
-    ejercicio_3_xor()
-        # ejercicio_3_paridad()
-        # ejercicio_3_numeros()
+    # ejercicio_3_xor()
+    # ejercicio_3_paridad()
+    ejercicio_3_numeros()
         # eval_weight()
         # ejercicio_3_generar_ruido()

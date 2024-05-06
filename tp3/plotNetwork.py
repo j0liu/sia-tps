@@ -63,33 +63,46 @@ def create_network_gif(network, weight_history, input, name):
     if not os.path.exists('tp3/plots/eje3/networks/gif_frames'):
         os.makedirs('tp3/plots/eje3/networks/gif_frames')
 
+    # Clear the folder
+    for file in os.listdir('tp3/plots/eje3/networks/gif_frames'):
+        os.remove(os.path.join('tp3/plots/eje3/networks/gif_frames', file))
+
+    #initialize best values in 0 for the output layer
+    best_values = network._forward_propagation(input, weight_history[0])[3]
+    print("BEST VALUE:",best_values)
     # for i, weights in enumerate(weight_history[::10]):
+    j = 0
     for i, weights in enumerate(weight_history):
         fig = plt.figure(figsize=(12, 8))
         ax = fig.gca()
         ax.axis('off')
 
         values = network._forward_propagation(input, weights)
-        
-        draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, network.layer_sizes, weights, values)
-        plt.savefig(f'tp3/plots/eje3/networks/gif_frames/frame_{i}.png')
-        plt.close()
-        
-        # Open the saved image with PIL and append it to the list
-        img = Image.open(f'tp3/plots/eje3/networks/gif_frames/frame_{i}.png')
+        if values[3][1] > best_values[1]:
+            best_values = values[3]
+            draw_neural_net(ax, 0.1, 0.9, 0.1, 0.9, network.layer_sizes, weights, values)
+            plt.savefig(f'tp3/plots/eje3/networks/gif_frames/frame_{j}.png')
+            j += 1
+        plt.close(fig)
+
+    # Save the files from the folder to a gif, do not use index
+    for i, file in enumerate(sorted(os.listdir('tp3/plots/eje3/networks/gif_frames'))):
+        img = Image.open(f'tp3/plots/eje3/networks/gif_frames/{file}')
         gif_images.append(img)
-    
-    # Save the images as a GIF
+
+    # Save the gif
     gif_images[0].save(f'tp3/plots/eje3/networks/{name}.gif',
-                       save_all=True, append_images=gif_images[1:], optimize=False, duration=500, loop=0)
+                       save_all=True, append_images=gif_images[1:], optimize=False, duration=1000, loop=0)
+
+
     
-# def make_gif_from_folder(folder_path, gif_name):
-#     gif_images = []
-#     for i, file in enumerate(sorted(os.listdir(folder_path))):
-#         img = Image.open(f'{folder_path}/{file}')
-#         gif_images.append(img)
-#     gif_images[0].save(f'{folder_path}/{gif_name}.gif',
-#                        save_all=True, append_images=gif_images[1:], optimize=False, duration=100, loop=0)
+def make_gif_from_folder(folder_path, gif_name):
+    gif_images = []
+    for i, file in enumerate(sorted(os.listdir(folder_path))):
+        img = Image.open(f'{folder_path}/{file}')
+        gif_images.append(img)
+    gif_images[0].save(f'{folder_path}/{gif_name}.gif',
+                       save_all=True, append_images=gif_images[1:], optimize=False, duration=1000, loop=0)
     
-# if __name__ == "__main__":
-#     make_gif_from_folder('tp3/plots/eje3/networks/gif_frames', 'xor')
+if __name__ == "__main__":
+    make_gif_from_folder('tp3/plots/eje3/networks/gif_frames', 'xor')

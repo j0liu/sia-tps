@@ -1,14 +1,14 @@
 {
-    "limit": 1000,
+    "limit": 2000,
     "random_start": true,
     "learning_rate": 0.02,
     "bias": 0,
     "epsilon": 0.1,
-    "k": 2,
+    "extra_groups": 2,
+    "k": 6,
     "beta": 1,
     "optimizer": "adam",
     "b1": 0.9331338848100159,
     "b2": 0.9658289155465659,
-    "e": 1e-8,
-    "batch_size": 10
+    "e": 1e-8
 }
