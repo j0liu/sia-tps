@@ -22,25 +22,31 @@ def analyze_method_categorization(config : dict, inputs : np.array, expected: np
 def process_k_fold_cross_validation_results(results, network: NetworkABC, denormalize_function = lambda x: x):
     errors = []
     train_errors = []
-    for (w, test, expected_test, train, expected_train, _, _, _) in results:        
+    for (w, test, expected_test, train, expected_train, w_hist) in results:        
         # errors.append(network.denormalized_error(test, expected_test, w))
         # train_errors.append(network.denormalized_error(test, expected_train, w))
         errors.append(network.denormalized_error(test, expected_test, w, denormalize_function)/len(test))
         train_errors.append(network.denormalized_error(train, expected_train, w, denormalize_function)/len(train))
+
     # get index of min value in errors
 
     # min_error_index = np.argmin(errors)
-    min_error_index = np.argmin(errors)
+    min_error_index = np.argmin(train_errors)
+    (_, min_test, min_expected_test, min_train, min_expected_train, min_w_hist) = results[min_error_index]
+    train_e_list = [network.denormalized_error(min_train, min_expected_train, w, denormalize_function)/len(min_train) for w in min_w_hist]
+    test_e_list = [network.denormalized_error(min_test, min_expected_test, w, denormalize_function)/len(min_test) for w in min_w_hist]
+    
+    plot_k_fold_errors(test_e_list, train_e_list, network.title)
 
-    plot_k_fold_errors(results[min_error_index][6], results[min_error_index][5], network.title)
-    print(f"Error medio con test: {np.mean(errors)}")
-    print(f"Error medio con train: {np.mean(train_errors)}")
+
+    print(f"Error minimo con test ({len(min_test)}): {errors[min_error_index]}")
+    print(f"Error minimo con train ({len(min_train)}): {train_errors[min_error_index]}")
 
     
 def process_k_fold_cross_categorization_results(results, network: NetworkABC, denormalize_function = lambda x : x):
     
     metrics = []
-    for i, (w, test, expected_test, train, expected_train, _, _, _) in enumerate(results):
+    for i, (w, test, expected_test, train, expected_train, _) in enumerate(results):
         train_outputs = denormalize_function(network.output_function(train, w))
         test_outputs = denormalize_function(network.output_function(test, w))
         train_confusion_matrix = get_confusion_matrix(train_outputs, denormalize_function(expected_train))
@@ -55,7 +61,7 @@ def process_k_fold_cross_categorization_results(results, network: NetworkABC, de
     # Select the best 
     best_index = np.argmax(metrics)
     metrics_to_plot = []
-    for w in results[best_index][7]:
+    for w in results[best_index][5]:
         train_outputs = denormalize_function(network.output_function(results[best_index][3], w))
         test_outputs = denormalize_function(network.output_function(results[best_index][1], w))
         train_confusion_matrix = get_confusion_matrix(train_outputs, denormalize_function(results[best_index][4]))
@@ -101,8 +107,6 @@ def k_fold_cross_validation(config, inputs, expected, network: NetworkABC):
         train = np.concatenate((inputs[:i*fold_size], inputs[(i+1)*fold_size:]), axis=0)
         train_expected = np.concatenate((expected[:i*fold_size], expected[(i+1)*fold_size:]), axis=0)
         w, w_hist= network.train_function(config, train, train_expected)
-        train_e_list = [network.error_function(train, train_expected, w)/len(train) for w in w_hist]
-        test_e_list = [network.error_function(test, test_expected, w)/len(test) for w in w_hist]
-        results.append((w, test, test_expected, train, train_expected, train_e_list, test_e_list, w_hist))
+        results.append((w, test, test_expected, train, train_expected, w_hist))
 
     return results

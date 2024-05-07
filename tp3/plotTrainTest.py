@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 import json
 
-with open("tp3/config/ej3-digit.json") as f:
+with open("tp3/config/ej2.json") as f:
     config = json.load(f)
 
 def plot_k_fold_errors(errors, train_errors, title):
@@ -12,10 +12,10 @@ def plot_k_fold_errors(errors, train_errors, title):
     fig, ax = plt.subplots()
     ax.plot(range(1, len(errors) + 1), errors, label='Test error')
     ax.plot(range(1, len(train_errors) + 1), train_errors, label='Train error')
-    ax.set_title(f'Error vs Epoch for {title} | K = {config["k"]}')
-    ax.set_ybound(0, 1)
+    ax.set_title(f'MSE vs Epoch for {title} | beta = {config["beta"]}')
+    # ax.set_ybound(0, 1200)
     ax.set_xlabel('Epoch')
-    ax.set_ylabel('Error')
+    ax.set_ylabel('MSE')
     ax.legend()
     plt.savefig(f'tp3/plots/EJE2/{config["k"]}/{title}.png')
     plt.close(fig)  # Close the figure to free up memory

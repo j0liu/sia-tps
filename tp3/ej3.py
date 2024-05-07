@@ -81,7 +81,7 @@ def ejercicio_3_numeros():
 
     network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "digits")
 
-    results = analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
+    # results = analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
     # option = int(input())
     
     # for i in range(10):
