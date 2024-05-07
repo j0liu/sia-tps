@@ -81,7 +81,7 @@ def ejercicio_3_numeros():
 
     network = MultiLayerNetwork([35,10,10,10], af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1,1), "digits")
 
-    # results = analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
+    results = analyze_method_categorization(config, np.copy(inputs), expected, network, 0, 1)
     # option = int(input())
     
     # for i in range(10):
@@ -161,21 +161,21 @@ def eval_weight():
 
 
 if __name__ == "__main__":
-    # import sys
-    # if len(sys.argv) > 1:
-    #     if sys.argv[1] == "xor":
-    #         ejercicio_3_xor()
-    #     elif sys.argv[1] == "paridad":
-    #         ejercicio_3_paridad()
-    #     elif sys.argv[1] == "numeros":
-    #         ejercicio_3_numeros()
-    #     elif sys.argv[1] == "ruido":
-    #         ejercicio_3_generar_ruido()
-    #     elif sys.argv[1] == "eval":
-    #         eval_weight()
+    # ejercicio_3_paridad()
+    # ejercicio_3_numeros()
+    import sys
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "xor":
+            ejercicio_3_xor()
+        elif sys.argv[1] == "paridad":
+            ejercicio_3_paridad()
+        elif sys.argv[1] == "numeros":
+            ejercicio_3_numeros()
+        elif sys.argv[1] == "ruido":
+            ejercicio_3_generar_ruido()
+        # elif sys.argv[1] == "eval":
+        #     eval_weight()
     # else:
     # ejercicio_3_xor()
-    # ejercicio_3_paridad()
-    ejercicio_3_numeros()
         # eval_weight()
         # ejercicio_3_generar_ruido()
