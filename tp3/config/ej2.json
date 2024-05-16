@@ -1,8 +1,8 @@
 {
-    "limit": 500,
-    "learning_rate": 0.01,
+    "limit": 10000,
+    "learning_rate": 0.08,
     "bias": 0,
     "epsilon": 0.1,
-    "k": 2,
+    "k": 12,
     "beta" : 1
 }
