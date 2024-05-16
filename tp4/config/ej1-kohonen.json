@@ -1,5 +1,5 @@
 {
-    "k": 10,
+    "k": 4,
     "radius" : 1,
     "learning_rate" : 0.1,
     "limit" : 14000
