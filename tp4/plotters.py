@@ -21,3 +21,10 @@ def plot_unified_distance_matrix(matrix):
     plt.colorbar(label='Distance')
     plt.title('Unified distance matrix')
     plt.show()
+
+def plot_first_principal_component(PC1, names, title):
+    plt.figure(figsize=(10, 8))
+    plt.bar(names, PC1)
+    plt.xticks(rotation=45)
+    plt.title(title)
+    plt.show()

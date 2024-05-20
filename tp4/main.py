@@ -3,6 +3,10 @@ from kohonen import KohonenNetwork
 import json
 import csv
 from plotters import plot_heatmap
+from oja import OjaNetwork
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from plotters import plot_first_principal_component
 
 def ej1_kohonen():
     with open('tp4/config/ej1-kohonen.json', 'r') as f:
@@ -36,5 +40,29 @@ def ej1_kohonen():
 
     plot_heatmap(hits, hits_names)
     print(w_hist[-1])
+
+def ej2_oja():
+    with open('tp4/config/ej2-oja.json', 'r') as f:
+        config = json.load(f)
+
+    scaler = StandardScaler()
+    with open("tp4/europe.csv") as f:
+        data = list(csv.reader(f)) 
+        names = np.array(data[1:])[:,0]
+        data = np.array(data[1:])[:,1:]
+        data = np.array(data[:,1:], dtype=float)
+        standarized_data = scaler.fit_transform(data)
+    network = OjaNetwork(weights=np.random.uniform(0, 1, len(data[0])))
+
+    network.train_network(config, standarized_data)      
+
+    # With library
+    pca = PCA(n_components=2)
+    pca_components = pca.fit_transform(standarized_data)
+
+    plot_first_principal_component(pca_components[:, 0], names, "PCA with library")
+    plot_first_principal_component(network.get_activation(standarized_data), names, "PCA with Oja")
+    
+
 if __name__ == '__main__':
-    ej1_kohonen()
+    ej2_oja()
