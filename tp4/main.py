@@ -6,9 +6,12 @@ from plotters import plot_heatmap
 from oja import OjaNetwork
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from plotters import plot_first_principal_component
+from plotters import plot_first_principal_component, plot_energies, plot_patterns_over_time
+from hopfield import HopfieldNetwork
+import pandas as pd
+from letters import get_letter, add_noise
 
-def ej1_kohonen():
+def ej1_1_kohonen():
     with open('tp4/config/ej1-kohonen.json', 'r') as f:
         config = json.load(f)
 
@@ -41,8 +44,8 @@ def ej1_kohonen():
     plot_heatmap(hits, hits_names)
     print(w_hist[-1])
 
-def ej2_oja():
-    with open('tp4/config/ej2-oja.json', 'r') as f:
+def ej1_2_oja():
+    with open('tp4/config/ej1.2-oja.json', 'r') as f:
         config = json.load(f)
 
     scaler = StandardScaler()
@@ -63,6 +66,30 @@ def ej2_oja():
     plot_first_principal_component(pca_components[:, 0], names, "PCA with library")
     plot_first_principal_component(network.get_activation(standarized_data), names, "PCA with Oja")
     
+def ej2_hopfield():
+
+    with open('tp4/config/ej2-hopfield.json', 'r') as f:
+        config = json.load(f)
+
+    # Definición de patrones
+    patterns = np.array([get_letter(letter) for letter in config['letters']])        
+
+    # Creación de la red Hopfield
+    hopfield_net = HopfieldNetwork(patterns)
+
+    # Patrón ruidoso (una perturbación aleatoria del patrón A)
+    noisy_pattern = add_noise(config['target'], config['noise_level'])
+
+    patterns_over_time = hopfield_net.run(config, noisy_pattern)
+
+    # Cálculo de energía para cada patrón en el tiempo
+    energies = [hopfield_net.energy(p) for p in patterns_over_time]
+    
+    # Graficar energía
+    plot_energies(energies)
+
+    # Graficar patrones recuperados
+    plot_patterns_over_time(config, patterns_over_time)
 
 if __name__ == '__main__':
-    ej2_oja()
+    ej2_hopfield()

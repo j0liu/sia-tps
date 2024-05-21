@@ -28,3 +28,24 @@ def plot_first_principal_component(PC1, names, title):
     plt.xticks(rotation=45)
     plt.title(title)
     plt.show()
+
+def plot_energies(energies, ):
+    # Graficar energía
+    plt.figure(figsize=(10, 5))
+    plt.plot(energies, marker='o')
+    plt.title('Energía del sistema a lo largo del tiempo')
+    plt.xlabel('Paso')
+    plt.ylabel('Energía')
+    plt.grid(True)
+    plt.show()
+
+
+def plot_patterns_over_time(config, patterns_over_time):
+    # Graficar patrones recuperados
+    fig, axes = plt.subplots(1, config['steps'] + 1, figsize=(15, 3))
+    for i, ax in enumerate(axes):
+        ax.imshow(patterns_over_time[i].reshape(5, 5), cmap='binary')
+        ax.set_title(f'Paso {i}')
+        ax.axis('off')
+
+    plt.show()

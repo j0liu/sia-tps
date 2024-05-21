@@ -1,0 +1,6 @@
+{
+    "steps": 5,
+    "noise_level": 0.1,
+    "letters": ["B", "D", "P", "X"],
+    "target": "D"
+}
