@@ -12,7 +12,7 @@ def plot_heatmap(hits, names):
     for i in range(hits.shape[0]):
         for j in range(hits.shape[1]):
             #make font color white and font size small
-            plt.text(j, i, names[i][j], ha='center', va='center', color='green', fontsize=5.5)
+            plt.text(j, i, names[i][j], ha='center', va='center', color='black', backgroundcolor='white',fontsize=10)
     plt.show()
 
 def plot_unified_distance_matrix(matrix):

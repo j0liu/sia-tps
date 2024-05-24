@@ -2,12 +2,12 @@ import numpy as np
 
 def squared_neighborhood(output_size, i, radius):
     neighbors = []
-    x = i % output_size
-    y = i // output_size
+    x,y = divmod(i, output_size)
     pos = np.array([x, y])
     neighbors = []
     for j in range(output_size**2):
-        pos2 = np.array([j % output_size, j // output_size])
+        # pos2 = np.array([j // output_size, j % output_size])
+        pos2 = np.array([*divmod(j, output_size)])
         if np.linalg.norm(pos - pos2) <= radius:
             neighbors.append(j)
     return neighbors
@@ -49,3 +49,14 @@ class KohonenNetwork():
             weight_history.append(weights.copy())
 
         return weight_history
+    
+    def get_distance_matrix(self,weights : np.array):
+        distance_matrix = np.zeros((self.output_size, self.output_size))
+        for i in range(self.output_size):
+            for j in range(self.output_size):
+                idx = i*self.output_size+j
+                neighborhood = squared_neighborhood(self.output_size, idx, 1)
+                neighborhood.remove(idx)
+                neighborhood_distances = np.array([np.linalg.norm(weights[n] - weights[idx]) for n in neighborhood])
+                distance_matrix[i][j] = np.mean(neighborhood_distances)
+        return distance_matrix

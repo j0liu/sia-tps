@@ -22,26 +22,36 @@ def ej1_1_kohonen():
     network = KohonenNetwork(output_size=config['k'], similarity_function=euclidean_distance, radius_update_function=radius_update_function, learning_rate_update_function=learning_rate_update_function)
 
     with open("tp4/europe.csv") as f:
-        data = list(csv.reader(f)) 
-        names = np.array(data[1:])[:,0]
-        data = np.array(data[1:])[:,1:]
-        data = np.array(data[:,1:], dtype=float)
+        raw_data = list(csv.reader(f)) 
+        variable_names = raw_data[0][1:]
+        names = np.array(raw_data[1:])[:,0]
+        nostd_data = np.array(np.array(raw_data[1:])[:,1:], dtype=float)
+        data = StandardScaler().fit_transform(nostd_data)
 
+    
     w_hist = network.train(config, network.initialize_weights(config, data), data)
 
     hits = np.zeros((network.output_size, network.output_size))
     hits_names = [["" for _ in range(network.output_size)] for _ in range(network.output_size)]
 
+    weights = w_hist[-1]
     for idx, x in enumerate(data):
-        winner_idx = np.argmin([network.similarity_function(x, w) for w in w_hist[-1]])
+        winner_idx = np.argmin([network.similarity_function(x, w) for w in weights])
         winner_x, winner_y = divmod(winner_idx, network.output_size)
         hits[winner_x][winner_y] += 1
         if hits_names[winner_x][winner_y] == "":
             hits_names[winner_x][winner_y] = names[idx]
         else:
             hits_names[winner_x][winner_y] += "\n" + names[idx]
+    
+    avg_distances = network.get_distance_matrix(weights)
+
+    
+    # for i in range(len(variable_names)):
 
     plot_heatmap(hits, hits_names)
+    plot_heatmap(avg_distances, np.round(avg_distances, 3))
+    #todo analisis por variable
     print(w_hist[-1])
 
 def ej1_2_oja():
@@ -92,4 +102,4 @@ def ej2_hopfield():
     plot_patterns_over_time(config, patterns_over_time)
 
 if __name__ == '__main__':
-    ej2_hopfield()
+    ej1_1_kohonen()
