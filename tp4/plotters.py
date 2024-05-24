@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import os
 
 def plot_heatmap(hits, names):
     plt.figure(figsize=(10, 8))
@@ -27,6 +28,7 @@ def plot_first_principal_component(PC1, names, title):
     plt.bar(names, PC1)
     plt.xticks(rotation=45)
     plt.title(title)
+    plt.savefig(os.path.join(f'tp4/plots/{title}.png'))
     plt.show()
 
 def plot_energies(energies, ):

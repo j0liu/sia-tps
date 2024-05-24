@@ -58,23 +58,27 @@ def ej1_2_oja():
     with open('tp4/config/ej1.2-oja.json', 'r') as f:
         config = json.load(f)
 
-    scaler = StandardScaler()
     with open("tp4/europe.csv") as f:
-        data = list(csv.reader(f)) 
-        names = np.array(data[1:])[:,0]
-        data = np.array(data[1:])[:,1:]
-        data = np.array(data[:,1:], dtype=float)
-        standarized_data = scaler.fit_transform(data)
-    network = OjaNetwork(weights=np.random.uniform(0, 1, len(data[0])))
+        raw_data = list(csv.reader(f)) 
+        variable_names = raw_data[0][1:]
+        names = np.array(raw_data[1:])[:,0]
+        nostd_data = np.array(np.array(raw_data[1:])[:,1:], dtype=float)
+        standarized_data = StandardScaler().fit_transform(nostd_data)
+    
+    network = OjaNetwork(lambda epoch: config['learning_rate'] / (1 + epoch))
+    weights0 = np.random.uniform(0, 1, len(standarized_data[0]))
 
-    network.train_network(config, standarized_data)      
+    w_hist = network.train_network(config, standarized_data, weights0)
+    weights = w_hist[-1]
 
     # With library
     pca = PCA(n_components=2)
     pca_components = pca.fit_transform(standarized_data)
 
+    print("y1 = " + " + ".join([f"{v} * {w:.3}" for v,w in zip(variable_names, weights)]))
+        
     plot_first_principal_component(pca_components[:, 0], names, "PCA with library")
-    plot_first_principal_component(network.get_activation(standarized_data), names, "PCA with Oja")
+    plot_first_principal_component(np.dot(standarized_data, weights), names, "PCA with Oja")
     
 def ej2_hopfield():
 
@@ -102,4 +106,4 @@ def ej2_hopfield():
     plot_patterns_over_time(config, patterns_over_time)
 
 if __name__ == '__main__':
-    ej1_1_kohonen()
+    ej1_2_oja()

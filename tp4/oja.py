@@ -2,29 +2,18 @@ import numpy as np
 
 class OjaNetwork():
 
-    def __init__(self, weights):
-        self.weights = weights
-
-    def update_weights(self, activation, learing_rate, inputs):
-        inputs = np.array(inputs)
-        activation = np.array(activation)
-        w_0 = np.array(self.weights)
-        w_delta = learing_rate * (inputs*activation - activation**2 * w_0)
-        self.weights = w_0 + w_delta
-        return self.weights
+    def __init__(self, learning_rate_update):
+        self.learning_rate_update = learning_rate_update
     
-    def get_activation(self, inputs):
-        inputs = np.array(inputs)
-        return np.dot(inputs, self.weights)
-    
-    def train_network(self, config, standarized_data):
-        w_hist = [self.weights.copy()]
+    def train_network(self, config, standarized_data, weights):
+        w_hist = [weights.copy()]
         learning_rate = config['learning_rate']
         for epoch in range(config['epochs']):
             for x in standarized_data:
-                activation = self.get_activation(x)
-                self.update_weights(activation, learning_rate, x)
-                learning_rate = learning_rate/(1+epoch)
-            w_hist.append(self.weights.copy())
+                activation = np.dot(x, weights)
+                w_delta = learning_rate * activation * (x - activation * weights)
+                weights += w_delta
+                learning_rate = self.learning_rate_update(epoch)
+            w_hist.append(weights.copy())
         return w_hist
         
