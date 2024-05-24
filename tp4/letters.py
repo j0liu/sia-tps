@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import itertools
 
 letters = {
     'A': np.array([
@@ -24,11 +26,11 @@ letters = {
          1,  1,  1,  1,  1
     ]),
     'D': np.array([
-         1,  1,  1, -1, -1,
-         1, -1, -1,  1, -1,
-         1, -1, -1,  1, -1,
-         1, -1, -1,  1, -1,
-         1,  1,  1, -1, -1
+         1,  1,  1,  1, -1,
+         1, -1, -1, -1,  1,
+         1, -1, -1, -1,  1,
+         1, -1, -1, -1,  1,
+         1,  1,  1,  1, -1
     ]),
     'E': np.array([
          1,  1,  1,  1,  1,
@@ -197,14 +199,60 @@ def add_noise(letter, noise_level):
             noisy_letter[i] *= -1
     return noisy_letter
 
-def plot_letters():
-    for letter in letters:
-        plt.figure()
-        plt.imshow(get_letter(letter).reshape(5, 5), cmap='binary')
-        plt.title(f'Letter {letter}')
+def plot_single_letter(letter):
+    plt.figure()
+    plt.imshow(get_letter(letter).reshape(5, 5), cmap='binary')
+    plt.title(f'Letter {letter}')
+    plt.axis('off')
+    plt.show()
+    plt.close()
+
+def plot_all_letters_together(letters):
+    plt.figure(figsize=(15, 10))
+    num_letters = len(letters)
+    grid_size = int(np.ceil(np.sqrt(num_letters)))
+
+    for idx, (letter, pattern) in enumerate(letters.items(), 1):
+        plt.subplot(grid_size, grid_size, idx)
+        plt.imshow(pattern.reshape(5, 5), cmap='binary')
+        plt.title(letter)
         plt.axis('off')
-        plt.show()
-        plt.close()
+
+    plt.tight_layout()
+    plt.show()
+
+def analyze_groups(letters):
+    flat_letters = {k: m.flatten() for k, m in letters.items()}
+    all_groups = itertools.combinations(flat_letters.keys(), 4)
+
+    avg_dot_product = []
+    max_dot_product = []
+
+    for g in all_groups:
+        group = np.array([v for k, v in flat_letters.items() if k in g])
+        orto_matrix = group.dot(group.T)
+        np.fill_diagonal(orto_matrix, 0)
+        row, _ = orto_matrix.shape
+        avg_dot_product.append((np.abs(orto_matrix).sum()/(orto_matrix.size-row), g))
+        max_v = np.abs(orto_matrix).max()
+        max_dot_product.append((max_v, np.count_nonzero(np.abs(orto_matrix) == max_v) / 2, g))
+
+    avg_dot_product_sorted = sorted(avg_dot_product, key=lambda x: x[0])
+    max_dot_product_sorted = sorted(max_dot_product, key=lambda x: (x[0], x[1]))
+
+    df_avg = pd.DataFrame(avg_dot_product_sorted, columns=["Average", "Group"])
+    df_max = pd.DataFrame(max_dot_product_sorted, columns=["Max", "Count", "Group"])
+
+    # Merge the two dataframes to get a combined view
+    df_combined = pd.merge(df_avg, df_max, on="Group")
+
+    # Display the best and worst 4 groups
+    print("Best 4 Groups by Average Dot Product:")
+    print(df_combined.head(4))
+
+    print("\nWorst 4 Groups by Average Dot Product:")
+    print(df_combined.tail(4))
 
 if __name__ == '__main__':
-    plot_letters()
+    plot_all_letters_together(letters)
+    analyze_groups(letters)
