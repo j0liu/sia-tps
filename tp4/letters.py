@@ -199,20 +199,18 @@ def add_noise(letter, noise_level):
             noisy_letter[i] *= -1
     return noisy_letter
 
-def plot_single_letter(letter):
+def plot_single_pattern(pattern, label):
     plt.figure()
-    plt.imshow(get_letter(letter).reshape(5, 5), cmap='binary')
-    plt.title(f'Letter {letter}')
+    plt.imshow(pattern.reshape(5, 5), cmap='binary')
+    plt.title(f'Letter {label}')
     plt.axis('off')
     plt.show()
-    plt.close()
 
-def plot_all_letters_together(letters):
+def plot_all_patterns_together(patterns, labels):
     plt.figure(figsize=(15, 10))
-    num_letters = len(letters)
-    grid_size = int(np.ceil(np.sqrt(num_letters)))
+    grid_size = int(np.ceil(np.sqrt(len(patterns))))
 
-    for idx, (letter, pattern) in enumerate(letters.items(), 1):
+    for idx, (letter, pattern) in enumerate(zip(labels,patterns), 1):
         plt.subplot(grid_size, grid_size, idx)
         plt.imshow(pattern.reshape(5, 5), cmap='binary')
         plt.title(letter)
@@ -243,16 +241,19 @@ def analyze_groups(letters):
     df_avg = pd.DataFrame(avg_dot_product_sorted, columns=["Average", "Group"])
     df_max = pd.DataFrame(max_dot_product_sorted, columns=["Max", "Count", "Group"])
 
+
     # Merge the two dataframes to get a combined view
     df_combined = pd.merge(df_avg, df_max, on="Group")
 
     # Display the best and worst 4 groups
     print("Best 4 Groups by Average Dot Product:")
-    print(df_combined.head(4))
+    print(df_combined.head(10))
+
+    print(df_combined.iloc[len(df_avg) // 2])
 
     print("\nWorst 4 Groups by Average Dot Product:")
-    print(df_combined.tail(4))
+    print(df_combined.tail(10))
 
 if __name__ == '__main__':
-    plot_all_letters_together(letters)
+    plot_all_patterns_together(letters.values(), letters.keys())
     analyze_groups(letters)

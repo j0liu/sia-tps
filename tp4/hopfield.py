@@ -1,15 +1,16 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import letters
 
 class HopfieldNetwork:
     
     def __init__(self, patterns):
         self.patterns = patterns
         self.num_neurons = patterns.shape[1]
-        self.weights = self._initialize_weights(patterns)
+        self.weights = self.initialize_weights(patterns)
     
-    def _initialize_weights(self, patterns):
+    def initialize_weights(self, patterns):
         n = self.num_neurons
         W = np.zeros((n, n))
         for p in patterns:
@@ -23,15 +24,17 @@ class HopfieldNetwork:
     def energy(self, pattern):
         return -0.5 * np.dot(pattern.T, np.dot(self.weights, pattern))
     
-    def run(self, config, initial_pattern):
-        current_pattern = initial_pattern.copy()
+    def run(self, config, input):
+        current_pattern = input.copy()
         history = [current_pattern.copy()]
         
-        for step in range(config['steps']):
+        for _ in range(config['steps']):
             # Asynchronous update
-            for i in np.random.permutation(self.num_neurons):
-                current_pattern[i] = np.sign(np.dot(self.weights[i], current_pattern))
-            
+            # for i in np.random.permutation(self.num_neurons):
+                # current_pattern[i] = np.sign(np.dot(self.weights[i], current_pattern))
+            current_pattern = np.sign(np.inner(self.weights, current_pattern))
             history.append(current_pattern.copy())
+            if np.array_equal(current_pattern, history[-2]):
+                break
         
         return history
