@@ -47,11 +47,14 @@ def ej1_1_kohonen():
     avg_distances = network.get_distance_matrix(weights)
 
     
-    # for i in range(len(variable_names)):
+        
 
     plot_heatmap(hits, hits_names, 'Entries amount', 'Final entries per neuron')
     plot_heatmap(avg_distances, np.round(avg_distances, 3), 'Average distance', 'Average distance per neuron')
     #todo analisis por variable
+    k = config['k']
+    for i in range(len(variable_names)):
+        plot_heatmap(weights[:,i].reshape(k,k), np.round(weights[:,i].reshape(k,k), 3), f'Variable {variable_names[i]}', 'Variable value per neuron')
     print(w_hist[-1])
 
 def ej1_2_oja():
