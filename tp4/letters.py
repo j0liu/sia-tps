@@ -254,6 +254,10 @@ def analyze_groups(letters):
     print("\nWorst 4 Groups by Average Dot Product:")
     print(df_combined.tail(10))
 
+def export_pattern(pattern):
+    with open('tp4/plots/hopfield/pattern.txt', 'w+') as f:
+        f.write(' '.join([str(int(i)) for i in pattern]))
+
 if __name__ == '__main__':
     plot_all_patterns_together(letters.values(), letters.keys())
     analyze_groups(letters)

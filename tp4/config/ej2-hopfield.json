@@ -2,5 +2,5 @@
     "steps": 20,
     "noise_level": 0.2,
     "letters": ["A", "Q", "T", "V"],
-    "target": "K"
+    "targets": ["K"]
 }

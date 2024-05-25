@@ -31,7 +31,7 @@ def plot_first_principal_component(PC1, names, title):
     plt.savefig(os.path.join(f'tp4/plots/{title}.png'))
     plt.show()
 
-def plot_energies(energies, ):
+def plot_energies(energies, title=None):
     # Graficar energía
     plt.figure(figsize=(10, 5))
     plt.plot(energies, marker='o')
@@ -40,15 +40,18 @@ def plot_energies(energies, ):
     plt.xlabel('Paso')
     plt.ylabel('Energía')
     plt.grid(True)
+    if title:
+        plt.savefig(f'tp4/plots/hopfield/{title}.png')
     plt.show()
 
 
-def plot_patterns_over_time(config, patterns_over_time):
+def plot_patterns_over_time(config, patterns_over_time, title=None):
     # Graficar patrones recuperados
     fig, axes = plt.subplots(1, len(patterns_over_time), figsize=(15, 3))
     for i, ax in enumerate(axes):
         ax.imshow(patterns_over_time[i].reshape(5, 5), cmap='binary')
         ax.set_title(f'Paso {i}')
         ax.axis('off')
-
+    if title:
+        plt.savefig(f'tp4/plots/hopfield/{title}.png')
     plt.show()

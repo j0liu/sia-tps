@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from plotters import plot_first_principal_component, plot_energies, plot_patterns_over_time
 from hopfield import HopfieldNetwork
 import pandas as pd
-from letters import get_letter, add_noise, plot_all_patterns_together
+from letters import get_letter, add_noise, plot_all_patterns_together, export_pattern
 
 def ej1_1_kohonen():
     with open('tp4/config/ej1-kohonen.json', 'r') as f:
@@ -80,33 +80,9 @@ def ej1_2_oja():
     plot_first_principal_component(pca_components[:, 0], names, "PCA with library")
     plot_first_principal_component(np.dot(standarized_data, weights), names, "PCA with Oja")
     
+
 def ej2_hopfield():
-
-    with open('tp4/config/ej2-hopfield.json', 'r') as f:
-        config = json.load(f)
-
-    # Definición de patrones
-    patterns = np.array([get_letter(letter) for letter in config['letters']])        
-
-    # Creación de la red Hopfield
-    hopfield_net = HopfieldNetwork(patterns)
-
-    # Patrón ruidoso (una perturbación aleatoria del patrón A)
-    noisy_pattern = add_noise(config['target'], config['noise_level'])
-
-    patterns_over_time = hopfield_net.run(config, noisy_pattern)
-    
-    # Cálculo de energía para cada patrón en el tiempo
-    energies = [hopfield_net.energy(p) for p in patterns_over_time]
-    
-    # Graficar energía
-    plot_energies(energies)
-
-    # Graficar patrones recuperados
-    plot_patterns_over_time(config, patterns_over_time)
-
-def ej2_hopfield_espurios():
-
+    # with open('tp4/config/ej2-hopfield.json', 'r') as f:
     with open('tp4/config/estado_espurio.json', 'r') as f:
         config = json.load(f)
 
@@ -117,19 +93,24 @@ def ej2_hopfield_espurios():
     hopfield_net = HopfieldNetwork(patterns)
 
     # Patrón ruidoso (una perturbación aleatoria del patrón A)
+    targets = config['targets']
 
-    noisy_pattern = add_noise(config['target'], config['noise_level'])
+    for i,t in enumerate(targets):
+        noisy_pattern = add_noise(t, config['noise_level'])
 
-    patterns_over_time = hopfield_net.run(config, noisy_pattern)
-    
-    # Cálculo de energía para cada patrón en el tiempo
-    energies = [hopfield_net.energy(p) for p in patterns_over_time]
-    
-    # Graficar energía
-    plot_energies(energies)
-    
-    # Graficar patrones recuperados
-    plot_patterns_over_time(config, patterns_over_time)
+        patterns_over_time = hopfield_net.run(config, noisy_pattern)
+        result = patterns_over_time[-1]
+        # Cálculo de energía para cada patrón en el tiempo
+        energies = [hopfield_net.energy(p) for p in patterns_over_time]
+        
+        # Graficar energía
+        plot_energies(energies, title=f'{t}_{i}_energies')
+        
+        # Graficar patrones recuperados
+        plot_patterns_over_time(config, patterns_over_time, title=f'{t}_{i}_process')
+
+        if not any([np.array_equal(result, p) for p in patterns]):
+            export_pattern(result)
 
 
 if __name__ == '__main__':
