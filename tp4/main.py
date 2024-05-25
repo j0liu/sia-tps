@@ -49,8 +49,8 @@ def ej1_1_kohonen():
     
     # for i in range(len(variable_names)):
 
-    plot_heatmap(hits, hits_names)
-    plot_heatmap(avg_distances, np.round(avg_distances, 3))
+    plot_heatmap(hits, hits_names, 'Entries amount', 'Final entries per neuron')
+    plot_heatmap(avg_distances, np.round(avg_distances, 3), 'Average distance', 'Average distance per neuron')
     #todo analisis por variable
     print(w_hist[-1])
 
@@ -114,4 +114,4 @@ def ej2_hopfield():
 
 
 if __name__ == '__main__':
-    ej2_hopfield()
+    ej1_1_kohonen()
