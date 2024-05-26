@@ -54,19 +54,23 @@ if len(custom_palette) < len(data['Country'].unique()):
 plt.figure(figsize=(12, 8))
 
 # Scatter plot of the PCA components with distinct colors and markers
-sns.scatterplot(x='PC1', y='PC2', data=data, hue='Country', palette=custom_palette, style='Country', s=150)  # Ajuste del tamaño de las formas
+sns.scatterplot(x='PC1', y='PC2', data=data, hue='Country', palette=custom_palette, style='Country', s=150, legend=None)
 
 # Adding vectors for each feature
 for i, feature in enumerate(data_features.columns):
     plt.arrow(0, 0, pca.components_[0, i], pca.components_[1, i], color='red', alpha=0.5)
     plt.text(pca.components_[0, i], pca.components_[1, i], feature, color='black')
 
+# Adding country names on top of each point
+for i in range(data.shape[0]):
+    plt.text(data['PC1'][i], data['PC2'][i], data['Country'][i], fontsize=9, ha='right')
+
 plt.title('Biplot of the First Two Principal Components')
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
 plt.grid(True)
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.tight_layout()  # Ajustar los márgenes
+plt.tight_layout()  # Adjust margins
 plt.show()
 
 # Plot the PC1 data for each country as a bar plot
@@ -76,5 +80,5 @@ plt.xticks(rotation=90)
 plt.title('PC1 per Country')
 plt.xlabel('Country')
 plt.ylabel('PC1')
-plt.tight_layout()  # Ajustar los márgenes
+plt.tight_layout()  # Adjust margins
 plt.show()

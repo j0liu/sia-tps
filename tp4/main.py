@@ -6,7 +6,7 @@ from plotters import plot_heatmap
 from oja import OjaNetwork
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from plotters import plot_first_principal_component, plot_energies, plot_patterns_over_time
+from plotters import plot_first_principal_component, plot_energies, plot_patterns_over_time, plot_biplot, plot_boxplots
 from hopfield import HopfieldNetwork
 import pandas as pd
 from letters import get_letter, add_noise, plot_all_patterns_together, export_pattern
@@ -65,6 +65,9 @@ def ej1_2_oja():
         names = np.array(raw_data[1:])[:,0]
         nostd_data = np.array(np.array(raw_data[1:])[:,1:], dtype=float)
         standarized_data = StandardScaler().fit_transform(nostd_data)
+
+    # Create box plots
+    plot_boxplots(nostd_data, standarized_data, variable_names)
     
     network = OjaNetwork(lambda epoch: config['learning_rate'] / (1 + epoch))
     weights0 = np.random.uniform(0, 1, len(standarized_data[0]))
@@ -73,13 +76,15 @@ def ej1_2_oja():
     weights = w_hist[-1]
 
     # With library
-    pca = PCA(n_components=2)
+    pca = PCA()
     pca_components = pca.fit_transform(standarized_data)
 
     print("y1 = " + " + ".join([f"{v} * {w:.3}" for v,w in zip(variable_names, weights)]))
         
     plot_first_principal_component(pca_components[:, 0], names, "PCA with library")
     plot_first_principal_component(np.dot(standarized_data, weights), names, "PCA with Oja")
+
+
     
 
 def ej2_hopfield():
@@ -116,4 +121,4 @@ def ej2_hopfield():
 
 
 if __name__ == '__main__':
-    ej2_hopfield()
+    ej1_2_oja()
