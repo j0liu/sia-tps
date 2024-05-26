@@ -34,7 +34,7 @@ class HopfieldNetwork:
                 # current_pattern[i] = np.sign(np.dot(self.weights[i], current_pattern))
             current_pattern = np.sign(np.inner(self.weights, current_pattern))
             history.append(current_pattern.copy())
-            if np.array_equal(current_pattern, history[-2]):
+            if any([np.array_equal(current_pattern, p) for p in history[:-1]]):
                 break
         
         return history

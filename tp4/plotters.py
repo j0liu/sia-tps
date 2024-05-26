@@ -52,7 +52,7 @@ def plot_patterns_over_time(config, patterns_over_time, title=None):
     # Graficar patrones recuperados
     fig, axes = plt.subplots(1, len(patterns_over_time), figsize=(15, 3))
     for i, ax in enumerate(axes):
-        ax.imshow(patterns_over_time[i].reshape(5, 5), cmap='binary')
+        ax.imshow(patterns_over_time[i].reshape(5, 5), cmap='Wistia')
         ax.set_title(f'Paso {i}')
         ax.axis('off')
     if title:
