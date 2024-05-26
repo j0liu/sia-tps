@@ -234,14 +234,19 @@ def analyze_groups(letters):
         avg_dot_product = np.abs(orto_matrix).sum()/(orto_matrix.size-row)
         avg_dot_product_list.append((avg_dot_product, g))
         max_v = np.abs(orto_matrix).max()
+
+        max_poses = np.argwhere(np.abs(orto_matrix) == max_v)
+        max_poses = list(set([tuple(sorted(p)) for p in max_poses]))
+
+        # max_pos = np.unravel_index(np.argmax(np.abs(orto_matrix), axis=None), orto_matrix.shape)
         max_dot_product_count = np.count_nonzero(np.abs(orto_matrix) == max_v) / 2
-        max_dot_product_list.append((max_v, max_dot_product_count, g))
+        max_dot_product_list.append((max_v, max_dot_product_count, g, max_poses))
 
     avg_dot_product_sorted = sorted(avg_dot_product_list, key=lambda x: x[0])
     max_dot_product_sorted = sorted(max_dot_product_list, key=lambda x: (x[0], x[1]))
 
     df_avg = pd.DataFrame(avg_dot_product_sorted, columns=["Average", "Group"])
-    df_max = pd.DataFrame(max_dot_product_sorted, columns=["Max", "Count", "Group"])
+    df_max = pd.DataFrame(max_dot_product_sorted, columns=["Max", "Count", "Group", "Pos Max"])
 
 
     # Merge the two dataframes to get a combined view
