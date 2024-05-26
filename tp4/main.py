@@ -121,4 +121,19 @@ def ej2_hopfield():
 
 
 if __name__ == '__main__':
-    ej1_2_oja()
+    # menu for the different exercises
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: python main.py <exercise>")
+        sys.exit(1)
+    exercise = sys.argv[1]
+    if exercise == 'kohonen':
+        ej1_1_kohonen()
+    elif exercise == 'oja':
+        ej1_2_oja()
+    elif exercise == 'hopfield':
+        ej2_hopfield()
+    else:
+        print("Invalid exercise")
+        sys.exit(1)
+

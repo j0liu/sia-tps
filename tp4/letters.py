@@ -242,6 +242,7 @@ def analyze_groups(letters):
         max_dot_product_count = np.count_nonzero(np.abs(orto_matrix) == max_v) / 2
         max_dot_product_list.append((max_v, max_dot_product_count, g, max_poses))
 
+
     avg_dot_product_sorted = sorted(avg_dot_product_list, key=lambda x: x[0])
     max_dot_product_sorted = sorted(max_dot_product_list, key=lambda x: (x[0], x[1]))
 
@@ -251,6 +252,14 @@ def analyze_groups(letters):
 
     # Merge the two dataframes to get a combined view
     df_combined = pd.merge(df_avg, df_max, on="Group")
+
+    # get matrix 
+    idx = 13012
+    best_group = np.array([v for k, v in flat_letters.items() if k in df_combined.iloc[idx]['Group']])
+    best_group_matrix = best_group.dot(best_group.T)
+    np.fill_diagonal(best_group_matrix, 0)
+    print(best_group_matrix, df_combined.iloc[idx])
+
     with open('tp4/plots/hopfield/archive/groups.txt', 'w') as f:
         for g, avg_dot_product, max_v, max_dot_product_count in zip(df_combined['Group'], df_combined['Average'], df_combined['Max'], df_combined['Count']):
             f.write(f'{g} {avg_dot_product:.1f} {max_v:.1f} {max_dot_product_count}\n')
