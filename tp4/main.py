@@ -16,7 +16,8 @@ def ej1_1_kohonen():
         config = json.load(f)
 
     euclidean_distance = lambda x, y: np.sum((x - y)**2)**0.5
-    learning_rate_update_function = lambda epoch: config['learning_rate'] / (1 + epoch)
+    learning_rate_update_function = lambda epoch: config['learning_rate'] / (1 + epoch * 0.1)
+    # learning_rate_update_function = lambda epoch: 0.01
     radius_update_function = lambda epoch: config['radius']
 
     network = KohonenNetwork(output_size=config['k'], similarity_function=euclidean_distance, radius_update_function=radius_update_function, learning_rate_update_function=learning_rate_update_function)
@@ -45,9 +46,6 @@ def ej1_1_kohonen():
             hits_names[winner_x][winner_y] += "\n" + names[idx]
     
     avg_distances = network.get_distance_matrix(weights)
-
-    
-        
 
     plot_heatmap(hits, hits_names, 'Entries amount', 'Final entries per neuron')
     plot_heatmap(avg_distances, np.round(avg_distances, 3), 'Average distance', 'Average distance per neuron')
@@ -85,8 +83,7 @@ def ej1_2_oja():
     
 
 def ej2_hopfield():
-    # with open('tp4/config/ej2-hopfield.json', 'r') as f:
-    with open('tp4/config/estado_espurio.json', 'r') as f:
+    with open('tp4/config/ej2-hopfield.json', 'r') as f:
         config = json.load(f)
 
     # Definición de patrones
@@ -100,6 +97,8 @@ def ej2_hopfield():
 
     for i,t in enumerate(targets):
         noisy_pattern = add_noise(t, config['noise_level'])
+        if config.get("negate", False):
+            noisy_pattern = -noisy_pattern
 
         patterns_over_time = hopfield_net.run(config, noisy_pattern)
         result = patterns_over_time[-1]
@@ -117,4 +116,4 @@ def ej2_hopfield():
 
 
 if __name__ == '__main__':
-    ej1_1_kohonen()
+    ej2_hopfield()
