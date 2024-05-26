@@ -223,20 +223,22 @@ def analyze_groups(letters):
     flat_letters = {k: m.flatten() for k, m in letters.items()}
     all_groups = itertools.combinations(flat_letters.keys(), 4)
 
-    avg_dot_product = []
-    max_dot_product = []
+    avg_dot_product_list = []
+    max_dot_product_list = []
 
     for g in all_groups:
         group = np.array([v for k, v in flat_letters.items() if k in g])
         orto_matrix = group.dot(group.T)
         np.fill_diagonal(orto_matrix, 0)
         row, _ = orto_matrix.shape
-        avg_dot_product.append((np.abs(orto_matrix).sum()/(orto_matrix.size-row), g))
+        avg_dot_product = np.abs(orto_matrix).sum()/(orto_matrix.size-row)
+        avg_dot_product_list.append((avg_dot_product, g))
         max_v = np.abs(orto_matrix).max()
-        max_dot_product.append((max_v, np.count_nonzero(np.abs(orto_matrix) == max_v) / 2, g))
+        max_dot_product_count = np.count_nonzero(np.abs(orto_matrix) == max_v) / 2
+        max_dot_product_list.append((max_v, max_dot_product_count, g))
 
-    avg_dot_product_sorted = sorted(avg_dot_product, key=lambda x: x[0])
-    max_dot_product_sorted = sorted(max_dot_product, key=lambda x: (x[0], x[1]))
+    avg_dot_product_sorted = sorted(avg_dot_product_list, key=lambda x: x[0])
+    max_dot_product_sorted = sorted(max_dot_product_list, key=lambda x: (x[0], x[1]))
 
     df_avg = pd.DataFrame(avg_dot_product_sorted, columns=["Average", "Group"])
     df_max = pd.DataFrame(max_dot_product_sorted, columns=["Max", "Count", "Group"])
@@ -244,6 +246,9 @@ def analyze_groups(letters):
 
     # Merge the two dataframes to get a combined view
     df_combined = pd.merge(df_avg, df_max, on="Group")
+    with open('tp4/plots/hopfield/archive/groups.txt', 'w') as f:
+        for g, avg_dot_product, max_v, max_dot_product_count in zip(df_combined['Group'], df_combined['Average'], df_combined['Max'], df_combined['Count']):
+            f.write(f'{g} {avg_dot_product:.1f} {max_v:.1f} {max_dot_product_count}\n')
 
     # Display the best and worst 4 groups
     print("Best 4 Groups by Average Dot Product:")
@@ -255,7 +260,7 @@ def analyze_groups(letters):
     print(df_combined.tail(10))
 
 def export_pattern(pattern):
-    with open('tp4/plots/hopfield/pattern.txt', 'a') as f:
+    with open('tp4/plots/hopfield/archive/pattern.txt', 'a') as f:
         f.write(' '.join([str(int(i)) for i in pattern]))
         f.write('\n')
 
