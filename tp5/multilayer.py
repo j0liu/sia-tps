@@ -1,9 +1,7 @@
 import numpy as np
 import sys
 from functools import partial
-from plot import plotxy
 import json
-from utils import pad
 import math
 import activation_functions as af
 from network_abc import NetworkABC
@@ -38,9 +36,7 @@ class MultiLayerNetwork(NetworkABC):
         
         expected_copy = np.zeros(network_width)
         expected_copy[0] = 1
-        #expected_copy2[1:] = pad(expected, network_width-1)
         expected_copy[1:1+len(expected)] = expected
-        #assert np.allclose(expected_copy, expected_copy2)
 
         #initialize deltas
         for j in range(self.layer_sizes[-1]):
@@ -49,12 +45,15 @@ class MultiLayerNetwork(NetworkABC):
             delta_ws[-1][j] = learning_rate * deltas[-1][j] * values[-2]
 
         for m in range(len(deltas)-2, -1, -1):
-            for j in range(self.layer_sizes[m]):
-                h = np.dot(values[m], w[m][j])
+            hv = np.dot(values[m], w[m].T)
+            deltas[m] = (np.dot(deltas[m+1], w[m+1].T)) * self.deriv_activation_function(hv)
+            delta_ws[m] = learning_rate * np.outer(deltas[m], values[m])
+            # for j in range(self.layer_sizes[m]):
+            #     h = np.dot(values[m], w[m][j])
 
-                deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * self.deriv_activation_function(h)
+            #     deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * self.deriv_activation_function(h)
                 
-                delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
+            #     delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
         return delta_ws
 
     def _forward_propagation(self, x : np.array, w : np.array):
@@ -63,8 +62,9 @@ class MultiLayerNetwork(NetworkABC):
         values[0,1:1+len(x)] = x
         values[:,0] = 1 #poner 1 a cada valor[m][0] para todo m
         for m in range(1, len(self.layer_sizes)):
-            for j in range(1,self.layer_sizes[m]):
-                values[m][j] = self.activation_function(np.dot(values[m-1], w[m-1][j]))
+            values[m] = self.activation_function(np.dot(values[m-1], w[m-1].T))
+            # for j in range(1,self.layer_sizes[m]):
+            #     values[m][j] = self.activation_function(np.dot(values[m-1], w[m-1][j]))
         return values
     
     def train_function(self, config : dict, inputs : np.array, expected_results : np.array):
@@ -112,7 +112,7 @@ class MultiLayerNetwork(NetworkABC):
             weights_history.append(w.copy())
 
             error = self.error_function(inputs, expected_results, w)
-            if error < min_error:
+            if error != None and error < min_error:
                 min_error = error
                 print(f"{i} error:", error)
                 w_min = weights_history[-1]
@@ -129,11 +129,21 @@ class MultiLayerNetwork(NetworkABC):
     def error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
         p, _ = inputs.shape # p puntos en el plano, dim dimensiones
 
-        val = 0
+        sum_val = 0
+        # Discrete error
         for mu in range(p):
             output = self._forward_propagation(inputs[mu], w)[-1][1:]
-            for i in range(len(expected_results[mu])):
-                val += 0.5 * (expected_results[mu][i] - output[i])**2
+            val = np.sum(np.abs(expected_results[mu] - np.sign(output))/2)
+            sum_val += val
+            if val > 1:
+                return None
+
+        # MSE
+        # for mu in range(p):
+            # output = self._forward_propagation(inputs[mu], w)[-1][1:]
+            # val += 0.5 * np.sum( (expected_results[mu] - output)**2)
+            # for i in range(len(expected_results[mu])):
+                # val += 0.5 * (expected_results[mu][i] - output[i])**2
         return val
 
 
