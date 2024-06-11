@@ -8,7 +8,7 @@ from network_abc import NetworkABC
 from plotNetwork import plot_neural_network, create_network_gif
 
 def layer_normalize(layer_sizes : np.array):
-    return list(map(lambda x : x+1, layer_sizes))
+    return [x+1 for x in layer_sizes]
 
 def hypercube_layers(layer_sizes : np.array):
     network_width = max(layer_sizes)
@@ -130,6 +130,7 @@ class MultiLayerNetwork(NetworkABC):
         p, _ = inputs.shape # p puntos en el plano, dim dimensiones
 
         sum_val = 0
+        # val = 0
         # Discrete error
         for mu in range(p):
             output = self._forward_propagation(inputs[mu], w)[-1][1:]
@@ -140,12 +141,18 @@ class MultiLayerNetwork(NetworkABC):
 
         # MSE
         # for mu in range(p):
-            # output = self._forward_propagation(inputs[mu], w)[-1][1:]
-            # val += 0.5 * np.sum( (expected_results[mu] - output)**2)
+        #     output = self._forward_propagation(inputs[mu], w)[-1][1:]
+        #     val += 0.5 * np.sum( (expected_results[mu] - output)**2)
             # for i in range(len(expected_results[mu])):
-                # val += 0.5 * (expected_results[mu][i] - output[i])**2
+            #     val += 0.5 * (expected_results[mu][i] - output[i])**2
         return val
 
+    # Importante: Se asume que el autoencoder tiene una arquitecutra simetrica y de longitud impar
+    def get_encoder(self, w : np.array):
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
+
+    def get_decoder(self, w : np.array):
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} encoder"), w[len(self.layer_sizes)//2:]
 
     def export_weights(self, w : np.array, filename : str):
         with open(filename, 'w+') as f:

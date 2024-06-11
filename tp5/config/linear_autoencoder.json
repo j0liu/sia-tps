@@ -10,5 +10,7 @@
     "b1": 0.9,
     "b2": 0.999,
     "e": 1e-8,
-    "batch_size": 31
+    "batch_size": 32,
+    "import_path" : "tp5/weights/mse_weights.txt",
+    "import" : true
 }
