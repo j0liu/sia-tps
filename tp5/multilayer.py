@@ -66,6 +66,9 @@ class MultiLayerNetwork(NetworkABC):
             # for j in range(1,self.layer_sizes[m]):
             #     values[m][j] = self.activation_function(np.dot(values[m-1], w[m-1][j]))
         return values
+
+    def forward_propagation(self, x : np.array, w : np.array):
+        return self._forward_propagation(x, w)[-1][1:self.layer_sizes[-1]]
     
     def train_function(self, config : dict, inputs : np.array, expected_results : np.array):
         """
@@ -122,7 +125,7 @@ class MultiLayerNetwork(NetworkABC):
     def output_function(self, inputs : np.array, w : np.array):
         outputs = np.zeros((len(inputs), self.layer_sizes[-1]-1))
         for i, x in enumerate(inputs):
-            outputs[i] = self._forward_propagation(x, w)[-1][1:self.layer_sizes[-1]]
+            outputs[i] = self.forward_propagation(x, w)
         return outputs
 
 
@@ -133,7 +136,7 @@ class MultiLayerNetwork(NetworkABC):
         # val = 0
         # Discrete error
         for mu in range(p):
-            output = self._forward_propagation(inputs[mu], w)[-1][1:]
+            output = self.forward_propagation(inputs[mu], w)
             val = np.sum(np.abs(expected_results[mu] - np.sign(output))/2)
             sum_val += val
             if val > 1:
@@ -152,7 +155,7 @@ class MultiLayerNetwork(NetworkABC):
         return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
 
     def get_decoder(self, w : np.array):
-        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} encoder"), w[len(self.layer_sizes)//2:]
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
 
     def export_weights(self, w : np.array, filename : str):
         with open(filename, 'w+') as f:
