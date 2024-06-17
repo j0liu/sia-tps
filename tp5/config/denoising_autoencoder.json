@@ -1,4 +1,4 @@
-{
+{    
     "limit": 20000,
     "latent_space_dim": 2,
     "random_start": true,

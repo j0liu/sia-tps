@@ -96,9 +96,6 @@ def ejercicio_3_generar_ruido():
     # Generate noise
     print (inputs)
     
-    noise = np.random.normal(0, 0.25, inputs.shape)
-    # noisy_inputs = np.clip(inputs + noise, 0, 1)
-
     for i, num_pixels in enumerate(inputs):
         with open(f"tp3/numeros/{i}.txt", 'w') as file:
             for _ in range(10):
