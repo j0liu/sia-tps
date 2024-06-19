@@ -36,7 +36,7 @@ class MultiLayerNetwork(NetworkABC):
             for j in range(1,self.layer_sizes[m+1]):
                 w[m][j][0] = config['bias']
                 if config.get('random_start', True):
-                    w[m][j][1:self.layer_sizes[m]] = np.random.rand(self.layer_sizes[m]-1)
+                    w[m][j][1:self.layer_sizes[m]] = np.random.rand(self.layer_sizes[m]-1) * 2 - 1
 
 
     def _backward_propagation(self, learning_rate : float, values : np.array, w : np.array, expected : np.array):
@@ -79,7 +79,11 @@ class MultiLayerNetwork(NetworkABC):
         return values
 
     def forward_propagation(self, x : np.array, w : np.array):
-        return self._forward_propagation(x, w)[-1][1:self.layer_sizes[-1]]
+        vals = self._forward_propagation(x, w)#[-1][1:self.layer_sizes[-1]]
+        # l_pos = len(vals)//2+1
+        # print("inside forward")
+        # print(vals[l_pos][1:self.layer_sizes[l_pos]])
+        return vals[-1][1:self.layer_sizes[-1]]
     
     def train_function(self, config : dict, inputs : np.array, expected_results : np.array):
         """

@@ -1,10 +1,10 @@
 {
-    "limit": 10000,
+    "limit": -1,
     "latent_space_dim": 2,
     "random_start": true,
     "learning_rate": 0.001,
     "bias": 0,
-    "epsilon": -1,
+    "epsilon": 0.1, 
     "beta": 6,
     "optimizer": "adam",
     "b1": 0.9,
@@ -13,5 +13,5 @@
     "batch_size": 32,
     "import_path" : "tp5/weights/10000i_weights.txt",
     "import" : false,
-    "encoder_layers": [25, 25]
+    "encoder_layers": [10, 10]
 }
