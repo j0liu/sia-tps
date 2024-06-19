@@ -14,11 +14,22 @@ def hypercube_layers(layer_sizes : np.array):
     network_width = max(layer_sizes)
     return [network_width for _ in range(len(layer_sizes))]
 
+class ErrorType(object):
+    DISCRETE = 0
+    MSE = 1
+
 class MultiLayerNetwork(NetworkABC):
-    def __init__(self, layer_sizes, activation_function, deriv_activation_function, interval = None, title=""):
+    def __init__(self, layer_sizes, activation_function, deriv_activation_function, error_type = ErrorType.MSE, interval = None, title=""):
         super().__init__(activation_function, deriv_activation_function, interval, title)
+        error_function_map = {
+            ErrorType.DISCRETE : self.discrete_error_function,
+            ErrorType.MSE : self.mse_error_function
+        }
+        self.error_type = error_type
+        self.error_function = error_function_map[error_type]
         self.layer_sizes = np.array(layer_normalize(layer_sizes))
         self.network_width = max(self.layer_sizes)
+
 
     def _initialize_weights(self, w : np.array, config : dict):
         for m in range(len(self.layer_sizes)-1): #sin contar la capa de output
@@ -121,7 +132,8 @@ class MultiLayerNetwork(NetworkABC):
                 w_min = weights_history[-1]
             i += 1
         return w_min, weights_history
-    
+
+
     def output_function(self, inputs : np.array, w : np.array):
         outputs = np.zeros((len(inputs), self.layer_sizes[-1]-1))
         for i, x in enumerate(inputs):
@@ -129,11 +141,9 @@ class MultiLayerNetwork(NetworkABC):
         return outputs
 
 
-    def error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
+    def discrete_error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
         p, _ = inputs.shape # p puntos en el plano, dim dimensiones
-
         sum_val = 0
-        # val = 0
         # Discrete error
         for mu in range(p):
             output = self.forward_propagation(inputs[mu], w)
@@ -141,21 +151,26 @@ class MultiLayerNetwork(NetworkABC):
             sum_val += val
             if val > 1:
                 return None
-
-        # MSE
-        # for mu in range(p):
-        #     output = self._forward_propagation(inputs[mu], w)[-1][1:]
-        #     val += 0.5 * np.sum( (expected_results[mu] - output)**2)
-            # for i in range(len(expected_results[mu])):
-            #     val += 0.5 * (expected_results[mu][i] - output[i])**2
         return val
+
+
+    def mse_error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
+        p, _ = inputs.shape # p puntos en el plano, dim dimensiones
+        val = 0
+        for mu in range(p):
+            output = self._forward_propagation(inputs[mu], w)[-1][1:]
+            val += 0.5 * np.sum( (expected_results[mu] - output)**2)
+            for i in range(len(expected_results[mu])):
+                val += 0.5 * (expected_results[mu][i] - output[i])**2
+        return val
+
 
     # Importante: Se asume que el autoencoder tiene una arquitecutra simetrica y de longitud impar
     def get_encoder(self, w : np.array):
-        return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
 
     def get_decoder(self, w : np.array):
-        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
 
     def export_weights(self, w : np.array, filename : str):
         with open(filename, 'w+') as f:

@@ -1,11 +1,11 @@
 # read font.h and parse the letters
 
-from multilayer import MultiLayerNetwork, hypercube_layers
+from multilayer import MultiLayerNetwork, hypercube_layers, ErrorType
 import numpy as np
 import activation_functions as af
 import json
 from datetime import datetime
-from plots import plot_comparison, plot_latent_space
+from plots import plot_comparison, plot_latent_space, plot_augmented_latent_space
 
 
 FILE_NAME = "tp5/font.txt"
@@ -16,7 +16,6 @@ def read_letters(file_name = FILE_NAME):
   inputs = []
   labels = []
   for line in lines:
-    print(line.replace('\n', '').split(' ')[1:])
     x = np.array([float(i) for i in line.replace('\n', '').split(' ')[1:]])
     inputs.append(x)
     labels.append(line.split(' ')[0])
@@ -37,7 +36,7 @@ def generate_noise(labels: str, inputs : np.array):
           
         file.write("\n")
 
-def run_normal_autoencoder():
+def ej_1a():
   with open("tp5/config/linear_autoencoder.json") as f:
     config = json.load(f)
   ENCODER_LAYERS = config['encoder_layers']
@@ -48,7 +47,7 @@ def run_normal_autoencoder():
 
   layer_sizes = [input_len, *ENCODER_LAYERS, config['latent_space_dim'], *(ENCODER_LAYERS[::-1]), input_len]
 
-  network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1, 1), "autoencoder")
+  network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   norm_inputs = network.normalize(inputs.copy(), 0, 1)  
   denormalize = network.gen_denormalize_function(0, 1)
 
@@ -62,7 +61,7 @@ def run_normal_autoencoder():
   encoder, w_encoder = network.get_encoder(w)
   plot_latent_space(encoder.output_function(norm_inputs, w_encoder), labels, "Latent space")
 
-def run_denoising_autoencoder():
+def ej_1b():
   with open("tp5/config/denoising_autoencoder.json") as f:
     config = json.load(f)
   ENCODER_LAYERS = config['encoder_layers']
@@ -82,7 +81,7 @@ def run_denoising_autoencoder():
   all_inputs = np.concatenate((inputs, noisy_inputs))
   all_expected = np.concatenate((inputs, np.array([input_dict[l] for l in noisy_labels]))) #[3*i for i in inputs]
 
-  network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), (-1, 1), "autoencoder")
+  network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   norm_inputs = network.normalize(all_inputs.copy(), 0, 1)
   norm_expected = network.normalize(all_expected.copy(), 0, 1)
   denormalize = network.gen_denormalize_function(0, 1)
@@ -105,11 +104,10 @@ def get_weights(config: dict, network: MultiLayerNetwork, inputs: np.array, expe
     t = datetime.now()
     w, _ = network.train_function(config, inputs, expected_list)
     print(datetime.now() - t)
-    if w != None:
-      network.export_weights(w, config['import_path'])
+    network.export_weights(w, config['import_path'])
   return w
 
 
 if __name__ == "__main__":
-  # run_normal_autoencoder()
-  run_denoising_autoencoder()
+  ej_1a()
+  # ej_1b()
