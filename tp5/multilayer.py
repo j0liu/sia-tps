@@ -56,15 +56,12 @@ class MultiLayerNetwork(NetworkABC):
             delta_ws[-1][j] = learning_rate * deltas[-1][j] * values[-2]
 
         for m in range(len(deltas)-2, -1, -1):
-            hv = np.dot(values[m], w[m].T)
-            deltas[m] = (np.dot(deltas[m+1], w[m+1].T)) * self.deriv_activation_function(hv)
-            delta_ws[m] = learning_rate * np.outer(deltas[m], values[m])
-            # for j in range(self.layer_sizes[m]):
-            #     h = np.dot(values[m], w[m][j])
+            for j in range(self.layer_sizes[m]):
+                h = np.dot(values[m], w[m][j])
 
-            #     deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * self.deriv_activation_function(h)
+                deltas[m][j] = (np.dot(deltas[m+1], w[m+1][j])) * self.deriv_activation_function(h)
                 
-            #     delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
+                delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
         return delta_ws
 
     def _forward_propagation(self, x : np.array, w : np.array):
