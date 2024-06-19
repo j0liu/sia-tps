@@ -5,8 +5,7 @@ import numpy as np
 import activation_functions as af
 import json
 from datetime import datetime
-from plots import plot_comparison, plot_latent_space, plot_augmented_latent_space
-
+from plots import plot_comparison, plot_latent_space, generate_latent_space_grid, plot_output_grid
 
 FILE_NAME = "tp5/font.txt"
 
@@ -57,9 +56,21 @@ def ej_1a():
   for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), labels)):
     # print(i,x)
     plot_comparison(denormalize(x), denormalize(x2), f'{l}')
-  
+    
   encoder, w_encoder = network.get_encoder(w)
-  plot_latent_space(encoder.output_function(norm_inputs, w_encoder), labels, "Latent space")
+  latent_space = encoder.output_function(norm_inputs, w_encoder)
+  plot_latent_space(latent_space, labels, "Latent space")
+
+  decoder, w_decoder = network.get_decoder(w)
+
+  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(15, 15))
+  plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5))
+
+  # Plot each new letter 
+
+  
+
+  
 
 def ej_1b():
   with open("tp5/config/denoising_autoencoder.json") as f:
