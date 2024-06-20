@@ -43,9 +43,7 @@ def ej_1a():
   inputs, labels = read_letters()
   # inputs = inputs[:10]
   # labels = labels[:10]
-  input_len = len(inputs[0])
-
-  layer_sizes = [input_len, *ENCODER_LAYERS, config['latent_space_dim'], *(ENCODER_LAYERS[::-1]), input_len]
+  layer_sizes = MultiLayerNetwork(len(inputs[0]), config['latent_space_dim'], ENCODER_LAYERS)
 
   network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   norm_inputs = network.normalize(inputs.copy(), 0, 1)  
@@ -77,10 +75,7 @@ def ej_1b():
   input_dict = dict(zip(labels, inputs))
   noisy_inputs, noisy_labels = read_letters("tp5/noisy_font.txt")
 
-  
-  input_len = len(inputs[0])
-  
-  layer_sizes = [input_len, *ENCODER_LAYERS, config['latent_space_dim'], *(ENCODER_LAYERS[::-1]), input_len]
+  layer_sizes = MultiLayerNetwork(len(inputs[0]), config['latent_space_dim'], ENCODER_LAYERS)
 
   all_inputs = np.concatenate((inputs, noisy_inputs))
   all_expected = np.concatenate((inputs, np.array([input_dict[l] for l in noisy_labels]))) #[3*i for i in inputs]
