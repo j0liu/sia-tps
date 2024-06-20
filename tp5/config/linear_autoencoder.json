@@ -7,7 +7,7 @@
     "min_learning_rate": 0.000001,
     "max_learning_rate": 0.1,
     "bias": 2,
-    "epsilon": 0.01,
+    "epsilon": 2.01,
     "beta": 2,
     "optimizer": "adam",
     "b1": 0.9,
@@ -16,5 +16,5 @@
     "batch_size": 12,
     "import_path": "tp5/weights/10000i_weights.txt",
     "import": false,
-    "encoder_layers": [24, 16, 8]
+    "encoder_layers": [32, 16, 8]
 }
