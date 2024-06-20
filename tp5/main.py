@@ -51,22 +51,18 @@ def ej_1a():
   norm_inputs = network.normalize(inputs.copy(), 0, 1)  
   denormalize = network.gen_denormalize_function(0, 1)
   
-  try:
-    w = get_weights(config, network, norm_inputs, norm_inputs)
-    for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), labels)):
-      plot_comparison(denormalize(x), denormalize(x2), f"{config['title']} {l}")
-      
-    encoder, w_encoder = network.get_encoder(w)
-    latent_space = encoder.output_function(norm_inputs, w_encoder)
-    plot_latent_space(latent_space, labels, f"{config['title']}_Latent space")
+  w = get_weights(config, network, norm_inputs, norm_inputs)
+  for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), labels)):
+    plot_comparison(denormalize(x), denormalize(x2), f"{config['title']} {l}")
+    
+  encoder, w_encoder = network.get_encoder(w)
+  latent_space = encoder.output_function(norm_inputs, w_encoder)
+  plot_latent_space(latent_space, labels, f"{config['title']}_Latent space")
 
-    decoder, w_decoder = network.get_decoder(w)
+  decoder, w_decoder = network.get_decoder(w)
 
-    output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(15, 15))
-    plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title=f"{config['title']}_Output grid")
-
-  except KeyboardInterrupt:
-    print(config)
+  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(15, 15))
+  plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title=f"{config['title']}_Output grid")
   
 
 def ej_1b():
@@ -76,7 +72,7 @@ def ej_1b():
 
   inputs, labels = read_letters()
 
-  generate_noise(labels, inputs)
+  # generate_noise(labels, inputs)
 
   input_dict = dict(zip(labels, inputs))
   noisy_inputs, noisy_labels = read_letters("tp5/noisy_font.txt")
@@ -88,6 +84,7 @@ def ej_1b():
 
   all_inputs = np.concatenate((inputs, noisy_inputs))
   all_expected = np.concatenate((inputs, np.array([input_dict[l] for l in noisy_labels]))) #[3*i for i in inputs]
+  all_labels = labels + noisy_labels
 
   network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   norm_inputs = network.normalize(all_inputs.copy(), 0, 1)
@@ -97,9 +94,9 @@ def ej_1b():
   w = get_weights(config, network, norm_inputs, norm_expected)
 
   # network.denormalized_error(norm_inputs, norm_inputs, w, denormalize)
-  for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), labels)):
+  for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), all_labels)):
     # print(i,x)
-    plot_comparison(denormalize(x), denormalize(x2), f"{config['title']} {l}")
+    plot_comparison(denormalize(x), denormalize(x2), f"{config['title']} {l} {i}")
   
   # encoder, w_encoder = network.get_encoder(w)
   # plot_latent_space(encoder.output_function(norm_inputs, w_encoder), labels, "Latent space")
@@ -113,9 +110,10 @@ def get_weights(config: dict, network: MultiLayerNetwork, inputs: np.array, expe
     w, _ = network.train_function(config, inputs, expected_list)
     print(datetime.now() - t)
     network.export_weights(w, f"tp5/weights/{config['title']}.txt")
+    print(config)
   return w
 
 
 if __name__ == "__main__":
-  ej_1a()
-  # ej_1b()
+  # ej_1a()
+  ej_1b()

@@ -108,48 +108,49 @@ class MultiLayerNetwork(NetworkABC):
         learning_rate = config['learning_rate']
         learning_rate_decay = config.get('learning_rate_decay', 0.99)
         patience_counter = 0
-
-        while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
-            batch_mus = np.random.choice(p, min(p, config.get('batch_size', p)), replace=False)
-            resultant_w = w.copy()
-            for mu in batch_mus:
-                values = self._forward_propagation(inputs[mu], w)
-                delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu])
-                
-                if config.get('optimizer', 'adam') == 'adam':
-                    m = config['b1'] * m + (1 - config['b1']) * delta_w
-                    v = config['b2'] * v + (1 - config['b2']) * (delta_w ** 2)
-                    m_hat = m / (1 - config['b1'] ** (i + 1))
-                    v_hat = v / (1 - config['b2'] ** (i + 1))
-                    delta_w = learning_rate * m_hat / (np.sqrt(v_hat) + config['e'])
-                
-                # Gradient clipping
-                delta_w = np.clip(delta_w, self.interval[0], self.interval[1])
-                resultant_w += delta_w
-            w = resultant_w
-            error = self.error_function(inputs, expected_results, w)
-            error_history.append(error)
-            if error < min_error:
-                patience_counter = 0
-                min_error = error
-                print(f"{i} error:", error)
-                w_min = w.copy()
-
-            # Learning rate decay
-            learning_rate *= learning_rate_decay
-
-            if learning_rate < config.get('min_learning_rate', 0.0001):
-                patience_counter += 1
-                print("Learning rate reset")
-                if patience_counter >= 5:
+        try:
+            while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
+                batch_mus = np.random.choice(p, min(p, config.get('batch_size', p)), replace=False)
+                resultant_w = w.copy()
+                for mu in batch_mus:
+                    values = self._forward_propagation(inputs[mu], w)
+                    delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu])
+                    
+                    if config.get('optimizer', 'adam') == 'adam':
+                        m = config['b1'] * m + (1 - config['b1']) * delta_w
+                        v = config['b2'] * v + (1 - config['b2']) * (delta_w ** 2)
+                        m_hat = m / (1 - config['b1'] ** (i + 1))
+                        v_hat = v / (1 - config['b2'] ** (i + 1))
+                        delta_w = learning_rate * m_hat / (np.sqrt(v_hat) + config['e'])
+                    
+                    # Gradient clipping
+                    delta_w = np.clip(delta_w, self.interval[0], self.interval[1])
+                    resultant_w += delta_w
+                w = resultant_w
+                error = self.error_function(inputs, expected_results, w)
+                error_history.append(error)
+                if error < min_error:
                     patience_counter = 0
-                    learning_rate = config['max_learning_rate']
-                    print(f'Momentum increased to {learning_rate}')
-                else:
-                    learning_rate = config['learning_rate']
+                    min_error = error
+                    print(f"{i} error:", error)
+                    w_min = w.copy()
 
-            i += 1
+                # Learning rate decay
+                learning_rate *= learning_rate_decay
 
+                if learning_rate < config.get('min_learning_rate', 0.0001):
+                    patience_counter += 1
+                    print("Learning rate reset")
+                    if patience_counter >= 5:
+                        patience_counter = 0
+                        learning_rate = config['max_learning_rate']
+                        print(f'Momentum increased to {learning_rate}')
+                    else:
+                        learning_rate = config['learning_rate']
+
+                i += 1
+        except KeyboardInterrupt:
+            pass
         return w_min, weights_history
 
     
@@ -200,13 +201,15 @@ class MultiLayerNetwork(NetworkABC):
             for m in range(len(w)):
                 for j in range(self.layer_sizes[m]):
                     f.write(" ".join(map(str, w[m][j])) + "\n")
+        nw = self.import_weights(filename)
+        print()
 
     def import_weights(self, filename : str):
         w = np.zeros((len(self.layer_sizes)-1, self.network_width, self.network_width))
         with open(filename, 'r') as f:
             f.readline()
             for m in range(len(self.layer_sizes)-1):
-                for j in range(self.layer_sizes[m]):
+                for j in range(self.layer_sizes[m+1]):
                     w[m][j] = list(map(float, f.readline().split()))
         return w
 
