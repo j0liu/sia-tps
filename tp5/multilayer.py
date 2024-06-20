@@ -38,19 +38,13 @@ class MultiLayerNetwork(NetworkABC):
                     limit = np.sqrt(6 / (self.layer_sizes[m] + self.layer_sizes[m+1]))
                     w[m][j][1:self.layer_sizes[m]] = np.random.uniform(-limit, limit, size=self.layer_sizes[m]-1)
 
-    # def _initialize_weights(self, w : np.array, config : dict):
-    #  for m in range(len(self.layer_sizes)-1):
-    #      for j in range(1, self.layer_sizes[m+1]):
-    #          w[m][j][0] = config.get('bias', 0.1)
-    #          if config.get('random_start', True):
-    #              w[m][j][1:self.layer_sizes[m]] = np.random.rand(self.layer_sizes[m]-1) * 2 - 1
-
 
     def _backward_propagation(self, learning_rate: float, values: np.array, w: np.array, expected: np.array):
         deltas = np.zeros((len(self.layer_sizes) - 1, self.network_width))
         delta_ws = np.zeros((len(self.layer_sizes) - 1, self.network_width, self.network_width))
         
         expected_copy = np.zeros(self.network_width)
+        expected_copy[0] = 1
         expected_copy[1:1 + len(expected)] = expected
 
         # Compute deltas for the output layer
@@ -67,7 +61,7 @@ class MultiLayerNetwork(NetworkABC):
                 delta_ws[m][j] = learning_rate * deltas[m][j] * values[m]
         
         # Gradient clipping to avoid exploding gradients
-        delta_ws = np.clip(delta_ws, -1, 1)
+        delta_ws = np.clip(delta_ws, self.interval[0], self.interval[1])
         
         return delta_ws
 
@@ -84,9 +78,20 @@ class MultiLayerNetwork(NetworkABC):
 
     def forward_propagation(self, x : np.array, w : np.array):
         vals = self._forward_propagation(x, w)
+        # l_pos = len(vals)//2+1
+        # print("inside forward")
+        # print(vals[l_pos][1:self.layer_sizes[l_pos]])
         return vals[-1][1:self.layer_sizes[-1]]
 
     def train_function(self, config: dict, inputs: np.array, expected_results: np.array):
+        """
+        inputs: np.array - matrix of shape p x n, of inputs
+        layer_sizes: np.array - array of shape m, with layer sizes
+        expected: np.array - array of shape p, of expected outputs
+        activation_function: function - R -> R , unless normalized
+        deriv_activation_function: function 
+        return: np.array - tensor of shape m x wd x wd
+        """
         p, _ = inputs.shape
         i = 0
         w = np.zeros((len(self.layer_sizes)-1, self.network_width, self.network_width))
@@ -106,6 +111,7 @@ class MultiLayerNetwork(NetworkABC):
 
         while min_error > config['epsilon'] and (i < config['limit'] or config['limit'] == -1):
             batch_mus = np.random.choice(p, min(p, config.get('batch_size', p)), replace=False)
+            resultant_w = w.copy()
             for mu in batch_mus:
                 values = self._forward_propagation(inputs[mu], w)
                 delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu])
@@ -118,9 +124,9 @@ class MultiLayerNetwork(NetworkABC):
                     delta_w = learning_rate * m_hat / (np.sqrt(v_hat) + config['e'])
                 
                 # Gradient clipping
-                delta_w = np.clip(delta_w, -1, 1)
-                w += delta_w
-
+                delta_w = np.clip(delta_w, self.interval[0], self.interval[1])
+                resultant_w += delta_w
+            w = resultant_w
             error = self.error_function(inputs, expected_results, w)
             error_history.append(error)
             if error < min_error:
@@ -180,7 +186,7 @@ class MultiLayerNetwork(NetworkABC):
         for mu in range(p):
             output = self._forward_propagation(inputs[mu], w)[-1][1:]
             val += 0.5 * np.sum((expected_results[mu] - output)**2)
-        return val/p
+        return val
 
     def get_encoder(self, w : np.array):
         return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
