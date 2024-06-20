@@ -199,10 +199,10 @@ class MultiLayerNetwork(NetworkABC):
         with open(filename, 'w+') as f:
             f.write(f"{self.layer_sizes} {self.title}, {self.interval}\n")
             for m in range(len(w)):
-                for j in range(self.layer_sizes[m]):
+                for j in range(self.layer_sizes[m+1]):
                     f.write(" ".join(map(str, w[m][j])) + "\n")
         nw = self.import_weights(filename)
-        print()
+        assert np.allclose(w, nw)
 
     def import_weights(self, filename : str):
         w = np.zeros((len(self.layer_sizes)-1, self.network_width, self.network_width))
