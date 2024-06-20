@@ -41,7 +41,8 @@ def ej_1a():
   ENCODER_LAYERS = config['encoder_layers']
 
   inputs, labels = read_letters()
-
+  # inputs = inputs[:10]
+  # labels = labels[:10]
   input_len = len(inputs[0])
 
   layer_sizes = [input_len, *ENCODER_LAYERS, config['latent_space_dim'], *(ENCODER_LAYERS[::-1]), input_len]
