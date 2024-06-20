@@ -16,5 +16,6 @@
     "batch_size": 12,
     "import_path": "tp5/weights/10000i_weights.txt",
     "import": false,
-    "encoder_layers": [32, 16, 8]
+    "encoder_layers": [32, 16, 8],
+    "title": "32_16_8"
 }

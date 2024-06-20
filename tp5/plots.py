@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import math
 def plot_comparison(original, reconstructed, label):
     plt.figure()
     plt.subplot(1, 3, 1)
@@ -32,12 +32,12 @@ def plot_latent_space(points, labels, title):
 
     plt.title(title)
     plt.savefig(f"tp5/plots/{title}.png")
-    plt.show()
     plt.close()
 
 def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5)):
-    x_vals = np.linspace(-1, 1, grid_size[1])
-    y_vals = np.linspace(-1, 1, grid_size[0]) 
+    length = math.pi/2
+    x_vals = np.linspace(-length, length, grid_size[1])
+    y_vals = np.linspace(-length, length, grid_size[0]) 
     latent_space_grid = np.array(np.meshgrid(x_vals, y_vals)).T.reshape(-1, 2)
     
     outputs = []
@@ -47,7 +47,7 @@ def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5)):
     
     return np.array(outputs).reshape(grid_size[0], grid_size[1], -1), x_vals, y_vals
 
-def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5)):
+def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = ""):
     grid_size = output_grid.shape[:2]
     fig, axes = plt.subplots(grid_size[0], grid_size[1], figsize=(8, 8),
                              gridspec_kw={'wspace': 0, 'hspace': 0})
@@ -65,4 +65,5 @@ def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5)):
 
     plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
     plt.title("Latent space grid")
-    plt.show()
+    plt.savefig(f"tp5/plots/{title}.png")
+    
