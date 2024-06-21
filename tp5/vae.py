@@ -5,6 +5,7 @@ import math
 import activation_functions as af
 from network_abc import NetworkABC
 from plotNetwork import plot_neural_network, create_network_gif
+from multilayer import MultiLayerNetwork
 
 def layer_normalize(layer_sizes : np.array):
     return [x+1 for x in layer_sizes]
@@ -204,10 +205,12 @@ class VAENetwork(NetworkABC):
         return val
 
     def get_encoder(self, w : np.array):
-        return VAENetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
+        encoder = VAENetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder")
+        encoder.stochastic_layer = self.stochastic_layer
+        return encoder, w[:len(self.layer_sizes)//2]
 
     def get_decoder(self, w : np.array):
-        return VAENetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
 
     def export_weights(self, w : np.array, filename : str):
         with open(filename, 'w+') as f:

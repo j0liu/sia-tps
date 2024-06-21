@@ -192,7 +192,7 @@ class MultiLayerNetwork(NetworkABC):
         return val
 
     def get_encoder(self, w : np.array):
-        return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2+1]
+        return MultiLayerNetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder"), w[:len(self.layer_sizes)//2]
 
     def get_decoder(self, w : np.array):
         return MultiLayerNetwork([x-1 for x in self.layer_sizes[len(self.layer_sizes)//2:]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} decoder"), w[len(self.layer_sizes)//2:]
