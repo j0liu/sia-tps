@@ -1,0 +1,20 @@
+{
+    "limit": -1,
+    "latent_space_dim": 2,
+    "random_start": true,
+    "learning_rate": 0.001,
+    "learning_rate_decay": 0.9999,
+    "min_learning_rate": 0.000001,
+    "max_learning_rate": 0.1,
+    "bias": 0,
+    "epsilon": 2.01,
+    "beta": 2,
+    "optimizer": "adam",
+    "b1": 0.9,
+    "b2": 0.999,
+    "e": 1e-8,
+    "batch_size": 2,
+    "import": true,
+    "encoder_layers": [200, 100, 50],
+    "title": "vae_200_100_50"
+}

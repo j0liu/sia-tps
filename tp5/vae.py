@@ -44,7 +44,7 @@ class VAENetwork(NetworkABC):
                     w[m][j][1:self.layer_sizes[m]] = np.random.uniform(-limit, limit, size=self.layer_sizes[m]-1)
 
 
-    def _backward_propagation(self, learning_rate: float, values: np.array, w: np.array, expected: np.array):
+    def _backward_propagation(self, learning_rate: float, values: np.array, w: np.array, expected: np.array, eps: float):
         deltas = np.zeros((len(self.layer_sizes) - 1, self.network_width))
         delta_ws = np.zeros((len(self.layer_sizes) - 1, self.network_width, self.network_width))
         
@@ -60,9 +60,10 @@ class VAENetwork(NetworkABC):
 
         # Compute deltas for the hidden layers
         for m in range(len(deltas) - 2, -1, -1):
-            if m == self.stochastic_layer:
+            if m == self.stochastic_layer - 1:
                 for j in range(self.layer_sizes[self.stochastic_layer]):
-                    deltas[m][j] = np.sum(deltas[m+1]) #???
+                    deltas[m][2*j] = deltas[m+1][j]
+                    deltas[m][2*j+1] = eps * deltas[m+1][j]
             else:
                 for j in range(1, self.layer_sizes[m + 1]):
                     h = np.dot(values[m], w[m][j])
@@ -73,7 +74,6 @@ class VAENetwork(NetworkABC):
         delta_ws = np.clip(delta_ws, self.interval[0], self.interval[1])
         
         return delta_ws
-
 
 
     def _forward_propagation(self, x : np.array, w : np.array):
@@ -88,7 +88,7 @@ class VAENetwork(NetworkABC):
                     values[m][i] = eps * values[m-1][i*2] + values[m-1][i*2+1] # epsilon * sigma + mu
             else:
                 values[m] = self.activation_function(np.dot(values[m-1], w[m-1].T))
-        return values
+        return values, eps
 
     def forward_propagation(self, x : np.array, w : np.array):
         vals, _ = self._forward_propagation(x, w)
@@ -128,7 +128,7 @@ class VAENetwork(NetworkABC):
                 resultant_w = w.copy()
                 for mu in batch_mus:
                     values, eps = self._forward_propagation(inputs[mu], w)
-                    delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu])
+                    delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu], eps)
                     
                     if config.get('optimizer', 'adam') == 'adam':
                         m = config['b1'] * m + (1 - config['b1']) * delta_w
