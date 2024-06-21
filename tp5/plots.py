@@ -26,17 +26,27 @@ def plot_latent_space(points, labels, title):
     plt.figure()
     plt.xlim(-1.2, 1.2)
     plt.ylim(-1.2, 1.2)
-    print(points)
-    plt.scatter(points[:, 0], points[:, 1])
-    for i, p in enumerate(points):
-        plt.annotate(labels[i], (p[0], p[1]))
 
-    plt.title(title)
+    unique_labels = np.unique(labels)
+    num_unique_labels = len(unique_labels)
+    colormap = plt.cm.get_cmap('tab20', num_unique_labels)
+
+    # Create a dictionary to map labels to colors
+    label_to_color = {label: colormap(i) for i, label in enumerate(unique_labels)}
+
+    for i, p in enumerate(points):
+        plt.scatter(p[0], p[1], color=label_to_color[labels[i]], label=labels[i] if labels[i] not in plt.gca().get_legend_handles_labels()[1] else "")
+        plt.annotate(labels[i], (p[0], p[1]), color='black')
+
+    handles, legend_labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(legend_labels, handles))
+
+    plt.title("Latent Space")
     plt.savefig(f"tp5/plots/{title}.png")
     plt.close()
-
+    
 def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5)):
-    length = math.pi/2
+    length = 1
     x_vals = np.linspace(-length, length, grid_size[1])
     y_vals = np.linspace(-length, length, grid_size[0]) 
     latent_space_grid = np.array(np.meshgrid(x_vals, y_vals)).T.reshape(-1, 2)
@@ -65,6 +75,28 @@ def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = "
                 axes[i, j].set_xlabel(f"{x_vals[j]:.2f}", fontsize=8)
 
     plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
-    plt.title("Latent space grid")
     plt.savefig(f"tp5/plots/{title}.png")
     
+
+def plot_all_comparisons(noisy_inputs, denoised_outputs, labels, noise_level, denormalize, title, letters_per_row=8):
+    n = len(noisy_inputs)
+    rows = n // letters_per_row + (n % letters_per_row != 0)
+    fig, axes = plt.subplots(rows * 2, letters_per_row, figsize=(letters_per_row * 2, rows * 4))
+    fig.suptitle(f"Noise Level: {noise_level}")
+    
+    for i, (noisy, denoised) in enumerate(zip(noisy_inputs, denoised_outputs)):
+        row = (i // letters_per_row) * 2
+        col = i % letters_per_row
+        
+        axes[row, col].imshow(-denormalize(noisy).reshape(7, 5), cmap='summer')
+        axes[row, col].axis('off')
+        
+        axes[row + 1, col].imshow(-np.round(denormalize(denoised).reshape(7, 5)), cmap='summer')
+        axes[row + 1, col].axis('off')
+    
+    for ax in axes.flat:
+        ax.axis('off')
+    
+    plt.tight_layout()
+    plt.subplots_adjust(top=0.95)
+    plt.savefig(f"tp5/plots/noise/{title}.png")
