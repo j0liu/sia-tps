@@ -55,7 +55,7 @@ def plot_latent_space(points, labels, title, length=1.2):
 
 def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5), length=1):
     x_vals = np.linspace(-length, length, grid_size[1])
-    y_vals = np.linspace(-length, length, grid_size[0]) 
+    y_vals = np.linspace(-length, length, grid_size[0])
     latent_space_grid = np.array(np.meshgrid(x_vals, y_vals)).T.reshape(-1, 2)
     
     outputs = decoder.output_function(latent_space_grid, w_decoder)
@@ -70,18 +70,18 @@ def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = "
 
     for i in range(grid_size[0]):
         for j in range(grid_size[1]):
-            axes[i, j].imshow(output_grid[i, j].reshape(letter_shape), cmap=COLOR_MAP, aspect='auto')
+            axes[i, j].imshow(output_grid[grid_size[0] - 1 - i, j].reshape(letter_shape), cmap=COLOR_MAP, aspect='auto')
             axes[i, j].set_xticks([])
             axes[i, j].set_yticks([])
-            axes[i, j].set_frame_on(False) 
+            axes[i, j].set_frame_on(False)
             if j == 0:
-                axes[i, j].set_ylabel(f"{y_vals[i]:.2f}", fontsize=8)
+                axes[i, j].set_ylabel(f"{y_vals[grid_size[0] - 1 - i]:.2f}", fontsize=8)
             if i == grid_size[0] - 1:
                 axes[i, j].set_xlabel(f"{x_vals[j]:.2f}", fontsize=8)
 
     plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
     plt.savefig(f"tp5/plots/{title}.png")
-    
+
 
 def plot_all_comparisons(noisy_inputs, denoised_outputs, labels, noise_level, denormalize, title, letters_per_row=8):
     n = len(noisy_inputs)
