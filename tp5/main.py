@@ -59,7 +59,7 @@ def ej_1a():
 
   decoder, w_decoder = network.get_decoder(w)
 
-  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(15, 15))
+  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(config.get('grid_size', 15), config.get('grid_size', 15)))
   plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title=f"{config['title']}_Output grid")
   
 
