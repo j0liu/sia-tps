@@ -58,26 +58,31 @@ def ej_2():
   network = VAENetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   
   w = get_weights(config, network, inputs, inputs)
-  outputs = network.output_function(inputs, w)
-  for i, (x, x2, l) in enumerate(zip(inputs, outputs, labels)):
-    plot_comparison(x, x2, f"{config['title']} {l}", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1], with_rounded=False)
-
   encoder, w_encoder = network.get_encoder(w)
+  decoder, w_decoder = network.get_decoder(w)
+
+  for i, (x, l) in enumerate(zip(inputs, labels)):
+    o = network.forward_propagation(x, w)
+    latent = encoder.forward_propagation(x, w_encoder)
+    o2 = decoder.forward_propagation(latent, w_decoder)
+    plot_comparison(x, o, f"{config['title']} {l}", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1], with_rounded=False)
+    plot_comparison(x, o2, f"{config['title']} {l} decode", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1], with_rounded=False)
+
   latent_space = encoder.output_function(inputs, w_encoder)
   latent_max = math.ceil(max([1] + [np.max(np.abs(l)) for l in latent_space]))
   
   plot_latent_space(latent_space, labels, f"{config['title']}_Latent space", latent_max)
 
-
-  decoder, w_decoder = network.get_decoder(w)
-
-  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, (15, 15), latent_max)
+  output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, (config.get('grid_size', 15), config.get('grid_size', 15)), latent_max)
   plot_output_grid(output_grid, x_vals, y_vals, EMOJI_SIZE, title=f"{config['title']}_Output grid")
 
-  output_list, x_vals, y_vals = generate_lerp(decoder, w_decoder, 10, latent_space[0], latent_space[1])
-  plot_all_patterns_together(output_list, zip(x_vals, y_vals), EMOJI_SIZE, title=f"{config['title']}_Lerp")
-  
+  for i in range(len(latent_space)):
+    for j in range(i+1, len(latent_space)):
+      lerp(latent_space[i], latent_space[j], decoder, w_decoder, config, f"{labels[i][0]}{labels[j][0]}")
 
+def lerp(x1, x2, decoder, w_decoder, config, title):
+  output_list, x_vals, y_vals = generate_lerp(decoder, w_decoder, config.get("lerp_count",10), x1, x2)
+  plot_all_patterns_together(output_list, list(zip(np.round(x_vals,2), np.round(y_vals,2))), EMOJI_SIZE, title=f"{config['title']}_Lerp {title}")
 
 
 def get_weights(config: dict, network: VAENetwork, inputs: np.array, expected_list: np.array) -> np.array:
@@ -94,4 +99,4 @@ def get_weights(config: dict, network: VAENetwork, inputs: np.array, expected_li
 
 if __name__ == "__main__":
   ej_2()
-#   parse_emojis()
+  # parse_emojis()

@@ -39,7 +39,7 @@ class VAENetwork(NetworkABC):
         for m in range(len(self.layer_sizes)-1):
             for j in range(1, self.layer_sizes[m+1]):
                 w[m][j][0] = config.get('bias', 0.1)
-                if config.get('random_start', True):
+                if config.get('random_start', True) and m != self.stochastic_layer - 1:
                     # Xavier initialization
                     limit = np.sqrt(6 / (self.layer_sizes[m] + self.layer_sizes[m+1]))
                     w[m][j][1:self.layer_sizes[m]] = np.random.uniform(-limit, limit, size=self.layer_sizes[m]-1)
@@ -63,8 +63,8 @@ class VAENetwork(NetworkABC):
         for m in range(len(deltas) - 2, -1, -1):
             if m == self.stochastic_layer - 1:
                 for j in range(self.layer_sizes[self.stochastic_layer]):
-                    deltas[m][2*j] = deltas[m+1][j]
-                    deltas[m][2*j+1] = eps * deltas[m+1][j]
+                    deltas[m][2*j-1] = deltas[m+1][j]
+                    deltas[m][2*j] = eps * deltas[m+1][j]
             else:
                 for j in range(1, self.layer_sizes[m + 1]):
                     h = np.dot(values[m], w[m][j])
@@ -85,8 +85,8 @@ class VAENetwork(NetworkABC):
         eps = np.random.standard_normal()
         for m in range(1, len(self.layer_sizes)):
             if m == self.stochastic_layer:
-                for i in range(self.layer_sizes[self.stochastic_layer]):
-                    values[m][i] = eps * values[m-1][i*2] + values[m-1][i*2+1] # epsilon * sigma + mu
+                for i in range(1,self.layer_sizes[self.stochastic_layer]):
+                    values[m][i] = eps * values[m-1][i*2-1] + values[m-1][i*2] # epsilon * sigma + mu
             else:
                 values[m] = self.activation_function(np.dot(values[m-1], w[m-1].T))
         return values, eps
@@ -142,7 +142,7 @@ class VAENetwork(NetworkABC):
                     delta_w = np.clip(delta_w, self.interval[0], self.interval[1])
                     resultant_w += delta_w
                 w = resultant_w
-                error = self.error_function(inputs, expected_results, w)
+                error = self.loss_error_function(inputs, expected_results, w)
                 error_history.append(error)
                 if error < min_error:
                     patience_counter = 0
@@ -203,6 +203,22 @@ class VAENetwork(NetworkABC):
             output = self.forward_propagation(inputs[mu], w)
             val += 0.5 * np.sum((expected_results[mu] - output)**2)
         return val
+
+    def loss_error_function(self, inputs : np.array, expected_results : np.array, w : np.array):
+        p, _ = inputs.shape
+        rec = 0
+        kl = 0
+        for mu in range(p):
+            values, _ = self._forward_propagation(inputs[mu], w)
+            output = values[-1][1:self.layer_sizes[-1]]
+            rec += 0.5 * np.sum((expected_results[mu] - output)**2)
+            for i in range(1, self.stochastic_layer):
+                mean = values[self.stochastic_layer-1][2*i-1]
+                std = values[self.stochastic_layer-1][2*i]
+                kl += -0.5 * (1 + std - mean**2 - np.exp(std))
+
+        return rec + kl
+
 
     def get_encoder(self, w : np.array):
         encoder = VAENetwork([x-1 for x in self.layer_sizes[:len(self.layer_sizes)//2+1]], self.activation_function, self.deriv_activation_function, self.error_type, self.interval, f"{self.title} encoder")

@@ -65,7 +65,7 @@ def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5), length=1):
 
 def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = ""):
     grid_size = output_grid.shape[:2]
-    fig, axes = plt.subplots(grid_size[0], grid_size[1], figsize=(8, 8),
+    fig, axes = plt.subplots(grid_size[0], grid_size[1], figsize=(16, 16),
                              gridspec_kw={'wspace': 0, 'hspace': 0})
 
     for i in range(grid_size[0]):
@@ -118,11 +118,11 @@ def generate_lerp(decoder, w_decoder, length, p1, p2):
 
 def plot_all_patterns_together(patterns, labels, shape, title):
     plt.figure(figsize=(15, 10))
-
-    for idx, (label, pattern) in enumerate(zip(labels,patterns), 1):
-        plt.subplot(1, len(patterns), idx)
+    rows = max(1,len(patterns) // 10)
+    for idx, pattern in enumerate(patterns):
+        plt.subplot(rows, 10, idx+1)
         plt.imshow(pattern.reshape(shape[0], shape[1]), cmap=COLOR_MAP)
-        plt.title(label)
+        plt.title(labels[idx])
         plt.axis('off')
 
     plt.tight_layout()
