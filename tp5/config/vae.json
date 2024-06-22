@@ -7,7 +7,7 @@
     "min_learning_rate": 0.000001,
     "max_learning_rate": 0.1,
     "bias": 0,
-    "epsilon": 1,
+    "epsilon": 0.2,
     "beta": 2,
     "optimizer": "adam",
     "b1": 0.9,

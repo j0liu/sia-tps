@@ -1,22 +1,28 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-def plot_comparison(original, reconstructed, label, height = 7, width = 5):
+
+COLOR_MAP = 'gray'
+
+def plot_comparison(original, reconstructed, label, height = 7, width = 5, with_rounded = True):
     plt.figure()
+    total_plots = 2 if not with_rounded else 3
     plt.subplot(1, 3, 1)
-    plt.imshow(-original.reshape(height, width), cmap='binary')
+    plt.imshow(original.reshape(height, width), cmap=COLOR_MAP)
     plt.title(f'Original {label}')
     plt.axis('off')
 
     plt.subplot(1, 3, 2)
-    plt.imshow(-reconstructed.reshape(height, width), cmap='binary')
+    plt.imshow(reconstructed.reshape(height, width), cmap=COLOR_MAP)
     plt.title(f'Reconstructed {label}')
     plt.axis('off')
 
-    plt.subplot(1, 3, 3)
-    plt.imshow(-np.round(reconstructed.reshape(height, width),0), cmap='binary')
-    plt.title(f'Rounded {label}')
-    plt.axis('off')
+    if with_rounded:
+        plt.subplot(1, 3, 3)
+        plt.imshow(np.round(reconstructed.reshape(height, width),0), cmap=COLOR_MAP)
+        plt.title(f'Rounded {label}')
+        plt.axis('off')
+
     plt.savefig(f"tp5/plots/{label}.png")
     # plt.show()
     plt.close()
@@ -52,10 +58,7 @@ def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5), length=1):
     y_vals = np.linspace(-length, length, grid_size[0]) 
     latent_space_grid = np.array(np.meshgrid(x_vals, y_vals)).T.reshape(-1, 2)
     
-    outputs = []
-    for z in latent_space_grid:
-        output = decoder.output_function([z], w_decoder)
-        outputs.append(output.flatten())
+    outputs = decoder.output_function(latent_space_grid, w_decoder)
     
     return np.array(outputs).reshape(grid_size[0], grid_size[1], -1), x_vals, y_vals
 
@@ -67,7 +70,7 @@ def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = "
 
     for i in range(grid_size[0]):
         for j in range(grid_size[1]):
-            axes[i, j].imshow(output_grid[i, j].reshape(letter_shape), cmap='gray', aspect='auto')
+            axes[i, j].imshow(output_grid[i, j].reshape(letter_shape), cmap=COLOR_MAP, aspect='auto')
             axes[i, j].set_xticks([])
             axes[i, j].set_yticks([])
             axes[i, j].set_frame_on(False) 
@@ -90,10 +93,10 @@ def plot_all_comparisons(noisy_inputs, denoised_outputs, labels, noise_level, de
         row = (i // letters_per_row) * 2
         col = i % letters_per_row
         
-        axes[row, col].imshow(-denormalize(noisy).reshape(7, 5), cmap='summer')
+        axes[row, col].imshow(denormalize(noisy).reshape(7, 5), cmap='summer')
         axes[row, col].axis('off')
         
-        axes[row + 1, col].imshow(-np.round(denormalize(denoised).reshape(7, 5)), cmap='summer')
+        axes[row + 1, col].imshow(np.round(denormalize(denoised).reshape(7, 5)), cmap='summer')
         axes[row + 1, col].axis('off')
     
     for ax in axes.flat:
@@ -118,7 +121,7 @@ def plot_all_patterns_together(patterns, labels, shape, title):
 
     for idx, (label, pattern) in enumerate(zip(labels,patterns), 1):
         plt.subplot(1, len(patterns), idx)
-        plt.imshow(-pattern.reshape(shape[0], shape[1]), cmap='binary')
+        plt.imshow(pattern.reshape(shape[0], shape[1]), cmap=COLOR_MAP)
         plt.title(label)
         plt.axis('off')
 

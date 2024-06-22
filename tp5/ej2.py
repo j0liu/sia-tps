@@ -60,7 +60,7 @@ def ej_2():
   w = get_weights(config, network, inputs, inputs)
   outputs = network.output_function(inputs, w)
   for i, (x, x2, l) in enumerate(zip(inputs, outputs, labels)):
-    plot_comparison(x, x2, f"{config['title']} {l}", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1])
+    plot_comparison(x, x2, f"{config['title']} {l}", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1], with_rounded=False)
 
   encoder, w_encoder = network.get_encoder(w)
   latent_space = encoder.output_function(inputs, w_encoder)
@@ -72,10 +72,10 @@ def ej_2():
   decoder, w_decoder = network.get_decoder(w)
 
   output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, (15, 15), latent_max)
-  plot_output_grid(-output_grid, x_vals, y_vals, EMOJI_SIZE, title=f"{config['title']}_Output grid")
+  plot_output_grid(output_grid, x_vals, y_vals, EMOJI_SIZE, title=f"{config['title']}_Output grid")
 
   output_list, x_vals, y_vals = generate_lerp(decoder, w_decoder, 10, latent_space[0], latent_space[1])
-  plot_all_patterns_together(-output_list, zip(x_vals, y_vals), EMOJI_SIZE, title=f"{config['title']}_Lerp")
+  plot_all_patterns_together(output_list, zip(x_vals, y_vals), EMOJI_SIZE, title=f"{config['title']}_Lerp")
   
 
 
