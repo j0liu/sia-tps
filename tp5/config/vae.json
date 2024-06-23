@@ -15,8 +15,9 @@
     "e": 1e-8,
     "batch_size": 2,
     "import": true,
-    "encoder_layers": [200, 100, 100],
-    "title": "gjm_vae_200_100_100_4",
+    "encoder_layers": [250, 225],
+    "title": "ss_vae_250_225",
     "grid_size": 15,
-    "lerp_count": 10
+    "lerp_count": 10,
+    "encode_count": 20
 }

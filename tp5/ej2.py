@@ -69,9 +69,18 @@ def ej_2():
     plot_comparison(x, o2, f"{config['title']} {l} decode", height=EMOJI_SIZE[0], width=EMOJI_SIZE[1], with_rounded=False)
 
   latent_space = encoder.output_function(inputs, w_encoder)
+  
+  latent_copies = list(latent_space.copy())
+  latent_labels = list(labels.copy())
+  for x,l in zip(inputs, labels):
+    results = list(encoder.output_function([x] * config.get('encode_count', 5), w_encoder))
+    latent_copies += results
+    latent_labels += [l] * config.get('encode_count', 5)
+    plot_all_patterns_together(decoder.output_function(results,w_decoder), [str(np.round(r,2)) for r in results], EMOJI_SIZE, f"{config['title']} {l} samples" )
+  latent_copies = np.array(latent_copies)
   latent_max = math.ceil(max([1] + [np.max(np.abs(l)) for l in latent_space]))
   
-  plot_latent_space(latent_space, labels, f"{config['title']}_Latent space", latent_max)
+  plot_latent_space(latent_copies, latent_labels, f"{config['title']}_Latent space", latent_max, False)
 
   output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, (config.get('grid_size', 15), config.get('grid_size', 15)), latent_max)
   plot_output_grid(output_grid, x_vals, y_vals, EMOJI_SIZE, title=f"{config['title']}_Output grid")

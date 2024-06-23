@@ -32,7 +32,7 @@ def plot_comparison(original, reconstructed, label, height = 7, width = 5, with_
     plt.close()
 
 
-def plot_latent_space(points, labels, title, length=1.2):
+def plot_latent_space(points, labels, title, length=1.2, with_labels=True):
     plt.figure()
     unique_labels = np.unique(labels)
     num_unique_labels = len(unique_labels)
@@ -48,7 +48,10 @@ def plot_latent_space(points, labels, title, length=1.2):
     plt.scatter(points[:, 0], points[:, 1])
     for i, p in enumerate(points):
         plt.scatter(p[0], p[1], color=label_to_color[labels[i]], label=labels[i] if labels[i] not in plt.gca().get_legend_handles_labels()[1] else "")
-        plt.annotate(labels[i], (p[0], p[1]), color='black')
+        if with_labels:
+            plt.annotate(labels[i], (p[0], p[1]), color='black')
+    if not with_labels:
+        plt.legend(unique_labels, loc='upper left')
 
     handles, legend_labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(legend_labels, handles))
@@ -131,4 +134,4 @@ def plot_all_patterns_together(patterns, labels, shape, title):
 
     plt.tight_layout()
     # plt.show()
-    plt.savefig(f"tp5/plots/{title} lerp.png")
+    plt.savefig(f"tp5/plots/{title}.png")
