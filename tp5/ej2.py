@@ -92,7 +92,9 @@ def ej_2():
 def lerp(x1, x2, decoder, w_decoder, config, title):
   output_list, x_vals, y_vals = generate_lerp(decoder, w_decoder, config.get("lerp_count",10), x1, x2)
   plot_all_patterns_together(output_list, list(zip(np.round(x_vals,2), np.round(y_vals,2))), EMOJI_SIZE, title=f"{config['title']}_Lerp {title}")
-  plot_latent_space(np.column_stack((x_vals, y_vals)), [f"" for x,y in zip(x_vals, y_vals)], f"{config['title']}_Lerp {title} latent", 1, False)
+  lerp_line = np.column_stack((x_vals, y_vals))
+  lerp_max = math.ceil(max([1] + [np.max(np.abs(l)) for l in lerp_line]))
+  plot_latent_space(lerp_line, [f"" for x,y in zip(x_vals, y_vals)], f"{config['title']}_Lerp {title} latent", lerp_max, False)
 
 
 def get_weights(config: dict, network: VAENetwork, inputs: np.array, expected_list: np.array) -> np.array:
