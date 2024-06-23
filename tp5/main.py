@@ -5,7 +5,8 @@ import numpy as np
 import activation_functions as af
 import json
 from datetime import datetime
-from plots import plot_comparison, plot_latent_space, generate_latent_space_grid, plot_output_grid, plot_all_comparisons
+from plots import plot_comparison, plot_latent_space, generate_latent_space_grid, plot_output_grid, plot_all_comparisons, set_color_map
+
 
 FILE_NAME = "tp5/font.txt"
 
@@ -15,9 +16,10 @@ def read_letters(file_name = FILE_NAME):
   inputs = []
   labels = []
   for line in lines:
-    x = np.array([float(i) for i in line.replace('\n', '').split(' ')[1:]])
-    inputs.append(x)
-    labels.append(line.split(' ')[0])
+    if not line.startswith("//"):
+      x = np.array([float(i) for i in line.replace('\n', '').split(' ')[1:]])
+      inputs.append(x)
+      labels.append(line.split(' ')[0])
   inputs = np.array(inputs)#[:-1]
   labels = labels[:len(inputs)]
   return inputs, labels
@@ -47,18 +49,21 @@ def ej_1a():
   network = MultiLayerNetwork(layer_sizes, af.gen_tanh(config['beta']), af.gen_tanh_derivative(config['beta']), ErrorType.MSE, (-1, 1), "autoencoder")
   norm_inputs = network.normalize(inputs.copy(), 0, 1)  
   denormalize = network.gen_denormalize_function(0, 1)
-  
-  # w = get_weights(config, network, norm_inputs, norm_inputs)
-  w = network.import_weights(f"tp5/weights/{config['title']}.txt")
-  for i, (x, x2, l) in enumerate(zip(norm_inputs, network.output_function(norm_inputs, w), labels)):
-    plot_comparison(denormalize(x), denormalize(x2), f"{config['title']} {l}")
+
+  set_color_map('summer')
+  w = get_weights(config, network, norm_inputs, norm_inputs)
+  for i, (x, l) in enumerate(zip(norm_inputs, labels)):
+    o = network.forward_propagation(x, w)
+    plot_comparison(denormalize(-x), denormalize(-o), f"{config['title']} {l}")
+    o_neg = network.forward_propagation(-x, w)
+    plot_comparison(denormalize(x), denormalize(-o_neg), f"{config['title']} {l} neg")
     
   encoder, w_encoder = network.get_encoder(w)
   latent_space = encoder.output_function(norm_inputs, w_encoder)
   plot_latent_space(latent_space, labels, f"{config['title']}_Latent space")
 
   decoder, w_decoder = network.get_decoder(w)
-
+  set_color_map('binary')
   output_grid, x_vals, y_vals = generate_latent_space_grid(decoder, w_decoder, grid_size=(config.get('grid_size', 15), config.get('grid_size', 15)))
   plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title=f"{config['title']}_Output grid")
   

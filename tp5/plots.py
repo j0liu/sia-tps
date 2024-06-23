@@ -4,6 +4,10 @@ import math
 
 COLOR_MAP = 'gray'
 
+def set_color_map(color_map):
+    global COLOR_MAP
+    COLOR_MAP = color_map
+
 def plot_comparison(original, reconstructed, label, height = 7, width = 5, with_rounded = True):
     plt.figure()
     total_plots = 2 if not with_rounded else 3
@@ -57,9 +61,9 @@ def generate_latent_space_grid(decoder, w_decoder, grid_size=(7, 5), length=1):
     x_vals = np.linspace(-length, length, grid_size[1])
     y_vals = np.linspace(-length, length, grid_size[0])
     latent_space_grid = np.array(np.meshgrid(x_vals, y_vals)).T.reshape(-1, 2)
-    
+
     outputs = decoder.output_function(latent_space_grid, w_decoder)
-    
+
     return np.array(outputs).reshape(grid_size[0], grid_size[1], -1), x_vals, y_vals
 
 
@@ -70,7 +74,7 @@ def plot_output_grid(output_grid, x_vals, y_vals, letter_shape=(7, 5), title = "
 
     for i in range(grid_size[0]):
         for j in range(grid_size[1]):
-            axes[i, j].imshow(output_grid[grid_size[0] - 1 - i, j].reshape(letter_shape), cmap=COLOR_MAP, aspect='auto')
+            axes[i, j].imshow(output_grid[j, grid_size[0] - 1 - i].reshape(letter_shape), cmap=COLOR_MAP, aspect='auto')
             axes[i, j].set_xticks([])
             axes[i, j].set_yticks([])
             axes[i, j].set_frame_on(False)
