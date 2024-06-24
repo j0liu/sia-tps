@@ -45,7 +45,7 @@ class VAENetwork(NetworkABC):
                     w[m][j][1:self.layer_sizes[m]] = np.random.uniform(-limit, limit, size=self.layer_sizes[m]-1)
 
 
-    def _backward_propagation(self, learning_rate: float, values: np.array, w: np.array, expected: np.array, eps: float):
+    def _backward_propagation(self, learning_rate: float, values: np.array, w: np.array, expected: np.array, epsv: float):
         deltas = np.zeros((len(self.layer_sizes) - 1, self.network_width))
         delta_ws = np.zeros((len(self.layer_sizes) - 1, self.network_width, self.network_width))
         
@@ -64,7 +64,7 @@ class VAENetwork(NetworkABC):
             if m == self.stochastic_layer - 1:
                 for j in range(self.layer_sizes[self.stochastic_layer]):
                     deltas[m][2*j-1] = deltas[m+1][j]
-                    deltas[m][2*j] = eps * deltas[m+1][j]
+                    deltas[m][2*j] = epsv[j] * deltas[m+1][j]
             else:
                 for j in range(1, self.layer_sizes[m + 1]):
                     h = np.dot(values[m], w[m][j])
@@ -82,14 +82,14 @@ class VAENetwork(NetworkABC):
         values = np.zeros((len(self.layer_sizes), network_width))
         values[0,1:1+len(x)] = x
         values[:,0] = 1
-        eps = np.random.standard_normal()
+        epsv = np.random.standard_normal(self.layer_sizes[self.stochastic_layer])
         for m in range(1, len(self.layer_sizes)):
             if m == self.stochastic_layer:
                 for i in range(1,self.layer_sizes[self.stochastic_layer]):
-                    values[m][i] = eps * values[m-1][i*2-1] + values[m-1][i*2] # epsilon * sigma + mu
+                    values[m][i] = epsv[i] * values[m-1][i*2-1] + values[m-1][i*2] # epsilon * sigma + mu
             else:
                 values[m] = self.activation_function(np.dot(values[m-1], w[m-1].T))
-        return values, eps
+        return values, epsv
 
     def forward_propagation(self, x : np.array, w : np.array):
         vals, _ = self._forward_propagation(x, w)
@@ -128,8 +128,8 @@ class VAENetwork(NetworkABC):
                 batch_mus = np.random.choice(p, min(p, config.get('batch_size', p)), replace=False)
                 resultant_w = w.copy()
                 for mu in batch_mus:
-                    values, eps = self._forward_propagation(inputs[mu], w)
-                    delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu], eps)
+                    values, epsv = self._forward_propagation(inputs[mu], w)
+                    delta_w = self._backward_propagation(learning_rate, values, w, expected_results[mu], epsv)
                     
                     if config.get('optimizer', 'adam') == 'adam':
                         m = config['b1'] * m + (1 - config['b1']) * delta_w
