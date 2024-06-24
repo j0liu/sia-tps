@@ -108,7 +108,14 @@ def get_weights(config: dict, network: VAENetwork, inputs: np.array, expected_li
     print(config)
   return w
 
-
-if __name__ == "__main__":
-  ej_2()
-  # parse_emojis()
+if __name__ == '__main__':
+  import sys
+# quiero que si no le paso nada ejecute el ejercicio 2, sino hay q pasarle emojis y q corra parse_emojis()
+  if len(sys.argv) == 1:
+    ej_2()
+  elif sys.argv[1] == "emojis":
+    parse_emojis()
+  else:
+      print("Invalid exercise")
+      sys.exit(1)
+    
